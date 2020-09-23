@@ -14,3 +14,4 @@ Ceph Ansible Playbooks Development Rules
 
 - Work from 45drives labeled branchs at all times, do not work from any of source branches.
     
+- to build RPM use "make rpm" from the root of git repo
