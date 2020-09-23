@@ -1,0 +1,25 @@
+---
+- hosts: osds
+  tasks:
+    - name: 45Drives Repository - Configure 45drives repository
+      yum_repository:
+        name: ceph_45drives
+        description: 45Drives $basearch repo
+        gpgcheck: no
+        enabled: yes
+        state: present
+        baseurl: http://images.45drives.com/ceph/rpm/el8/
+        file: ceph_45drives
+        priority: "1"
+      register: result
+      until: result is success
+
+    - name: install tools
+      package:
+        name: 45drives-tools
+        state: present
+      register: result
+      until: result is succeeded
+
+- name: Import generate-osd-vars playbook
+  import_playbook: generate-osd-vars.yml

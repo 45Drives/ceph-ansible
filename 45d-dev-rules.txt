@@ -13,5 +13,7 @@ Ceph Ansible Playbooks Development Rules
     Do not add to existing ceph-osd role, create new playbook (or role is function is big enough to warrent role) and have this playbook be run after ceph-osd role in core.yml playbook.
 
 - Work from 45drives labeled branchs at all times, do not work from any of source branches.
+
+	branches will take the form "stable-$MAJORVERSION.$MINORVERSION-45d"
     
 - to build RPM use "make rpm" from the root of git repo

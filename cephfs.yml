@@ -1,0 +1,112 @@
+---
+# Defines deployment design and assigns role to server groups
+
+- hosts:
+  - mdss
+
+  gather_facts: false
+  any_errors_fatal: true
+  become: true
+
+  tags: always
+
+  vars:
+    delegate_facts_host: True
+
+  pre_tasks:
+    # If we can't get python2 installed before any module is used we will fail
+    # so just try what we can to get it installed
+
+    - import_tasks: raw_install_python.yml
+
+    - name: gather facts
+      setup:
+        gather_subset:
+          - 'all'
+          - '!facter'
+          - '!ohai'
+      when:
+        - not delegate_facts_host | bool or inventory_hostname in groups.get(client_group_name, [])
+
+    - name: gather and delegate facts
+      setup:
+        gather_subset:
+          - 'all'
+          - '!facter'
+          - '!ohai'
+      delegate_to: "{{ item }}"
+      delegate_facts: True
+      with_items: "{{ groups['all'] | difference(groups.get('clients', [])) }}"
+      run_once: true
+      when: delegate_facts_host | bool
+
+  tasks:
+    - import_role:
+        name: ceph-defaults
+    - import_role:
+        name: ceph-facts
+    - import_role:
+        name: ceph-validate
+    - import_role:
+        name: ceph-infra
+    - import_role:
+        name: ceph-common
+
+- hosts: mdss
+  gather_facts: false
+  become: True
+  any_errors_fatal: true
+  pre_tasks:
+    - name: set ceph mds install 'In Progress'
+      run_once: true
+      set_stats:
+        data:
+          installer_phase_ceph_mds:
+            status: "In Progress"
+            start: "{{ lookup('pipe', 'date +%Y%m%d%H%M%SZ') }}"
+
+  tasks:
+    - import_role:
+        name: ceph-defaults
+      tags: ['ceph_update_config']
+    - import_role:
+        name: ceph-facts
+      tags: ['ceph_update_config']
+    - import_role:
+        name: ceph-handler
+      tags: ['ceph_update_config']
+    - import_role:
+        name: ceph-config
+      tags: ['ceph_update_config']
+    - import_role:
+        name: ceph-mds
+
+  post_tasks:
+    - name: set ceph mds install 'Complete'
+      run_once: true
+      set_stats:
+        data:
+          installer_phase_ceph_mds:
+            status: "Complete"
+            end: "{{ lookup('pipe', 'date +%Y%m%d%H%M%SZ') }}"
+
+- hosts: mons
+  gather_facts: false
+  become: True
+  any_errors_fatal: true
+  tasks:
+    - import_role:
+        name: ceph-defaults
+    - name: get ceph status from the first monitor
+      command: ceph --cluster {{ cluster }} -s
+      register: ceph_status
+      changed_when: false
+      delegate_to: "{{ groups[mon_group_name][0] }}"
+      run_once: true
+
+    - name: "show ceph status for cluster {{ cluster }}"
+      debug:
+        msg: "{{ ceph_status.stdout_lines }}"
+      delegate_to: "{{ groups[mon_group_name][0] }}"
+      run_once: true
+      when: not ceph_status.failed
