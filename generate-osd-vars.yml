@@ -11,5 +11,5 @@
     - local_action: file path=/usr/share/ceph-ansible/host_vars/ state=directory
       when: not output.failed
 
-    - local_action: copy content={{ output.stdout }} dest=/usr/share/ceph-ansible/host_vars/{{ ansible_hostname }}.yml
+    - local_action: copy content={{ output.stdout }} dest=/usr/share/ceph-ansible/host_vars/{{ inventory_hostname }}.yml
       when: not output.failed
