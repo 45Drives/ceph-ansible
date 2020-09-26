@@ -1,6 +1,4 @@
 ---
-# Defines deployment design and assigns role to server groups
-
 - name: confirm whether user really meant to update servers
   hosts: localhost
   gather_facts: false
