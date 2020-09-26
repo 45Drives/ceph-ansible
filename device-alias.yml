@@ -23,3 +23,29 @@
 
 - name: Import generate-osd-vars playbook
   import_playbook: generate-osd-vars.yml
+
+- hosts: osds
+  vars:
+      tools_install_dir: "/opt/tools" 
+  tasks:
+    - name: Create drive alias' for standard chassis
+      command: /usr/bin/python3 "{{ tools_install_dir }}"/dmap -s "{{ chassis_size }}"
+      when: not hybrid_chassis | bool
+
+    - name: Create drive alias' for hybrid chassis
+      command: /usr/bin/python3 "{{ tools_install_dir }}"/hmap -s "{{ chassis_size }}"
+      when: hybrid_chassis | bool
+
+    - name: Get drive layout
+      command: /usr/bin/python3 "{{ tools_install_dir }}"/lsdev -n
+      register: drive_layout
+      changed_when: false
+
+    - name: Show drive layout
+      debug:
+        msg: "{{ drive_layout.stdout_lines }}"
+      when: 
+      - not drive_layout.failed
+        
+- name: Import generate-osd-vars playbook
+  import_playbook: generate-osd-vars.yml
