@@ -1,0 +1,102 @@
+---
+# Defines deployment design and assigns role to server groups
+
+- name: confirm whether user really meant to update servers
+  hosts: localhost
+  gather_facts: false
+
+  vars_prompt:
+    - name: ireallymeanit
+      prompt: Are you sure you want to update each node ?
+      default: 'no'
+      private: no
+
+  tasks:
+  - name: exit playbook, if user did not mean to update servers
+    fail:
+      msg: >
+        "Exiting update-server playbook, servers were NOT updated.
+         To update servers, either say 'yes' on the prompt or
+         or use `-e ireallymeanit=yes` on the command line when
+         invoking the playbook"
+    when: ireallymeanit != 'yes'
+
+
+- hosts:
+  - mons
+  - osds
+  - mdss
+  - rgws
+  - nfss
+  - rbdmirrors
+  - clients
+  - mgrs
+  - iscsigws
+  - iscsi-gws # for backward compatibility only!
+  - grafana-server
+  - rgwloadbalancers
+
+  gather_facts: false
+  any_errors_fatal: true
+  become: true
+
+  serial: 1 # Increase to update more servers at once
+
+  tags: always
+
+  vars:
+    delegate_facts_host: True
+
+  tasks:
+    - name: Flush yum cache
+      shell: yum clean all
+      args:
+        warn: false
+
+    - name: check packages for updates
+      shell: yum list updates | awk 'f;/Available Upgrades/{f=1;}' | awk '{ print $1 }'
+      changed_when: updates.stdout_lines | length > 0
+      args:
+        warn: false
+      register: updates
+      
+    - name: display count
+      debug:
+        msg: "Found {{ updates.stdout_lines | length }} packages to be updated:\n\n{{ updates.stdout }}"
+      
+    - when: updates.stdout_lines | length > 0
+      block:
+        - name: install updates using Generic OS package manager
+          package:
+            name: "*"
+            state: latest
+      
+        - name: install yum-utils
+          package:
+            name: yum-utils
+            state: latest
+      
+        - name: check if reboot is required
+          shell: needs-restarting -r
+          failed_when: false
+          register: reboot_required
+          changed_when: false
+      
+    - when: updates.stdout_lines | length > 0 and reboot_required.rc != 0
+      block:
+      - name: reboot the server if required
+        shell: sleep 3; reboot
+        ignore_errors: true
+        changed_when: false
+        async: 1
+        poll: 0
+      
+      - name: wait for server to come back after reboot
+        wait_for_connection:
+          timeout: 600
+          delay: 20
+        register: reboot_result
+      
+      - name: reboot time
+        debug:
+          msg: "The system rebooted in {{ reboot_result.elapsed }} seconds." 
