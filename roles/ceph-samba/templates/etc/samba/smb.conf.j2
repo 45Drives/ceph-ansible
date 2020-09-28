@@ -1,0 +1,47 @@
+# DONT EDIT THIS FILE. IT IS MANAGED BY ANSIBLE
+# ANY EDITS WILL BE LOST WHEN THIS PLAYBOOK IS RUN
+#======================= Global Settings =======================
+[global]
+{% if domain_member %}
+  #Domain Member
+  security = ads
+{% else %}
+  #Standalone
+  security = user
+{% endif %}
+{% if samba_cluster %}
+  #CTDB Node
+  clustering = yes
+
+  netbios name = {{ samba_global_options.netbios_name }}
+{% endif %}
+  server string = {{ samba_global_options.server_string }}
+
+  idmap config * : backend = tdb2
+  idmap config * : range = {{ samba_global_options.idmap_range }}
+{% if domain_member %}
+  idmap config {{ active_directory_info.workgroup|upper }} : backend = rid
+  idmap config {{ active_directory_info.workgroup|upper }} : range = {{ active_directory_info.idmap_range }}
+  
+  realm = {{ active_directory_info.realm|upper }}
+  workgroup = {{ active_directory_info.workgroup|upper }}
+  
+  winbind enum groups = {{ active_directory_info.winbind_enum_groups }}
+  winbind enum users = {{ active_directory_info.winbind_enum_users }}
+  winbind use default domain = {{ active_directory_info.winbind_use_default_domain }}
+{% endif %}
+
+{% if windows_acl %}
+  registry shares = yes
+  ea support = yes
+  map acl inherit = yes
+  store dos attributes = yes
+  vfs objects = acl_xattr
+{% endif %}
+
+{% if include_overrides %}
+  include = /etc/samba/overrides.conf
+{% endif %}
+
+  log level = {{ samba_global_options.log_level }}
+

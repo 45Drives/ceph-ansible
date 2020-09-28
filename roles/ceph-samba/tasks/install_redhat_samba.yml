@@ -1,0 +1,107 @@
+---
+- name: install yum plugin priorities
+  package:
+    name: yum-plugin-priorities
+    state: "present"
+  register: result
+  until: result is succeeded
+
+- name: 45Drives Repository - Configure 45drives samba repository
+  yum_repository:
+    name: ceph_45drives
+    description: 45Drives Samba $basearch repo
+    gpgcheck: no
+    enabled: yes
+    state: present
+    baseurl: "{{ ceph_45drives_repo_url }}"
+    file: ceph_45drives
+    priority: "1"
+  register: result
+  until: result is success
+  when: '"45drives" in samba_repo'
+
+- name: Community Repository - Check if samba_45drives repo is present; remove if it is
+  block:
+  - name: Community Repository - Check if samba_45drives repo is present
+    stat:
+      path: /etc/yum.repos.d/samba_45drives.repo
+    register: stat_result
+    when: '"community" in samba_repo'
+
+  - name: Community Repository - Remove samba_45drives repository (and clean up left-over metadata)
+    yum_repository:
+      name: samba_45drives
+      state: absent
+    when: '"community" in samba_repo'
+  
+  - name: Community Repository - yum-clean-metadata
+    command: yum clean metadata
+    args:
+      warn: no
+    when: '"community" in samba_repo'
+
+- name: Install samba/ctdb/winbind packages
+  block:
+    - name: install samba
+      package:
+        name: samba
+        state: "{{ (upgrade_samba_packages|bool) | ternary('latest','present') }}"
+      register: result
+      until: result is succeeded
+      when:
+        - samba_server | bool
+
+    - name: install attr
+      package:
+        name: attr
+        state: "{{ (upgrade_samba_packages|bool) | ternary('latest','present') }}"
+      register: result
+      until: result is succeeded
+      when:
+        - samba_server | bool
+
+    - name: install samba-vfs-cephfs
+      package:
+        name: samba-vfs-cephfs
+        state: "{{ (upgrade_samba_packages|bool) | ternary('latest','present') }}"
+      register: result
+      until: result is succeeded
+      when:
+        - samba_server | bool
+        - samba_cephfs_module | bool
+
+    - name: install samba-winbind 
+      package:
+        name: samba-winbind
+        state: "{{ (upgrade_samba_packages|bool) | ternary('latest','present') }}"
+      register: result
+      until: result is succeeded
+      when:
+        - domain_member | bool
+
+    - name: install samba-winbind-clients 
+      package:
+        name: samba-winbind-clients
+        state: "{{ (upgrade_samba_packages|bool) | ternary('latest','present') }}"
+      register: result
+      until: result is succeeded
+      when:
+        - domain_member | bool
+
+    - name: install pam_krb5
+      package:
+        name: pam_krb5
+        state: "{{ (upgrade_samba_packages|bool) | ternary('latest','present') }}"
+      register: result
+      until: result is succeeded
+      when:
+        - domain_member | bool
+        
+    - name: install ctdb
+      package:
+        name: ctdb
+        state: "{{ (upgrade_samba_packages|bool) | ternary('latest','present') }}"
+      register: result
+      until: result is succeeded
+      when:
+        - samba_cluster | bool

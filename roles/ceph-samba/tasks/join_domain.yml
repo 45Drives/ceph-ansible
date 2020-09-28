@@ -1,0 +1,72 @@
+---
+- name: join_domain | Standalone
+  block:
+      # net ads testjoin -k will check if domain is already joined or not
+      # returns: 255 -> Not in Domain, 0 -> In domain
+    - name: join_domain | checking if already joined to domain
+      shell: "net ads testjoin -k"
+      ignore_errors: true
+      register: domain_check
+
+    - name: join_domain | joining domain
+      shell: net ads join -U "{{ active_directory_info.domain_join_user }}"%"{{ active_directory_info.domain_join_password }}"
+      register: "domain_joined"
+      when: domain_check.rc == 255
+
+    - name: start_join_domain | enable samba
+      systemd:
+        name: smb
+        state: started
+        enabled: yes
+
+    - name: start_join_domain | enable winbind
+      systemd:
+        name: winbind
+        state: started
+        enabled: yes
+  when:
+    - not samba_cluster | bool
+
+- name: join_domain | Cluster
+  block:
+    - name: join_domain | ensure ctdb is started
+      service:
+        name: "ctdb"
+        state: started
+      register: "ctdb_started"
+
+    - name: join_domain | waiting for ctdb to start
+      wait_for:
+        delay: 5 
+        host: "{{ ansible_default_ipv4.address }}"
+        port: 4379
+      when: ctdb_started.changed
+
+      # net ads testjoin -k will check if domain is already joined or not
+      # returns: 255 -> Not in Domain, 0 -> In domain
+    - name: join_domain | checking if already joined to domain
+      shell: "net ads testjoin -k"
+      failed_when: false
+      register: domain_check
+
+    - name: join_domain | joining domain
+      shell: net ads join -U "{{ active_directory_info.domain_join_user }}"%"{{ active_directory_info.domain_join_password }}"
+      run_once: true
+      register: domain_joined
+      when: domain_check.rc == 255
+
+    - name: join_domain | restarting ctdb #we do this after joining the domain in order to get winbind started
+      service:
+        name: "ctdb"
+        state: restarted
+      when: domain_check.rc == 255
+      register: "ctdb_restarted"
+
+    - name: join_domain | waiting for ctdb to restart
+      wait_for:
+        delay: 20
+        host: "{{ ansible_default_ipv4.address }}"
+        port: 4379
+      when: ctdb_restarted.changed
+  when:
+    - samba_cluster | bool

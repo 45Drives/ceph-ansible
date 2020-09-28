@@ -1,0 +1,13 @@
+[libdefaults]
+  dns_lookup_realm = false
+  dns_lookup_kdc = true
+  default_realm = {{ active_directory_info.realm|upper }}
+
+[realms]
+
+[logging]
+
+[domain_realm]
+  .{{ active_directory_info.realm|lower }} = {{ active_directory_info.realm|upper }}
+  {{ active_directory_info.realm|lower }} = {{ active_directory_info.realm|upper }}
+

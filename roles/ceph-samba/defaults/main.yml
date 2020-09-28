@@ -1,0 +1,98 @@
+---
+# samba_repo can either be '45drives' or 'community'.
+# Community will install Samba,CTDB & Winbind packages from the standard CentOS repo.
+# 45drives will install the same packages and version of Samba,CTDB & Winbind as communuty but rebuilt with support for storing CTDB locks in RADOS objects.
+# Default is to install with RADOS support. If not using samba with CephFS then "community" is fine.
+samba_repo: 45drives
+
+# Update samba packages if already installed
+upgrade_samba_packages: true
+
+# Roles
+samba_server: true
+samba_cluster: true
+domain_member: true
+
+# Which backend_fs to use. Currently only cephfs supported
+backend_fs: cephfs
+# True = use samba cephfs vfs module
+# False = use kernel cephfs mount
+samba_cephfs_module: false
+
+## Cephfs Options
+samba_keyring:
+  - { name: client.samba, caps: { mds: "allow r path=/, allow rwps path=/fsgw", mon: "allow r", osd: "allow *" }, mode: "0600" }
+shared_storage_mountpoint: /mnt/cephfs
+
+## Samba Server (SMB) Settings
+# Global options
+include_overrides: true
+
+samba_global_options:
+  netbios_name: 'SMBCLUSTER'
+  server_string: 'Samba %v'
+  idmap_range: '10000-99999'
+  log_level: '0'
+
+# Domain Authentication (Winbind) Settings
+# Todo add support for choice of sssd or winbind
+active_directory_info:
+  workgroup: 'SAMDOM'
+  idmap_range: '100000 - 999999'
+  realm: 'SAMDOM.COM'
+  winbind_enum_groups: yes
+  winbind_enum_users: yes
+  winbind_use_default_domain: yes
+  domain_join_user: ''
+  # Use ansible vault to create encrypted varible "domain_password"
+  # domain_join_password: '{{ domain_password }}'
+  domain_join_password: ''
+  ad_admin_group: "Domain Admins" 
+
+# Samba Share (SMB) Definitions
+configure_shares: false
+windows_acl: true
+samba_shares:
+  - name: 'share1'
+    path: '{{ shared_storage_mountpoint }}/fsgw/share1'
+    writeable: 'yes'
+    guest_ok: 'no'
+    comment: "comment for share1"
+  - name: 'share2'
+    path: '{{ shared_storage_mountpoint }}/fsgw/share2'
+    writeable: 'yes'
+    guest_ok: 'no'
+    comment: "comment for share2"
+  - name: 'share3'
+    path: '{{ shared_storage_mountpoint }}/fsgw/share3'
+    writeable: 'yes'
+    guest_ok: 'no'
+    comment: "comment for share3"
+
+## Samba Cluster (CTDB) Settings
+ctdb_public_addresses:
+  - vip_address: '192.168.103.10'
+    vip_interface: 'eth1'
+    subnet_mask: '16'
+  - vip_address: '192.168.103.11'
+    vip_interface: 'eth1'
+    subnet_mask: '16'
+
+ctdb_tunables:
+  - key: 'ControlTimeout'
+    value: '15'
+  - key: 'ElectionTimeout'
+    value: '2'
+  - key: 'KeepaliveInterval'
+    value: '1'
+  - key: 'KeepaliveLimit'
+    value: '3'
+  - key: 'MonitorInterval'
+    value: '5'
+  - key: 'TakeoverTimeout'
+    value: '5'
+
+ctdb_lock_name: ctdb_lock
+
+rados_locking: true
+

@@ -1,0 +1,73 @@
+---
+- name: configure_shares - Domain Member Windows ACL 
+  block:
+    - name: configure_shares - Grant the SeDiskOperatorPrivilege Privilege
+      shell: net rpc rights grant "{{ active_directory_info.ad_admin_group }}" SeDiskOperatorPrivilege -U "{{ active_directory_info.domain_join_user }}"%"{{ active_directory_info.domain_join_password }}"
+      run_once: true
+
+    - name: configure_shares - Create samba_shares paths and set ownership
+      file:
+        path: "{{ shared_storage_mountpoint }}/fsgw/{{ item.name }}"
+        owner: "root"
+        group: '{{ active_directory_info.workgroup|upper }}\{{ active_directory_info.ad_admin_group }}'
+        mode: '0770'
+        state: directory
+      run_once: true
+      with_items:
+        - "{{ samba_shares }}"
+
+  when:
+    - windows_acl | bool
+    - domain_member | bool
+
+# If using vfs_cephfs, use relative paths (i.e just the share name)
+- name: vfs_ceph share configuration
+  block:
+  - name: configure_shares - Unmount cephfs
+    mount:
+      name: "{{ shared_storage_mountpoint }}/fsgw"
+      state: absent 
+
+  - name: configure_shares - create shares
+    shell: net conf addshare {{ item.name }} /fsgw/{{ item.name }} writeable={{ item.writeable[:1] }} guest_ok={{ item.guest_ok[:1] }} "{{ item.comment }}"
+    failed_when: false
+    run_once: true
+    loop: "{{ samba_shares }}"
+
+  - name: configure_shares - add parameters vfs_objects
+    shell: net conf setparm {{ item.name }} "vfs objects" ceph
+    failed_when: false
+    run_once: true
+    loop: "{{ samba_shares }}"
+  
+  - name: configure_shares - add parameters kernel share modes
+    shell: net conf setparm {{ item.name }} "kernel share modes" no
+    failed_when: false
+    run_once: true   
+    loop: "{{ samba_shares }}"
+
+  - name: configure_shares - add parameters ceph config
+    shell: net conf setparm {{ item.name }} ceph:config_file /etc/ceph/ceph.conf
+    failed_when: false
+    run_once: true
+    loop: "{{ samba_shares }}"
+  
+  - name: configure_shares - add parameters ceph user
+    shell: net conf setparm {{ item.name }} ceph:user_id samba
+    failed_when: false
+    run_once: true
+    loop: "{{ samba_shares }}"
+
+  when:
+    - samba_cephfs_module | bool
+
+# If using kernel mount cephfs, use full path when creating share
+- name: configure_shares - create shares
+  shell: net conf addshare {{ item.name }} {{ item.path }} writeable={{ item.writeable[:1] }} guest_ok={{ item.guest_ok[:1] }} "{{ item.comment }}"
+  failed_when: false
+  run_once: true
+  loop: "{{ samba_shares }}"
+  when:
+    - not samba_cephfs_module | bool
+
+

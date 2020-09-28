@@ -1,0 +1,27 @@
+---
+- name: start_samba_server | Standalone
+  block:
+    - name: start_samba_server | enable samba
+      systemd:
+        name: smb
+        state: started
+        enabled: yes
+  when:
+    - not samba_cluster | bool
+
+- name: start_samba_server | Clustered
+  block:
+    - name: start_samba_server | disable samba
+      systemd:
+        name: smb
+        enabled: no
+      when:
+        - samba_server | bool
+
+    - name: start_samba_server | enable start ctdb
+      systemd:
+        name: ctdb
+        state: started
+        enabled: yes
+  when:
+      - samba_cluster | bool

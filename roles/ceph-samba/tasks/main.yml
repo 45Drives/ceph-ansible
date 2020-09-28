@@ -1,0 +1,54 @@
+---
+# Install packages
+- include: install_redhat_samba.yml
+  tags:
+  - packages
+
+- include: configure_cephfs_backend.yml
+  tags:
+    cephfs
+  when: 
+   - backend_fs == 'cephfs'
+  
+# Configure samba + winbind
+- include: configure_samba.yml
+  tags:
+    samba
+  when:
+    - samba_server | bool
+
+# Configure CTDB
+- include: configure_ctdb.yml
+  tags:
+    ctdb
+  when:
+    - samba_cluster | bool
+
+# Join Active Directory
+- include: join_domain.yml
+  tags:
+  - join_domain
+  when:
+    - domain_member | bool
+  
+- include: start_samba_server.yml
+  when:
+    - not domain_member | bool
+
+# Configure shares
+- include: configure_shares.yml
+  tags:
+    shares
+  when:
+    - configure_shares | bool
+
+- name: configure_shares - Unmount cephfs
+  mount:
+    name: "{{ shared_storage_mountpoint }}/fsgw"
+    state: absent
+  when:
+    - not configure_shares | bool 
+
+- include: show_ctdb_status.yml
+  when:
+    - samba_cluster | bool

@@ -1,0 +1,95 @@
+---
+- name: config_ctdb | configuring ctdb service
+  template:
+    src: "etc/ctdb/ctdb.conf.j2"
+    dest: "/etc/ctdb/ctdb.conf"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: config_ctdb | configuring ctdb public_addresses
+  template:
+    src: "etc/ctdb/public_addresses.j2"
+    dest: "/etc/ctdb/public_addresses"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: config_ctdb | configuring ctdb nodes
+  template:
+    src: "etc/ctdb/nodes.j2"
+    dest: "/etc/ctdb/nodes"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: config_ctdb | configuring ctdb tunables
+  template:
+    src: "etc/ctdb/ctdb.tunables.j2"
+    dest: "/etc/ctdb/ctdb.tunables"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: config_ctdb | ensure ctdb volatile directory exists
+  file:
+      path: /var/lib/ctdb/volatile
+      state: directory
+      mode: '0755'
+
+- name: config_ctdb | ensure ctdb persistent directory exists
+  file:
+      path: /var/lib/ctdb/persistent
+      state: directory
+      mode: '0755'
+
+- name: config_ctdb | ensure ctdb state directory exists
+  file:
+      path: /var/lib/ctdb/state
+      state: directory
+      mode: '0755'
+
+- name: config_ctdb | create ctdb event legacy directory
+  file:
+      path: /etc/ctdb/events/legacy/
+      state: directory
+      mode: '0755'
+
+- name: config_ctdb | link core ctdb event scripts
+  file:
+    src: /usr/share/ctdb/events/legacy/{{ item }}
+    dest: /etc/ctdb/events/legacy/{{ item }}
+    state: link
+  with_items:
+    - 00.ctdb.script
+    - 10.interface.script
+
+- name: config_samba | link samba ctdb event scripts
+  file:
+    src: /usr/share/ctdb/events/legacy/{{ item }}
+    dest: /etc/ctdb/events/legacy/{{ item }}
+    state: link
+  with_items:
+    - 50.samba.script
+  when:
+    - samba_server | bool
+
+- name: config_ctdb | link winbind ctdb event scripts
+  file:
+    src: /usr/share/ctdb/events/legacy/{{ item }}
+    dest: /etc/ctdb/events/legacy/{{ item }}
+    state: link
+  with_items:
+    - 49.winbind.script
+  when:
+    - domain_member | bool
+
+- name: config_samba | Create samba ctdb event options
+  copy:
+    dest: /etc/ctdb/events/legacy/{{ item }}
+    content: |
+      CTDB_SAMBA_SKIP_SHARE_CHECK=yes
+  with_items:
+    - 50.samba.options
+  when:
+    - samba_cephfs_module | bool
