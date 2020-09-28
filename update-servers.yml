@@ -22,25 +22,13 @@
     when: ireallymeanit != 'yes'
 
 
-- hosts:
-  - mons
-  - osds
-  - mdss
-  - rgws
-  - nfss
-  - rbdmirrors
-  - clients
-  - mgrs
-  - iscsigws
-  - iscsi-gws # for backward compatibility only!
-  - grafana-server
-  - rgwloadbalancers
-
+- hosts: all
+  
   gather_facts: false
   any_errors_fatal: true
   become: true
 
-  serial: 1 # Increase to update more servers at once
+  serial: 10 # Increase to update more servers at once
 
   tags: always
 
