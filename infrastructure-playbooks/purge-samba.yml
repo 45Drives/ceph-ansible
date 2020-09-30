@@ -1,0 +1,154 @@
+---
+# This playbook purges samba 
+# It removes: packages, configuration files and ALL THE DATA
+#
+# Use it like this:
+# ansible-playbook purge-samba.yml
+#     Prompts for confirmation to purge, defaults to no and
+#     doesn't purge the cluster. yes purges the cluster.
+#
+# ansible-playbook -e ireallymeanit=yes|no purge-samba.yml
+#     Overrides the prompt using -e option. Can be used in
+#     automation scripts to avoid interactive prompt.
+
+- name: confirm whether user really meant to purge the cluster
+  hosts: localhost
+  gather_facts: false
+
+  vars_prompt:
+    - name: ireallymeanit
+      prompt: Are you sure you want to purge the cluster?
+      default: 'no'
+      private: no
+
+  tasks:
+  - name: exit playbook, if user did not mean to purge cluster
+    fail:
+      msg: >
+        "Exiting purge-samba playbook, cluster was NOT purged.
+         To purge the cluster, either say 'yes' on the prompt or
+         or use `-e ireallymeanit=yes` on the command line when
+         invoking the playbook"
+    when: ireallymeanit != 'yes'
+
+- name: stop services
+  hosts:
+    - smbs
+
+  tasks:
+  - name: check for ctdb
+    stat:
+      path: /usr/lib/systemd/system/ctdb.service
+    register: ctdb_present
+
+  - name: stop ctdb service
+    systemd:
+      name: ctdb
+      state: stopped
+      enabled: no
+    when: ctdb_present.stat.exists
+
+  - name: check for samba
+    stat:
+      path: /usr/lib/systemd/system/smb.service
+    register: smb_present
+
+  - name: stop smb service
+    systemd:
+      name: smb
+      state: stopped
+      enabled: no
+    when: smb_present.stat.exists
+
+  - name: check for winbind
+    stat:
+      path: /usr/lib/systemd/system/winbind.service
+    register: winbind_present
+
+  - name: stop winbind service
+    systemd:
+      name: winbind
+      state: stopped
+      enabled: no
+    when: winbind_present.stat.exists
+
+- name: cleanup cephfs mounts on samba gateways
+  hosts:
+    - smbs
+
+  gather_facts: false # Already gathered previously
+  become: true
+  
+  tasks:
+  - name: umount cephfs mounts on samba gateway
+    mount:
+      name: "/mnt/cephfs/fsgw"
+      state: absent
+
+  - name:  remove samba cephfs secret keys
+    file:
+      path: "{{ item }}"
+      state: absent
+    with_items:
+      - /etc/ceph/samba.secret
+      - /etc/ceph/ceph.client.samba.keyring
+
+- name: final cleanup - purge samba packages and purge config
+  vars:
+    samba_packages:
+      - samba*
+      - ctdb*
+      - pam_krb5
+      - libsmbclient
+      - libwbclient
+
+  hosts:
+    - smbs
+
+  gather_facts: false # Already gathered previously
+  become: true
+  tasks:
+
+  - name: purge samba packages
+    package:
+      name: "{{ samba_packages }}"
+      state: absent
+
+  - name: remove config
+    file:
+      path: "{{ item }}"
+      state: absent
+    with_items:
+      - /etc/samba
+      - /etc/ctdb
+      - /etc/krb5.conf
+      - /var/lib/ctdb
+      - /var/lib/samba
+
+  - name: remove winbind from nsswitch
+    replace:
+      path: /etc/nsswitch.conf
+      regexp: 'winbind'
+      replace: ""
+
+  - name: remove logs
+    file:
+     path: /var/log/samba
+     state: absent
+     
+  - name: Check if samba_45drives repo is present
+    stat:
+      path: /etc/yum.repos.d/samba_45drives.repo
+    register: stat_result
+
+  - name: Remove samba_45drives repository (and clean up left-over metadata)
+    yum_repository:
+      name: samba_45drives
+      state: absent
+  
+  - name: yum-clean-metadata
+    command: yum clean metadata
+    args:
+      warn: no
+
+

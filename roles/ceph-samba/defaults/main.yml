@@ -4,6 +4,7 @@
 # 45drives will install the same packages and version of Samba,CTDB & Winbind as communuty but rebuilt with support for storing CTDB locks in RADOS objects.
 # Default is to install with RADOS support. If not using samba with CephFS then "community" is fine.
 samba_repo: 45drives
+ceph_45drives_repo_url: http://images.45drives.com/ceph/rpm/el8/
 
 # Update samba packages if already installed
 upgrade_samba_packages: true

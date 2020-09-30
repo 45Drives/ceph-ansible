@@ -197,6 +197,29 @@
         - nfs_group_name is defined
         - nfs_group_name in group_names
 
+
+    - name: open smb ports
+      firewalld:
+        service: "samba"
+        zone: "{{ ceph_samba_firewall_zone }}"
+        permanent: true
+        immediate: true
+        state: enabled
+      when:
+        - smb_group_name is defined
+        - smb_group_name in group_names
+
+    - name: open ctdb ports
+      firewalld:
+        service: "ctdb"
+        zone: "{{ ceph_samba_firewall_zone }}"
+        permanent: true
+        immediate: true
+        state: enabled
+      when:
+        - smb_group_name is defined
+        - smb_group_name in group_names
+
     - name: open ceph networks on rbdmirror
       firewalld:
         zone: "{{ ceph_rbdmirror_firewall_zone }}"

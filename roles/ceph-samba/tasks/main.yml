@@ -42,7 +42,7 @@
   when:
     - configure_shares | bool
 
-- name: configure_shares - Unmount cephfs
+- name: configure_shares | Unmount cephfs
   mount:
     name: "{{ shared_storage_mountpoint }}/fsgw"
     state: absent

@@ -1,11 +1,4 @@
 ---
-- name: install yum plugin priorities
-  package:
-    name: yum-plugin-priorities
-    state: "present"
-  register: result
-  until: result is succeeded
-
 - name: 45Drives Repository - Configure 45drives samba repository
   yum_repository:
     name: ceph_45drives
@@ -82,15 +75,6 @@
     - name: install samba-winbind-clients 
       package:
         name: samba-winbind-clients
-        state: "{{ (upgrade_samba_packages|bool) | ternary('latest','present') }}"
-      register: result
-      until: result is succeeded
-      when:
-        - domain_member | bool
-
-    - name: install pam_krb5
-      package:
-        name: pam_krb5
         state: "{{ (upgrade_samba_packages|bool) | ternary('latest','present') }}"
       register: result
       until: result is succeeded

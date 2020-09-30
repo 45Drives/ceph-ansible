@@ -20,7 +20,7 @@
     - windows_acl | bool
     - domain_member | bool
 
-# If using vfs_cephfs, use relative paths (i.e just the share name)
+# If using vfs_cephfs, use relative paths 
 - name: vfs_ceph share configuration
   block:
   - name: configure_shares - Unmount cephfs

@@ -1,38 +1,7 @@
 ---
-- name: configure_cephfs_backend | Get admin secret
-  command: "ceph auth get-key client.admin"
-  register: command_output_admin
+- name: configure_cephfs_backend | Create directory for samba shares
+  shell: cephfs-shell "mkdir -m 755 -p /fsgw"
   delegate_to: "{{ groups[mon_group_name][0] }}"
-  changed_when: false
-
-- name: configure_cephfs_backend | Set admin secret fact
-  set_fact:
-    cephfs_admin_secret: "{{ command_output_admin.stdout }}"
-
-- name: configure_cephfs_backend | Ensure cephfs dir exists
-  file:
-    path: "{{ shared_storage_mountpoint }}/"
-    state: directory
-    mode: 0755
-
-- name: configure_cephfs_backend | Mount cephfs as admin user 
-  mount:
-    name: "{{ shared_storage_mountpoint }}/"
-    src: "{{ groups[mon_group_name][0] }}:/"
-    fstype: "ceph"
-    opts: "name=admin,secret={{ cephfs_admin_secret }},_netdev"
-    state: mounted
-
-- name: configure_cephfs_backend | Create directory for data
-  file:
-    path: "{{ shared_storage_mountpoint }}/fsgw"
-    state: directory
-    mode: 0755
-
-- name: configure_cephfs_backend | Unmount cephfs as admin user 
-  mount:
-    name: "{{ shared_storage_mountpoint }}/"
-    state: absent 
 
 - name: configure_cephfs_backend | Create samba cephx user
   ceph_key:
@@ -44,6 +13,7 @@
   with_items: "{{ samba_keyring }}"
   delegate_to: "{{ groups[mon_group_name][0] }}"
 
+
 - name: configure_cephfs_backend | Get samba secret for cephfs mount
   command: "ceph auth get-key client.samba"
   register: command_output_samba
@@ -54,6 +24,15 @@
   set_fact:
     cephfs_samba_secret: "{{ command_output_samba.stdout }}"
 
+- name: configure_cephfs_backend | write ceph samba client secret
+  copy:
+    content: "{{ cephfs_samba_secret }}"
+    dest: /etc/ceph/samba.secret
+    force: yes
+    group: ceph
+    owner: ceph
+    mode: "0600"
+
 - name: configure_cephfs_backend | Get samba keyring for rados locking
   command: "ceph auth get client.samba"
   register: samba_keyring
@@ -62,17 +41,8 @@
 
 - name: configure_cephfs_backend | Write samba keyring
   copy:
-    content: "{{ samba_keyring.stdout }}"
+    content: "{{ samba_keyring.stdout }}\n"
     dest: "/etc/ceph/{{cluster}}.client.samba.keyring"
-    force: yes
-    group: ceph
-    owner: ceph
-    mode: "0600"
-
-- name: configure_cephfs_backend | write ceph samba client secret
-  copy:
-    content: "{{ cephfs_samba_secret }}"
-    dest: /etc/ceph/samba.secret
     force: yes
     group: ceph
     owner: ceph
