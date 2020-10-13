@@ -82,6 +82,8 @@
       tags: ['ceph_update_config']
     - import_role:
         name: ceph-mon
+## ADD REPO AND CEPHFS INSTALL TO MONS
+## IMPORT AD-HOC PLAYBOOK HAVE IT PULL DOWN REPO AND INSTALL CEPHFS-SHELL 
     - import_role:
         name: ceph-mgr
       when: groups.get(mgr_group_name, []) | length == 0

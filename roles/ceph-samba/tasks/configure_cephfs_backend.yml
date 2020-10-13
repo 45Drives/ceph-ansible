@@ -1,7 +1,8 @@
 ---
 - name: configure_cephfs_backend | Create directory for samba shares
-  shell: cephfs-shell "mkdir -m 755 -p /fsgw"
+  shell: /usr/local/bin/cephfs-shell "mkdir -m 755 -p /fsgw"
   delegate_to: "{{ groups[mon_group_name][0] }}"
+  run_once: true
 
 - name: configure_cephfs_backend | Create samba cephx user
   ceph_key:
@@ -12,7 +13,6 @@
     secret: "{{ item.key | default('') }}"
   with_items: "{{ samba_keyring }}"
   delegate_to: "{{ groups[mon_group_name][0] }}"
-
 
 - name: configure_cephfs_backend | Get samba secret for cephfs mount
   command: "ceph auth get-key client.samba"

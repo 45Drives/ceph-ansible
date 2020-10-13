@@ -1,5 +1,7 @@
 # DONT EDIT THIS FILE. IT IS MANAGED BY ANSIBLE
 # ANY EDITS WILL BE LOST WHEN THIS PLAYBOOK IS RUN
+# SHARES ARE TO BE CREATED IN REGISTRY "net conf addshare"
+# GLOBAL OPTIONS CAN BE ADDED OR OVERIRDDEN IN REGISTRY  
 #======================= Global Settings =======================
 [global]
 {% if domain_member %}
@@ -29,19 +31,20 @@
   winbind enum groups = {{ active_directory_info.winbind_enum_groups }}
   winbind enum users = {{ active_directory_info.winbind_enum_users }}
   winbind use default domain = {{ active_directory_info.winbind_use_default_domain }}
+  winbind refresh tickets = yes
+  winbind offline logon = yes 
+
 {% endif %}
 
 {% if windows_acl %}
-  registry shares = yes
   ea support = yes
   map acl inherit = yes
   store dos attributes = yes
   vfs objects = acl_xattr
 {% endif %}
 
-{% if include_overrides %}
-  include = /etc/samba/overrides.conf
-{% endif %}
-
   log level = {{ samba_global_options.log_level }}
-
+  registry shares = yes
+{% if include_overrides %}
+  include = registry
+{% endif %}

@@ -25,7 +25,7 @@
     - samba_cluster | bool
 
 # Join Active Directory
-- include: join_domain.yml
+- include: configure_domain.yml
   tags:
   - join_domain
   when:
@@ -41,13 +41,6 @@
     shares
   when:
     - configure_shares | bool
-
-- name: configure_shares | Unmount cephfs
-  mount:
-    name: "{{ shared_storage_mountpoint }}/fsgw"
-    state: absent
-  when:
-    - not configure_shares | bool 
 
 - include: show_ctdb_status.yml
   when:

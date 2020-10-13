@@ -33,54 +33,37 @@
       warn: no
     when: '"community" in samba_repo'
 
-- name: Install samba/ctdb/winbind packages
+- name: Install samba packages
   block:
     - name: install samba
       package:
-        name: samba
+        name: "{{ item }}"
         state: "{{ (upgrade_samba_packages|bool) | ternary('latest','present') }}"
       register: result
       until: result is succeeded
+      with_items:
+        - attr
+        - samba
+        - samba-vfs-cephfs
+        - samba-common-tools
       when:
         - samba_server | bool
 
-    - name: install attr
+    - name: install packages for domain integration
       package:
-        name: attr
+        name: "{{ item }}"
         state: "{{ (upgrade_samba_packages|bool) | ternary('latest','present') }}"
       register: result
       until: result is succeeded
-      when:
-        - samba_server | bool
-
-    - name: install samba-vfs-cephfs
-      package:
-        name: samba-vfs-cephfs
-        state: "{{ (upgrade_samba_packages|bool) | ternary('latest','present') }}"
-      register: result
-      until: result is succeeded
-      when:
-        - samba_server | bool
-        - samba_cephfs_module | bool
-
-    - name: install samba-winbind 
-      package:
-        name: samba-winbind
-        state: "{{ (upgrade_samba_packages|bool) | ternary('latest','present') }}"
-      register: result
-      until: result is succeeded
+      with_items:
+        - samba-winbind
+        - samba-winbind-clients
+        - oddjob
+        - oddjob-mkhomedir
+        - krb5-workstation
       when:
         - domain_member | bool
 
-    - name: install samba-winbind-clients 
-      package:
-        name: samba-winbind-clients
-        state: "{{ (upgrade_samba_packages|bool) | ternary('latest','present') }}"
-      register: result
-      until: result is succeeded
-      when:
-        - domain_member | bool
-        
     - name: install ctdb
       package:
         name: ctdb

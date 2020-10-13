@@ -68,6 +68,7 @@ ceph_rbdmirror_firewall_zone: public
 ceph_iscsi_firewall_zone: public
 ceph_dashboard_firewall_zone: public
 ceph_rgwloadbalancer_firewall_zone: public
+ceph_samba_firewall_zone: public
 
 # Generate local ceph.conf in fetch directory
 ceph_conf_local: false
