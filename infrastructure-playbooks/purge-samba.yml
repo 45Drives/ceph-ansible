@@ -101,6 +101,9 @@
       - pam_krb5
       - libsmbclient
       - libwbclient
+      - attr
+      - samba-common-tools
+      - oddjob*
 
   hosts:
     - smbs
