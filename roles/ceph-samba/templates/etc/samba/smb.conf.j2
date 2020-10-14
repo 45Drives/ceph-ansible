@@ -32,7 +32,8 @@
   winbind enum users = {{ active_directory_info.winbind_enum_users }}
   winbind use default domain = {{ active_directory_info.winbind_use_default_domain }}
   winbind refresh tickets = yes
-  winbind offline logon = yes 
+  winbind offline logon = yes
+  template shell = /bin/bash
 
 {% endif %}
 
