@@ -1,0 +1,30 @@
+---
+- name: configure_shares - Domain Member Windows ACL 
+  block:
+    - name: configure_shares - Grant the SeDiskOperatorPrivilege Privilege
+      shell: net rpc rights grant "{{ active_directory_info.ad_admin_group }}" SeDiskOperatorPrivilege -U "{{ active_directory_info.domain_join_user }}"%"{{ active_directory_info.domain_join_password }}"
+      run_once: true
+
+    - name: configure_shares - Create samba_shares paths and set ownership
+      file:
+        path: "{{ shared_storage_mountpoint }}/fsgw/{{ item.name }}"
+        owner: "root"
+        group: '{{ active_directory_info.workgroup|upper }}\{{ active_directory_info.ad_admin_group }}'
+        mode: '0770'
+        state: directory
+      run_once: true
+      with_items:
+        - "{{ samba_shares }}"
+
+  when:
+    - windows_acl | bool
+    - domain_member | bool
+
+- name: configure_shares - create shares
+  shell: net conf addshare {{ item.name }} {{ item.path }} writeable={{ item.writeable[:1] }} guest_ok={{ item.guest_ok[:1] }} "{{ item.comment }}"
+  failed_when: false
+  run_once: true
+  loop: "{{ samba_shares }}"
+
+
+

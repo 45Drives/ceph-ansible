@@ -58,16 +58,4 @@
     run_once: true
     loop: "{{ samba_shares }}"
 
-  when:
-    - samba_cephfs_module | bool
-
-# If using kernel mount cephfs, use full path when creating share
-- name: configure_shares - create shares
-  shell: net conf addshare {{ item.name }} {{ item.path }} writeable={{ item.writeable[:1] }} guest_ok={{ item.guest_ok[:1] }} "{{ item.comment }}"
-  failed_when: false
-  run_once: true
-  loop: "{{ samba_shares }}"
-  when:
-    - not samba_cephfs_module | bool
-
 

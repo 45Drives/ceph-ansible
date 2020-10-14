@@ -36,11 +36,19 @@
     - not domain_member | bool
 
 # Configure shares
-- include: configure_shares.yml
+- include: configure_vfs_shares.yml
   tags:
     shares
   when:
     - configure_shares | bool
+    - samba_cephfs_module | bool
+
+- include: configure_kernel_shares.yml
+  tags:
+    shares
+  when:
+    - configure_shares | bool
+    - not samba_cephfs_module | bool
 
 - include: show_ctdb_status.yml
   when:
