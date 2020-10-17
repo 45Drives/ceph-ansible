@@ -49,8 +49,8 @@ active_directory_info:
   domain_join_password: ''
   # "ad_admin_user" and "ad_admin_group" are used to administer permissions on shares.
   # Defaults to join user credentials, replace below if join user and admin user are different
-  ad_admin_user: "{{ domain_join_user }}"
-  ad_admin_password: "{{ domain_join_password }}"
+  ad_admin_user: ''
+  ad_admin_password: ''
   ad_admin_group: "Domain Admins"
 
 # Samba Share (SMB) Definitions
@@ -96,7 +96,9 @@ ctdb_tunables:
   - key: 'TakeoverTimeout'
     value: '5'
 
+# If setting up multiple ctdb clusters that use the cluster backend, choose a new lock name or else ctdb will never start due to lock contention
 ctdb_lock_name: ctdb_lock
 
+# Dont touch 
 rados_locking: true
 

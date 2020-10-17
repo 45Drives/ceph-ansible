@@ -92,7 +92,7 @@
 
 - name: join_domain | Create user mapping file
   template:
-    src: "etc/samba/user.map"
+    src: "etc/samba/user.map.j2"
     dest: "/etc/samba/user.map"
     owner: root
     group: root
