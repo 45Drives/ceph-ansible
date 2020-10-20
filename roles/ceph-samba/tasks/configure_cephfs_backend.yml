@@ -60,11 +60,4 @@
     owner: ceph
     mode: "0600"
 
-- name: configure_cephfs_backend | mount {{ shared_storage_mountpoint }}/fsgw
-  mount:
-    name: "{{ shared_storage_mountpoint }}/fsgw"
-    src: "{{ groups[mon_group_name][0] }}:/fsgw"
-    fstype: "ceph"
-    opts: "name=samba,secretfile=/etc/ceph/samba.secret,_netdev,relatime"
-    state: mounted
 

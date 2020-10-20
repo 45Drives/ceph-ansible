@@ -1,11 +1,36 @@
 ---
+- name: configure_cephfs_backend | mount {{ shared_storage_mountpoint }}/fsgw
+  mount:
+    name: "{{ shared_storage_mountpoint }}/fsgw"
+    src: "{{ groups[mon_group_name][0] }}:/fsgw"
+    fstype: "ceph"
+    opts: "name=samba,secretfile=/etc/ceph/samba.secret,_netdev,relatime"
+    state: mounted
+
+- name: configure_kernel_shares - Ensure share directory exists
+  file:
+    path: "{{ shared_storage_mountpoint }}/fsgw/{{ item.name }}"
+    owner: "root"
+    group: "root"
+    mode: '0775'
+    state: directory
+  run_once: true
+  with_items:
+    - "{{ samba_shares }}"
+
+- name: configure_kernel_shares - Create Shares
+  shell: net conf addshare {{ item.name }} {{ item.path }} writeable={{ item.writeable[:1] }} guest_ok={{ item.guest_ok[:1] }} "{{ item.comment }}"
+  failed_when: false
+  run_once: true
+  loop: "{{ samba_shares }}"
+
 - name: configure_kernel_shares - Domain Member Windows ACL 
   block:
     - name: configure_shares - Grant the SeDiskOperatorPrivilege Privilege
       shell: net rpc rights grant "{{ active_directory_info.ad_admin_group }}" SeDiskOperatorPrivilege -U "{{ active_directory_info.ad_admin_user }}"%"{{ active_directory_info.ad_admin_password }}"
       run_once: true
 
-    - name: configure_kernel_shares - Create samba_shares paths and set ownership
+    - name: configure_kernel_shares - Update directory ownership
       file:
         path: "{{ shared_storage_mountpoint }}/fsgw/{{ item.name }}"
         owner: "root"
@@ -15,16 +40,7 @@
       run_once: true
       with_items:
         - "{{ samba_shares }}"
-
   when:
     - windows_acl | bool
     - domain_member | bool
-
-- name: configure_kernel_shares - create shares
-  shell: net conf addshare {{ item.name }} {{ item.path }} writeable={{ item.writeable[:1] }} guest_ok={{ item.guest_ok[:1] }} "{{ item.comment }}"
-  failed_when: false
-  run_once: true
-  loop: "{{ samba_shares }}"
-
-
 
