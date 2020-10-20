@@ -89,11 +89,3 @@
         name: oddjobd
         state: started
         enabled: yes
-
-- name: join_domain | Create user mapping file
-  template:
-    src: "etc/samba/user.map.j2"
-    dest: "/etc/samba/user.map"
-    owner: root
-    group: root
-    mode: 0644
