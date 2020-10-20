@@ -89,3 +89,11 @@
         name: oddjobd
         state: started
         enabled: yes
+
+- name: config_domain | configuring samba user.map
+  template:
+    src: "etc/samba/user.map.j2"
+    dest: "/etc/samba/user.map"
+    owner: root
+    group: root
+    mode: 0644
