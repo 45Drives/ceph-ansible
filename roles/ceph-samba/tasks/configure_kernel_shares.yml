@@ -1,5 +1,5 @@
 ---
-- name: configure_cephfs_backend | mount {{ shared_storage_mountpoint }}/fsgw
+- name: configure_kernel_shares | mount {{ shared_storage_mountpoint }}/fsgw
   mount:
     name: "{{ shared_storage_mountpoint }}/fsgw"
     src: "{{ groups[mon_group_name][0] }}:/fsgw"
@@ -27,7 +27,7 @@
 - name: configure_kernel_shares - Domain Member Windows ACL 
   block:
     - name: configure_shares - Grant the SeDiskOperatorPrivilege Privilege
-      shell: net sam rights grant "{{ active_directory_info.ad_admin_group }}" SeDiskOperatorPrivilege -U "{{ active_directory_info.ad_admin_user }}"%"{{ active_directory_info.ad_admin_password }}"
+      shell: net sam rights grant "{{ active_directory_info.workgroup|upper }}\{{ active_directory_info.ad_admin_group }}" SeDiskOperatorPrivilege -U "{{ active_directory_info.ad_admin_user }}"%"{{ active_directory_info.ad_admin_password }}"
       run_once: true
 
     - name: configure_kernel_shares - Update directory ownership

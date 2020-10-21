@@ -1,5 +1,5 @@
 ---
-- name: configure_cephfs_backend | mount {{ shared_storage_mountpoint }}/fsgw
+- name: configure_vfs_shares | mount {{ shared_storage_mountpoint }}/fsgw
   mount:
     name: "{{ shared_storage_mountpoint }}/fsgw"
     src: "{{ groups[mon_group_name][0] }}:/fsgw"
@@ -7,7 +7,7 @@
     opts: "name=samba,secretfile=/etc/ceph/samba.secret,_netdev,relatime"
     state: mounted
 
-- name: configure_kernel_shares - Ensure share directory exists
+- name: configure_vfs_shares - Ensure share directory exists
   file:
     path: "{{ shared_storage_mountpoint }}/fsgw/{{ item.name }}"
     owner: "root"
@@ -54,7 +54,7 @@
 - name: configure_vfs_shares - Domain Member Windows ACL 
   block:
     - name: configure_vfs_shares - Grant the SeDiskOperatorPrivilege Privilege
-      shell: net sam rights grant "{{ active_directory_info.ad_admin_group }}" SeDiskOperatorPrivilege -U "{{ active_directory_info.domain_join_user }}"%"{{ active_directory_info.domain_join_password }}"
+      shell: net sam rights grant "{{ active_directory_info.workgroup|upper }}\{{ active_directory_info.ad_admin_group }}" SeDiskOperatorPrivilege -U "{{ active_directory_info.domain_join_user }}"%"{{ active_directory_info.domain_join_password }}"
       run_once: true
 
     - name: configure_vfs_shares - Update directory ownership
