@@ -41,6 +41,7 @@
       service:
         name: "ctdb"
         state: started
+        enabled: yes
       register: "ctdb_started"
 
     - name: join_domain | waiting for ctdb to start

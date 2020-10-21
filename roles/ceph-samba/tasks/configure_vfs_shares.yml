@@ -54,7 +54,7 @@
 - name: configure_vfs_shares - Domain Member Windows ACL 
   block:
     - name: configure_vfs_shares - Grant the SeDiskOperatorPrivilege Privilege
-      shell: net rpc rights grant "{{ active_directory_info.ad_admin_group }}" SeDiskOperatorPrivilege -U "{{ active_directory_info.domain_join_user }}"%"{{ active_directory_info.domain_join_password }}"
+      shell: net sam rights grant "{{ active_directory_info.ad_admin_group }}" SeDiskOperatorPrivilege -U "{{ active_directory_info.domain_join_user }}"%"{{ active_directory_info.domain_join_password }}"
       run_once: true
 
     - name: configure_vfs_shares - Update directory ownership
