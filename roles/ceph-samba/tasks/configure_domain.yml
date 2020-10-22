@@ -7,27 +7,38 @@
     group: root
     mode: 0644
 
-- name: join_domain | Standalone
+- name: config_domain | configure domain user login
+  block:
+    - name: config_domain | use authselect to configure nsswitch.conf
+      shell: "/usr/bin/authselect select winbind with-mkhomedir --force"
+    
+    - name: start_config_domain | enable oddjobd
+      systemd:
+        name: oddjobd
+        state: started
+        enabled: yes
+
+- name: config_domain | Standalone
   block:
       # net ads testjoin -k will check if domain is already joined or not
       # returns: 255 -> Not in Domain, 0 -> In domain
-    - name: join_domain | checking if already joined to domain
+    - name: config_domain | checking if already joined to domain
       shell: "net ads testjoin -k"
       ignore_errors: true
       register: domain_check
 
-    - name: join_domain | joining domain
+    - name: config_domain | joining domain
       shell: net ads join -U "{{ active_directory_info.domain_join_user }}"%"{{ active_directory_info.domain_join_password }}"
       register: "domain_joined"
       when: domain_check.rc == 255
 
-    - name: start_join_domain | enable samba
+    - name: start_config_domain | enable samba
       systemd:
         name: smb
         state: started
         enabled: yes
 
-    - name: start_join_domain | enable winbind
+    - name: start_config_domain | enable winbind
       systemd:
         name: winbind
         state: started
@@ -35,16 +46,16 @@
   when:
     - not samba_cluster | bool
 
-- name: join_domain | Cluster
+- name: config_domain | Cluster
   block:
-    - name: join_domain | ensure ctdb is started
+    - name: config_domain | ensure ctdb is started
       service:
         name: "ctdb"
         state: started
         enabled: yes
       register: "ctdb_started"
 
-    - name: join_domain | waiting for ctdb to start
+    - name: config_domain | waiting for ctdb to start
       wait_for:
         delay: 5 
         host: "{{ ansible_default_ipv4.address }}"
@@ -53,25 +64,25 @@
 
       # net ads testjoin -k will check if domain is already joined or not
       # returns: 255 -> Not in Domain, 0 -> In domain
-    - name: join_domain | checking if already joined to domain
+    - name: config_domain | checking if already joined to domain
       shell: "net ads testjoin -k"
       failed_when: false
       register: domain_check
 
-    - name: join_domain | joining domain
+    - name: config_domain | joining domain
       shell: net ads join -U "{{ active_directory_info.domain_join_user }}"%"{{ active_directory_info.domain_join_password }}"
       run_once: true
       register: domain_joined
       when: domain_check.rc == 255
 
-    - name: join_domain | restarting ctdb #we do this after joining the domain in order to get winbind started
+    - name: config_domain | restarting ctdb #we do this after joining the domain in order to get winbind started
       service:
         name: "ctdb"
         state: restarted
       when: domain_check.rc == 255
       register: "ctdb_restarted"
 
-    - name: join_domain | waiting for ctdb to restart
+    - name: config_domain | waiting for ctdb to restart
       wait_for:
         delay: 20
         host: "{{ ansible_default_ipv4.address }}"
@@ -80,13 +91,3 @@
   when:
     - samba_cluster | bool
 
-- name: join_domain | configure domain user login
-  block:
-    - name: join_domain | use authselect to configure nsswitch.conf
-      shell: "/usr/bin/authselect select winbind with-mkhomedir --force"
-    
-    - name: start_join_domain | enable oddjobd
-      systemd:
-        name: oddjobd
-        state: started
-        enabled: yes
