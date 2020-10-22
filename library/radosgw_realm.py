@@ -24,14 +24,14 @@ ANSIBLE_METADATA = {
 
 DOCUMENTATION = '''
 ---
-module: ceph_dashboard_user
+module: radosgw_realm
 
-short_description: Manage Ceph Dashboard User
+short_description: Manage RADOS Gateway Realm
 
 version_added: "2.8"
 
 description:
-    - Manage Ceph Dashboard user(s) creation, deletion and updates.
+    - Manage RADOS Gateway realm(s) creation, deletion and updates.
 options:
     cluster:
         description:
@@ -40,59 +40,41 @@ options:
         default: ceph
     name:
         description:
-            - name of the Ceph Dashboard user.
+            - name of the RADOS Gateway realm.
         required: true
     state:
         description:
-            If 'present' is used, the module creates a user if it doesn't
+            If 'present' is used, the module creates a realm if it doesn't
             exist or update it if it already exists.
-            If 'absent' is used, the module will simply delete the user.
+            If 'absent' is used, the module will simply delete the realm.
             If 'info' is used, the module will return all details about the
-            existing user (json formatted).
+            existing realm (json formatted).
         required: false
         choices: ['present', 'absent', 'info']
         default: present
-    password:
+    default:
         description:
-            - password of the Ceph Dashboard user.
+            - set the default flag on the realm.
         required: false
-    roles:
-        description:
-            - roles of the Ceph Dashboard user.
-        required: false
-        default: []
+        default: false
 
 author:
     - Dimitri Savineau <dsavinea@redhat.com>
 '''
 
 EXAMPLES = '''
-- name: create a Ceph Dashboard user
-  ceph_dashboard_user:
+- name: create a RADOS Gateway default realm
+  radosgw_realm:
     name: foo
-    password: bar
+    default: true
 
-- name: create a read-only/block-manager Ceph Dashboard user
-  ceph_dashboard_user:
-    name: foo
-    password: bar
-    roles:
-      - 'read-only'
-      - 'block-manager'
-
-- name: create a Ceph Dashboard admin user
-  ceph_dashboard_user:
-    name: foo
-    password: bar
-    roles: ['administrator']
-
-- name: get a Ceph Dashboard user information
-  ceph_dashboard_user:
+- name: get a RADOS Gateway realm information
+  radosgw_realm:
     name: foo
     state: info
 
-- name: delete a Ceph Dashboard user
-  ceph_dashboard_user:
+- name: delete a RADOS Gateway realm
+  radosgw_realm:
     name: foo
     state: absent
 '''
@@ -137,29 +119,29 @@ def is_containerized():
     return container_image
 
 
-def pre_generate_ceph_cmd(container_image=None):
+def pre_generate_radosgw_cmd(container_image=None):
     '''
-    Generate ceph prefix comaand
+    Generate radosgw-admin prefix comaand
     '''
     if container_image:
-        cmd = container_exec('ceph', container_image)
+        cmd = container_exec('radosgw-admin', container_image)
     else:
-        cmd = ['ceph']
+        cmd = ['radosgw-admin']
 
     return cmd
 
 
-def generate_ceph_cmd(cluster, args, container_image=None):
+def generate_radosgw_cmd(cluster, args, container_image=None):
     '''
-    Generate 'ceph' command line to execute
+    Generate 'radosgw' command line to execute
     '''
 
-    cmd = pre_generate_ceph_cmd(container_image=container_image)
+    cmd = pre_generate_radosgw_cmd(container_image=container_image)
 
     base_cmd = [
         '--cluster',
         cluster,
-        'dashboard'
+        'realm'
     ]
 
     cmd.extend(base_cmd + args)
@@ -177,82 +159,51 @@ def exec_commands(module, cmd):
     return rc, cmd, out, err
 
 
-def create_user(module, container_image=None):
+def create_realm(module, container_image=None):
     '''
-    Create a new user
+    Create a new realm
     '''
 
     cluster = module.params.get('cluster')
     name = module.params.get('name')
-    password = module.params.get('password')
+    default = module.params.get('default', False)
 
-    args = ['ac-user-create', name, password]
+    args = ['create', '--rgw-realm=' + name]
 
-    cmd = generate_ceph_cmd(cluster=cluster, args=args, container_image=container_image)
+    if default:
+        args.append('--default')
+
+    cmd = generate_radosgw_cmd(cluster=cluster, args=args, container_image=container_image)
 
     return cmd
 
 
-def set_roles(module, container_image=None):
+def get_realm(module, container_image=None):
     '''
-    Set user roles
+    Get existing realm
     '''
 
     cluster = module.params.get('cluster')
     name = module.params.get('name')
-    roles = module.params.get('roles')
 
-    args = ['ac-user-set-roles', name]
+    args = ['get', '--rgw-realm=' + name, '--format=json']
 
-    args.extend(roles)
-
-    cmd = generate_ceph_cmd(cluster=cluster, args=args, container_image=container_image)
+    cmd = generate_radosgw_cmd(cluster=cluster, args=args, container_image=container_image)
 
     return cmd
 
 
-def set_password(module, container_image=None):
+def remove_realm(module, container_image=None):
     '''
-    Set user password
-    '''
-
-    cluster = module.params.get('cluster')
-    name = module.params.get('name')
-    password = module.params.get('password')
-
-    args = ['ac-user-set-password', name, password]
-
-    cmd = generate_ceph_cmd(cluster=cluster, args=args, container_image=container_image)
-
-    return cmd
-
-
-def get_user(module, container_image=None):
-    '''
-    Get existing user
+    Remove a realm
     '''
 
     cluster = module.params.get('cluster')
     name = module.params.get('name')
 
-    args = ['ac-user-show', name, '--format=json']
+    args = ['delete', '--rgw-realm=' + name]
 
-    cmd = generate_ceph_cmd(cluster=cluster, args=args, container_image=container_image)
-
-    return cmd
-
-
-def remove_user(module, container_image=None):
-    '''
-    Remove a user
-    '''
-
-    cluster = module.params.get('cluster')
-    name = module.params.get('name')
-
-    args = ['ac-user-delete', name]
-
-    cmd = generate_ceph_cmd(cluster=cluster, args=args, container_image=container_image)
+    cmd = generate_radosgw_cmd(cluster=cluster, args=args, container_image=container_image)
 
     return cmd
 
@@ -279,23 +230,17 @@ def run_module():
         cluster=dict(type='str', required=False, default='ceph'),
         name=dict(type='str', required=True),
         state=dict(type='str', required=False, choices=['present', 'absent', 'info'], default='present'),
-        password=dict(type='str', required=False, no_log=True),
-        roles=dict(type='list',
-                   required=False,
-                   choices=['administrator', 'read-only', 'block-manager', 'rgw-manager', 'cluster-manager', 'pool-manager', 'cephfs-manager'],
-                   default=[]),
+        default=dict(type='bool', required=False, default=False),
     )
 
     module = AnsibleModule(
         argument_spec=module_args,
         supports_check_mode=True,
-        required_if=[['state', 'present', ['password']]]
     )
 
     # Gather module parameters in variables
     name = module.params.get('name')
     state = module.params.get('state')
-    roles = module.params.get('roles')
 
     if module.check_mode:
         module.exit_json(
@@ -315,31 +260,22 @@ def run_module():
     container_image = is_containerized()
 
     if state == "present":
-        rc, cmd, out, err = exec_commands(module, get_user(module, container_image=container_image))
-        if rc == 0:
-            user = json.loads(out)
-            user['roles'].sort()
-            roles.sort()
-            if user['roles'] != roles:
-                rc, cmd, out, err = exec_commands(module, set_roles(module, container_image=container_image))
-                changed = True
-            rc, cmd, out, err = exec_commands(module, set_password(module, container_image=container_image))
-        else:
-            rc, cmd, out, err = exec_commands(module, create_user(module, container_image=container_image))
-            rc, cmd, out, err = exec_commands(module, set_roles(module, container_image=container_image))
+        rc, cmd, out, err = exec_commands(module, get_realm(module, container_image=container_image))
+        if rc != 0:
+            rc, cmd, out, err = exec_commands(module, create_realm(module, container_image=container_image))
             changed = True
 
     elif state == "absent":
-        rc, cmd, out, err = exec_commands(module, get_user(module, container_image=container_image))
+        rc, cmd, out, err = exec_commands(module, get_realm(module, container_image=container_image))
         if rc == 0:
-            rc, cmd, out, err = exec_commands(module, remove_user(module, container_image=container_image))
+            rc, cmd, out, err = exec_commands(module, remove_realm(module, container_image=container_image))
             changed = True
         else:
             rc = 0
-            out = "Dashboard User {} doesn't exist".format(name)
+            out = "Realm {} doesn't exist".format(name)
 
     elif state == "info":
-        rc, cmd, out, err = exec_commands(module, get_user(module, container_image=container_image))
+        rc, cmd, out, err = exec_commands(module, get_realm(module, container_image=container_image))
 
     exit_module(module=module, out=out, rc=rc, cmd=cmd, err=err, startd=startd, changed=changed)
 

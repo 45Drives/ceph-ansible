@@ -24,14 +24,14 @@ ANSIBLE_METADATA = {
 
 DOCUMENTATION = '''
 ---
-module: ceph_dashboard_user
+module: ceph_fs
 
-short_description: Manage Ceph Dashboard User
+short_description: Manage Ceph File System
 
 version_added: "2.8"
 
 description:
-    - Manage Ceph Dashboard user(s) creation, deletion and updates.
+    - Manage Ceph File System(s) creation, deletion and updates.
 options:
     cluster:
         description:
@@ -40,59 +40,51 @@ options:
         default: ceph
     name:
         description:
-            - name of the Ceph Dashboard user.
+            - name of the Ceph File System.
         required: true
     state:
         description:
-            If 'present' is used, the module creates a user if it doesn't
-            exist or update it if it already exists.
-            If 'absent' is used, the module will simply delete the user.
+            If 'present' is used, the module creates a filesystem if it
+            doesn't  exist or update it if it already exists.
+            If 'absent' is used, the module will simply delete the filesystem.
             If 'info' is used, the module will return all details about the
-            existing user (json formatted).
+            existing filesystem (json formatted).
         required: false
         choices: ['present', 'absent', 'info']
         default: present
-    password:
+    data:
         description:
-            - password of the Ceph Dashboard user.
+            - name of the data pool.
         required: false
-    roles:
+    metadata:
         description:
-            - roles of the Ceph Dashboard user.
+            - name of the metadata pool.
         required: false
-        default: []
+    max_mds:
+        description:
+            - name of the max_mds attribute.
+        required: false
+
 
 author:
     - Dimitri Savineau <dsavinea@redhat.com>
 '''
 
 EXAMPLES = '''
-- name: create a Ceph Dashboard user
-  ceph_dashboard_user:
+- name: create a Ceph File System
+  ceph_fs:
     name: foo
-    password: bar
+    data: bar_data
+    metadata: bar_metadata
+    max_mds: 2
 
-- name: create a read-only/block-manager Ceph Dashboard user
-  ceph_dashboard_user:
-    name: foo
-    password: bar
-    roles:
-      - 'read-only'
-      - 'block-manager'
-
-- name: create a Ceph Dashboard admin user
-  ceph_dashboard_user:
-    name: foo
-    password: bar
-    roles: ['administrator']
-
-- name: get a Ceph Dashboard user information
-  ceph_dashboard_user:
+- name: get a Ceph File System information
+  ceph_fs:
     name: foo
     state: info
 
-- name: delete a Ceph Dashboard user
-  ceph_dashboard_user:
+- name: delete a Ceph File System
+  ceph_fs:
     name: foo
     state: absent
 '''
@@ -159,7 +151,7 @@ def generate_ceph_cmd(cluster, args, container_image=None):
     base_cmd = [
         '--cluster',
         cluster,
-        'dashboard'
+        'fs'
     ]
 
     cmd.extend(base_cmd + args)
@@ -177,80 +169,78 @@ def exec_commands(module, cmd):
     return rc, cmd, out, err
 
 
-def create_user(module, container_image=None):
+def create_fs(module, container_image=None):
     '''
-    Create a new user
+    Create a new fs
     '''
 
     cluster = module.params.get('cluster')
     name = module.params.get('name')
-    password = module.params.get('password')
+    data = module.params.get('data')
+    metadata = module.params.get('metadata')
 
-    args = ['ac-user-create', name, password]
+    args = ['new', name, metadata, data]
 
     cmd = generate_ceph_cmd(cluster=cluster, args=args, container_image=container_image)
 
     return cmd
 
 
-def set_roles(module, container_image=None):
+def get_fs(module, container_image=None):
     '''
-    Set user roles
+    Get existing fs
     '''
 
     cluster = module.params.get('cluster')
     name = module.params.get('name')
-    roles = module.params.get('roles')
 
-    args = ['ac-user-set-roles', name]
-
-    args.extend(roles)
+    args = ['get', name, '--format=json']
 
     cmd = generate_ceph_cmd(cluster=cluster, args=args, container_image=container_image)
 
     return cmd
 
 
-def set_password(module, container_image=None):
+def remove_fs(module, container_image=None):
     '''
-    Set user password
+    Remove a fs
     '''
 
     cluster = module.params.get('cluster')
     name = module.params.get('name')
-    password = module.params.get('password')
 
-    args = ['ac-user-set-password', name, password]
+    args = ['rm', name, '--yes-i-really-mean-it']
 
     cmd = generate_ceph_cmd(cluster=cluster, args=args, container_image=container_image)
 
     return cmd
 
 
-def get_user(module, container_image=None):
+def fail_fs(module, container_image=None):
     '''
-    Get existing user
+    Fail a fs
     '''
 
     cluster = module.params.get('cluster')
     name = module.params.get('name')
 
-    args = ['ac-user-show', name, '--format=json']
+    args = ['fail', name]
 
     cmd = generate_ceph_cmd(cluster=cluster, args=args, container_image=container_image)
 
     return cmd
 
 
-def remove_user(module, container_image=None):
+def set_fs(module, container_image=None):
     '''
-    Remove a user
+    Set parameter to a fs
     '''
 
     cluster = module.params.get('cluster')
     name = module.params.get('name')
+    max_mds = module.params.get('max_mds')
 
-    args = ['ac-user-delete', name]
+    args = ['set', name, 'max_mds', str(max_mds)]
 
     cmd = generate_ceph_cmd(cluster=cluster, args=args, container_image=container_image)
 
@@ -279,23 +269,21 @@ def run_module():
         cluster=dict(type='str', required=False, default='ceph'),
         name=dict(type='str', required=True),
         state=dict(type='str', required=False, choices=['present', 'absent', 'info'], default='present'),
-        password=dict(type='str', required=False, no_log=True),
-        roles=dict(type='list',
-                   required=False,
-                   choices=['administrator', 'read-only', 'block-manager', 'rgw-manager', 'cluster-manager', 'pool-manager', 'cephfs-manager'],
-                   default=[]),
+        data=dict(type='str', required=False),
+        metadata=dict(type='str', required=False),
+        max_mds=dict(type='int', required=False),
     )
 
     module = AnsibleModule(
         argument_spec=module_args,
         supports_check_mode=True,
-        required_if=[['state', 'present', ['password']]]
+        required_if=[['state', 'present', ['data', 'metadata']]],
     )
 
     # Gather module parameters in variables
     name = module.params.get('name')
     state = module.params.get('state')
-    roles = module.params.get('roles')
+    max_mds = module.params.get('max_mds')
 
     if module.check_mode:
         module.exit_json(
@@ -315,31 +303,33 @@ def run_module():
     container_image = is_containerized()
 
     if state == "present":
-        rc, cmd, out, err = exec_commands(module, get_user(module, container_image=container_image))
+        rc, cmd, out, err = exec_commands(module, get_fs(module, container_image=container_image))
         if rc == 0:
-            user = json.loads(out)
-            user['roles'].sort()
-            roles.sort()
-            if user['roles'] != roles:
-                rc, cmd, out, err = exec_commands(module, set_roles(module, container_image=container_image))
-                changed = True
-            rc, cmd, out, err = exec_commands(module, set_password(module, container_image=container_image))
+            fs = json.loads(out)
+            if max_mds and fs["mdsmap"]["max_mds"] != max_mds:
+                rc, cmd, out, err = exec_commands(module, set_fs(module, container_image=container_image))
+                if rc == 0:
+                    changed = True
         else:
-            rc, cmd, out, err = exec_commands(module, create_user(module, container_image=container_image))
-            rc, cmd, out, err = exec_commands(module, set_roles(module, container_image=container_image))
-            changed = True
+            rc, cmd, out, err = exec_commands(module, create_fs(module, container_image=container_image))
+            if max_mds and max_mds > 1:
+                exec_commands(module, set_fs(module, container_image=container_image))
+            if rc == 0:
+                changed = True
 
     elif state == "absent":
-        rc, cmd, out, err = exec_commands(module, get_user(module, container_image=container_image))
+        rc, cmd, out, err = exec_commands(module, get_fs(module, container_image=container_image))
         if rc == 0:
-            rc, cmd, out, err = exec_commands(module, remove_user(module, container_image=container_image))
-            changed = True
+            exec_commands(module, fail_fs(module, container_image=container_image))
+            rc, cmd, out, err = exec_commands(module, remove_fs(module, container_image=container_image))
+            if rc == 0:
+                changed = True
         else:
             rc = 0
-            out = "Dashboard User {} doesn't exist".format(name)
+            out = "Ceph File System {} doesn't exist".format(name)
 
     elif state == "info":
-        rc, cmd, out, err = exec_commands(module, get_user(module, container_image=container_image))
+        rc, cmd, out, err = exec_commands(module, get_fs(module, container_image=container_image))
 
     exit_module(module=module, out=out, rc=rc, cmd=cmd, err=err, startd=startd, changed=changed)
 

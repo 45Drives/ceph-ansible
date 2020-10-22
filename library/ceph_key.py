@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+
 # Copyright 2018, Red Hat, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -46,6 +47,16 @@ options:
         description:
             - name of the CephX key
         required: true
+    user:
+        description:
+            - entity used to perform operation.
+            It corresponds to the -n option (--name)
+        required: false
+    user_key:
+        description:
+            - the path to the keyring corresponding to the
+            user being used.
+            It corresponds to the -k option (--keyring)
     state:
         description:
             - If 'present' is used, the module creates a keyring
@@ -130,6 +141,8 @@ caps:
 - name: create cephx key
   ceph_key:
     name: "{{ keys_to_create }}"
+    user: client.bootstrap-rgw
+    user_key: /var/lib/ceph/bootstrap-rgw/ceph.keyring
     state: present
     caps: "{{ caps }}"
 
@@ -189,6 +202,7 @@ def str_to_bool(val):
     else:
         raise ValueError("Invalid input value: %s" % val)
 
+
 def fatal(message, module):
     '''
     Report a fatal error and exit
@@ -242,10 +256,12 @@ def generate_secret():
     return secret
 
 
-def generate_caps(cmd, _type, caps):
+def generate_caps(_type, caps):
     '''
     Generate CephX capabilities list
     '''
+
+    caps_cli = []
 
     for k, v in caps.items():
         # makes sure someone didn't pass an empty var,
@@ -253,13 +269,13 @@ def generate_caps(cmd, _type, caps):
         if len(k) == 0:
             continue
         if _type == "ceph-authtool":
-            cmd.extend(["--cap"])
-        cmd.extend([k, v])
+            caps_cli.extend(["--cap"])
+        caps_cli.extend([k, v])
 
-    return cmd
+    return caps_cli
 
 
-def generate_ceph_cmd(cluster, args, user, user_key, container_image=None):
+def generate_ceph_cmd(cluster, args, user, user_key_path, container_image=None):
     '''
     Generate 'ceph' command line to execute
     '''
@@ -276,7 +292,7 @@ def generate_ceph_cmd(cluster, args, user, user_key, container_image=None):
         '-n',
         user,
         '-k',
-        user_key,
+        user_key_path,
         '--cluster',
         cluster,
         'auth',
@@ -310,40 +326,38 @@ def generate_ceph_authtool_cmd(cluster, name, secret, caps, dest, container_imag
     ]
 
     cmd.extend(base_cmd)
-    cmd = generate_caps(cmd, "ceph-authtool", caps)
+    cmd.extend(generate_caps("ceph-authtool", caps))
 
     return cmd
 
 
-def create_key(module, result, cluster, name, secret, caps, import_key, dest, container_image=None):  # noqa E501
+def create_key(module, result, cluster, user, user_key_path, name, secret, caps, import_key, dest, container_image=None):  # noqa E501
     '''
     Create a CephX key
     '''
 
-    args = [
-        'import',
-        '-i',
-        dest,
-    ]
     cmd_list = []
-
     if not secret:
         secret = generate_secret()
+
+    if user == 'client.admin':
+        args = ['import', '-i', dest]
+    else:
+        args = ['get-or-create', name]
+        args.extend(generate_caps(None, caps))
+        args.extend(['-o', dest])
 
     cmd_list.append(generate_ceph_authtool_cmd(
         cluster, name, secret, caps, dest, container_image))
 
-    if import_key:
-        user = "client.admin"
-        keyring_filename = cluster + "." + user + ".keyring"
-        user_key = os.path.join("/etc/ceph/", keyring_filename)
+    if import_key or user != 'client.admin':
         cmd_list.append(generate_ceph_cmd(
-            cluster, args, user, user_key, container_image))
+            cluster, args, user, user_key_path, container_image))
 
     return cmd_list
 
 
-def delete_key(cluster, name, container_image=None):
+def delete_key(cluster, user, user_key_path, name, container_image=None):
     '''
     Delete a CephX key
     '''
@@ -355,16 +369,13 @@ def delete_key(cluster, name, container_image=None):
         name,
     ]
 
-    user = "client.admin"
-    keyring_filename = cluster + "." + user + ".keyring"
-    user_key = os.path.join("/etc/ceph/", keyring_filename)
     cmd_list.append(generate_ceph_cmd(
-        cluster, args, user, user_key, container_image))
+        cluster, args, user, user_key_path, container_image))
 
     return cmd_list
 
 
-def get_key(cluster, name, dest, container_image=None):
+def get_key(cluster, user, user_key_path, name, dest, container_image=None):
     '''
     Get a CephX key (write on the filesystem)
     '''
@@ -378,16 +389,13 @@ def get_key(cluster, name, dest, container_image=None):
         dest,
     ]
 
-    user = "client.admin"
-    keyring_filename = cluster + "." + user + ".keyring"
-    user_key = os.path.join("/etc/ceph/", keyring_filename)
     cmd_list.append(generate_ceph_cmd(
-        cluster, args, user, user_key, container_image))
+        cluster, args, user, user_key_path, container_image))
 
     return cmd_list
 
 
-def info_key(cluster, name, user, user_key, output_format, container_image=None):  # noqa E501
+def info_key(cluster, name, user, user_key_path, output_format, container_image=None):  # noqa E501
     '''
     Get information about a CephX key
     '''
@@ -402,12 +410,12 @@ def info_key(cluster, name, user, user_key, output_format, container_image=None)
     ]
 
     cmd_list.append(generate_ceph_cmd(
-        cluster, args, user, user_key, container_image))
+        cluster, args, user, user_key_path, container_image))
 
     return cmd_list
 
 
-def list_keys(cluster, user, user_key, container_image=None):
+def list_keys(cluster, user, user_key_path, container_image=None):
     '''
     List all CephX keys
     '''
@@ -421,7 +429,7 @@ def list_keys(cluster, user, user_key, container_image=None):
     ]
 
     cmd_list.append(generate_ceph_cmd(
-        cluster, args, user, user_key, container_image))
+        cluster, args, user, user_key_path, container_image))
 
     return cmd_list
 
@@ -460,14 +468,14 @@ def lookup_ceph_initial_entities(module, out):
     else:
         fatal("'auth_dump' key not present in json output:", module)  # noqa E501
 
-    if len(entities) != len(CEPH_INITIAL_KEYS) and not str_to_bool(os.environ.get('CEPH_ROLLING_UPDATE', False)):
+    if len(entities) != len(CEPH_INITIAL_KEYS) and not str_to_bool(os.environ.get('CEPH_ROLLING_UPDATE', False)):  # noqa E501
         # must be missing in auth_dump, as if it were in CEPH_INITIAL_KEYS
         # it'd be in entities from the above test. Report what's missing.
         missing = []
         for e in CEPH_INITIAL_KEYS:
             if e not in entities:
                 missing.append(e)
-        fatal("initial keyring does not contain keys: " + ' '.join(missing), module)
+        fatal("initial keyring does not contain keys: " + ' '.join(missing), module)  # noqa E501
     return entities
 
 
@@ -500,9 +508,11 @@ def run_module():
         name=dict(type='str', required=False),
         state=dict(type='str', required=False, default='present', choices=['present', 'update', 'absent', 'list', 'info', 'fetch_initial_keys']),
         caps=dict(type='dict', required=False, default=None),
-        secret=dict(type='str', required=False, default=None),
+        secret=dict(type='str', required=False, default=None, no_log=True),
         import_key=dict(type='bool', required=False, default=True),
         dest=dict(type='str', required=False, default='/etc/ceph/'),
+        user=dict(type='str', required=False, default='client.admin'),
+        user_key=dict(type='str', required=False, default=None)
     )
 
     module = AnsibleModule(
@@ -521,6 +531,8 @@ def run_module():
     secret = module.params.get('secret')
     import_key = module.params.get('import_key')
     dest = module.params.get('dest')
+    user = module.params.get('user')
+    user_key = module.params.get('user_key')
 
     changed = False
 
@@ -528,14 +540,15 @@ def run_module():
         changed=changed,
         stdout='',
         stderr='',
-        rc='',
+        rc=0,
         start='',
         end='',
         delta='',
     )
 
     if module.check_mode:
-        return result
+        module.exit_json(**result)
+
     startd = datetime.datetime.now()
 
     # will return either the image name or None
@@ -548,9 +561,13 @@ def run_module():
     _caps = caps
     key_exist = 1
 
-    user = "client.admin"
-    keyring_filename = cluster + '.' + user + '.keyring'
-    user_key = os.path.join("/etc/ceph/", keyring_filename)
+    if not user_key:
+        user_key_filename = '{}.{}.keyring'.format(cluster, user)
+        user_key_dir = '/etc/ceph'
+        user_key_path = os.path.join(user_key_dir, user_key_filename)
+    else:
+        user_key_path = user_key
+
     output_format = "json"
 
     if (state in ["present", "update"]):
@@ -560,8 +577,8 @@ def run_module():
             file_path = dest
         else:
             if 'bootstrap' in dest:
-                # Build a different path for bootstrap keys as there are stored as
-                # /var/lib/ceph/bootstrap-rbd/ceph.keyring
+                # Build a different path for bootstrap keys as there are stored
+                # as /var/lib/ceph/bootstrap-rbd/ceph.keyring
                 keyring_filename = cluster + '.keyring'
             else:
                 keyring_filename = cluster + "." + name + ".keyring"
@@ -572,7 +589,7 @@ def run_module():
         if import_key:
             _info_key = []
             rc, cmd, out, err = exec_commands(
-                module, info_key(cluster, name, user, user_key, output_format, container_image))  # noqa E501
+                module, info_key(cluster, name, user, user_key_path, output_format, container_image))  # noqa E501
             key_exist = rc
             if not caps and key_exist != 0:
                 fatal("Capabilities must be provided when state is 'present'", module)  # noqa E501
@@ -588,7 +605,7 @@ def run_module():
                 _caps = _info_key[0]['caps']
                 if secret == _secret and caps == _caps:
                     if not os.path.isfile(file_path):
-                        rc, cmd, out, err = exec_commands(module, get_key(cluster, name, file_path, container_image))  # noqa E501
+                        rc, cmd, out, err = exec_commands(module, get_key(cluster, user, user_key_path, name, file_path, container_image))  # noqa E501
                         result["rc"] = rc
                         if rc != 0:
                             result["stdout"] = "Couldn't fetch the key {0} at {1}.".format(name, file_path) # noqa E501
@@ -604,9 +621,9 @@ def run_module():
                 result["stdout"] = "{0} already exists in {1} you must provide secret *and* caps when import_key is {2}".format(name, dest, import_key) # noqa E501
                 result["rc"] = 0
                 module.exit_json(**result)
-        if (key_exist == 0 and (secret != _secret or caps != _caps)) or key_exist != 0:
+        if (key_exist == 0 and (secret != _secret or caps != _caps)) or key_exist != 0:  # noqa E501
             rc, cmd, out, err = exec_commands(module, create_key(
-                module, result, cluster, name, secret, caps, import_key, file_path, container_image))  # noqa E501
+                module, result, cluster, user, user_key_path, name, secret, caps, import_key, file_path, container_image))  # noqa E501
             if rc != 0:
                 result["stdout"] = "Couldn't create or update {0}".format(name)
                 result["stderr"] = err
@@ -614,11 +631,10 @@ def run_module():
             module.set_fs_attributes_if_different(file_args, False)
             changed = True
 
-
     elif state == "absent":
         if key_exist == 0:
             rc, cmd, out, err = exec_commands(
-                module, delete_key(cluster, name, container_image))
+                module, delete_key(cluster, user, user_key_path, name, container_image))
             if rc == 0:
                 changed = True
         else:
@@ -626,7 +642,7 @@ def run_module():
 
     elif state == "info":
         rc, cmd, out, err = exec_commands(
-            module, info_key(cluster, name, user, user_key, output_format, container_image))  # noqa E501
+            module, info_key(cluster, name, user, user_key_path, output_format, container_image))  # noqa E501
         if rc != 0:
             result["stdout"] = "skipped, since {0} does not exist".format(name)
             result['rc'] = 0
@@ -634,17 +650,17 @@ def run_module():
 
     elif state == "list":
         rc, cmd, out, err = exec_commands(
-            module, list_keys(cluster, user, user_key, container_image))
+            module, list_keys(cluster, user, user_key_path, container_image))
 
     elif state == "fetch_initial_keys":
         hostname = socket.gethostname().split('.', 1)[0]
         user = "mon."
         keyring_filename = cluster + "-" + hostname + "/keyring"
-        user_key = os.path.join("/var/lib/ceph/mon/", keyring_filename)
+        user_key_path = os.path.join("/var/lib/ceph/mon/", keyring_filename)
         rc, cmd, out, err = exec_commands(
-            module, list_keys(cluster, user, user_key, container_image))
+            module, list_keys(cluster, user, user_key_path, container_image))
         if rc != 0:
-            result["stdout"] = "failed to retrieve ceph keys".format(name)
+            result["stdout"] = "failed to retrieve ceph keys"
             result["sdterr"] = err
             result['rc'] = 0
             module.exit_json(**result)
@@ -667,7 +683,7 @@ def run_module():
             ]
 
             info_cmd = info_key(cluster, entity, user,
-                                user_key, output_format, container_image)
+                                user_key_path, output_format, container_image)
             # we use info_cmd[0] because info_cmd is an array made of an array
             info_cmd[0].extend(extra_args)
             rc, cmd, out, err = exec_commands(

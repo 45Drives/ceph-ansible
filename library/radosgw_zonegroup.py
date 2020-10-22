@@ -24,14 +24,14 @@ ANSIBLE_METADATA = {
 
 DOCUMENTATION = '''
 ---
-module: ceph_dashboard_user
+module: radosgw_zonegroup
 
-short_description: Manage Ceph Dashboard User
+short_description: Manage RADOS Gateway Zonegroup
 
 version_added: "2.8"
 
 description:
-    - Manage Ceph Dashboard user(s) creation, deletion and updates.
+    - Manage RADOS Gateway zonegroup(s) creation, deletion and updates.
 options:
     cluster:
         description:
@@ -40,60 +40,62 @@ options:
         default: ceph
     name:
         description:
-            - name of the Ceph Dashboard user.
+            - name of the RADOS Gateway zonegroup.
         required: true
     state:
         description:
-            If 'present' is used, the module creates a user if it doesn't
+            If 'present' is used, the module creates a zonegroup if it doesn't
             exist or update it if it already exists.
-            If 'absent' is used, the module will simply delete the user.
+            If 'absent' is used, the module will simply delete the zonegroup.
             If 'info' is used, the module will return all details about the
-            existing user (json formatted).
+            existing zonegroup (json formatted).
         required: false
         choices: ['present', 'absent', 'info']
         default: present
-    password:
+    realm:
         description:
-            - password of the Ceph Dashboard user.
-        required: false
-    roles:
+            - name of the RADOS Gateway realm.
+        required: true
+    endpoints:
         description:
-            - roles of the Ceph Dashboard user.
+            - endpoints of the RADOS Gateway zonegroup.
         required: false
         default: []
+    default:
+        description:
+            - set the default flag on the zonegroup.
+        required: false
+        default: false
+    master:
+        description:
+            - set the master flag on the zonegroup.
+        required: false
+        default: false
 
 author:
     - Dimitri Savineau <dsavinea@redhat.com>
 '''
 
 EXAMPLES = '''
-- name: create a Ceph Dashboard user
-  ceph_dashboard_user:
+- name: create a RADOS Gateway default zonegroup
+  radosgw_zonegroup:
     name: foo
-    password: bar
+    realm: bar
+    endpoints:
+      - http://192.168.1.10:8080
+      - http://192.168.1.11:8080
+    default: true
 
-- name: create a read-only/block-manager Ceph Dashboard user
-  ceph_dashboard_user:
+- name: get a RADOS Gateway zonegroup information
+  radosgw_zonegroup:
     name: foo
-    password: bar
-    roles:
-      - 'read-only'
-      - 'block-manager'
-
-- name: create a Ceph Dashboard admin user
-  ceph_dashboard_user:
-    name: foo
-    password: bar
-    roles: ['administrator']
-
-- name: get a Ceph Dashboard user information
-  ceph_dashboard_user:
-    name: foo
+    realm: bar
     state: info
 
-- name: delete a Ceph Dashboard user
-  ceph_dashboard_user:
+- name: delete a RADOS Gateway zonegroup
+  radosgw_zonegroup:
     name: foo
+    realm: bar
     state: absent
 '''
 
@@ -137,29 +139,29 @@ def is_containerized():
     return container_image
 
 
-def pre_generate_ceph_cmd(container_image=None):
+def pre_generate_radosgw_cmd(container_image=None):
     '''
-    Generate ceph prefix comaand
+    Generate radosgw-admin prefix comaand
     '''
     if container_image:
-        cmd = container_exec('ceph', container_image)
+        cmd = container_exec('radosgw-admin', container_image)
     else:
-        cmd = ['ceph']
+        cmd = ['radosgw-admin']
 
     return cmd
 
 
-def generate_ceph_cmd(cluster, args, container_image=None):
+def generate_radosgw_cmd(cluster, args, container_image=None):
     '''
-    Generate 'ceph' command line to execute
+    Generate 'radosgw' command line to execute
     '''
 
-    cmd = pre_generate_ceph_cmd(container_image=container_image)
+    cmd = pre_generate_radosgw_cmd(container_image=container_image)
 
     base_cmd = [
         '--cluster',
         cluster,
-        'dashboard'
+        'zonegroup'
     ]
 
     cmd.extend(base_cmd + args)
@@ -177,82 +179,92 @@ def exec_commands(module, cmd):
     return rc, cmd, out, err
 
 
-def create_user(module, container_image=None):
+def create_zonegroup(module, container_image=None):
     '''
-    Create a new user
+    Create a new zonegroup
     '''
 
     cluster = module.params.get('cluster')
     name = module.params.get('name')
-    password = module.params.get('password')
+    realm = module.params.get('realm')
+    endpoints = module.params.get('endpoints')
+    default = module.params.get('default')
+    master = module.params.get('master')
 
-    args = ['ac-user-create', name, password]
+    args = ['create', '--rgw-realm=' + realm, '--rgw-zonegroup=' + name]
 
-    cmd = generate_ceph_cmd(cluster=cluster, args=args, container_image=container_image)
+    if endpoints:
+        args.extend(['--endpoints=' + ','.join(endpoints)])
+
+    if default:
+        args.append('--default')
+
+    if master:
+        args.append('--master')
+
+    cmd = generate_radosgw_cmd(cluster=cluster, args=args, container_image=container_image)
 
     return cmd
 
 
-def set_roles(module, container_image=None):
+def modify_zonegroup(module, container_image=None):
     '''
-    Set user roles
+    Modify a new zonegroup
     '''
 
     cluster = module.params.get('cluster')
     name = module.params.get('name')
-    roles = module.params.get('roles')
+    realm = module.params.get('realm')
+    endpoints = module.params.get('endpoints')
+    default = module.params.get('default')
+    master = module.params.get('master')
 
-    args = ['ac-user-set-roles', name]
+    args = ['modify', '--rgw-realm=' + realm, '--rgw-zonegroup=' + name]
 
-    args.extend(roles)
+    if endpoints:
+        args.extend(['--endpoints=' + ','.join(endpoints)])
 
-    cmd = generate_ceph_cmd(cluster=cluster, args=args, container_image=container_image)
+    if default:
+        args.append('--default')
+
+    if master:
+        args.append('--master')
+
+    cmd = generate_radosgw_cmd(cluster=cluster, args=args, container_image=container_image)
 
     return cmd
 
 
-def set_password(module, container_image=None):
+def get_zonegroup(module, container_image=None):
     '''
-    Set user password
+    Get existing zonegroup
     '''
 
     cluster = module.params.get('cluster')
     name = module.params.get('name')
-    password = module.params.get('password')
+    realm = module.params.get('realm')
 
-    args = ['ac-user-set-password', name, password]
+    args = ['get', '--rgw-realm=' + realm, '--rgw-zonegroup=' + name, '--format=json']
 
-    cmd = generate_ceph_cmd(cluster=cluster, args=args, container_image=container_image)
+    cmd = generate_radosgw_cmd(cluster=cluster,
+                               args=args,
+                               container_image=container_image)
 
     return cmd
 
 
-def get_user(module, container_image=None):
+def remove_zonegroup(module, container_image=None):
     '''
-    Get existing user
-    '''
-
-    cluster = module.params.get('cluster')
-    name = module.params.get('name')
-
-    args = ['ac-user-show', name, '--format=json']
-
-    cmd = generate_ceph_cmd(cluster=cluster, args=args, container_image=container_image)
-
-    return cmd
-
-
-def remove_user(module, container_image=None):
-    '''
-    Remove a user
+    Remove a zonegroup
     '''
 
     cluster = module.params.get('cluster')
     name = module.params.get('name')
+    realm = module.params.get('realm')
 
-    args = ['ac-user-delete', name]
+    args = ['delete', '--rgw-realm=' + realm, '--rgw-zonegroup=' + name]
 
-    cmd = generate_ceph_cmd(cluster=cluster, args=args, container_image=container_image)
+    cmd = generate_radosgw_cmd(cluster=cluster, args=args, container_image=container_image)
 
     return cmd
 
@@ -279,23 +291,22 @@ def run_module():
         cluster=dict(type='str', required=False, default='ceph'),
         name=dict(type='str', required=True),
         state=dict(type='str', required=False, choices=['present', 'absent', 'info'], default='present'),
-        password=dict(type='str', required=False, no_log=True),
-        roles=dict(type='list',
-                   required=False,
-                   choices=['administrator', 'read-only', 'block-manager', 'rgw-manager', 'cluster-manager', 'pool-manager', 'cephfs-manager'],
-                   default=[]),
+        realm=dict(type='str', require=True),
+        endpoints=dict(type='list', require=False, default=[]),
+        default=dict(type='bool', required=False, default=False),
+        master=dict(type='bool', required=False, default=False),
     )
 
     module = AnsibleModule(
         argument_spec=module_args,
         supports_check_mode=True,
-        required_if=[['state', 'present', ['password']]]
     )
 
     # Gather module parameters in variables
     name = module.params.get('name')
     state = module.params.get('state')
-    roles = module.params.get('roles')
+    endpoints = module.params.get('endpoints')
+    master = str(module.params.get('master')).lower()
 
     if module.check_mode:
         module.exit_json(
@@ -315,31 +326,35 @@ def run_module():
     container_image = is_containerized()
 
     if state == "present":
-        rc, cmd, out, err = exec_commands(module, get_user(module, container_image=container_image))
+        rc, cmd, out, err = exec_commands(module, get_zonegroup(module, container_image=container_image))
         if rc == 0:
-            user = json.loads(out)
-            user['roles'].sort()
-            roles.sort()
-            if user['roles'] != roles:
-                rc, cmd, out, err = exec_commands(module, set_roles(module, container_image=container_image))
+            zonegroup = json.loads(out)
+            current = {
+                'endpoints': zonegroup['endpoints'],
+                'master': zonegroup.get('is_master', 'false')
+            }
+            asked = {
+                'endpoints': endpoints,
+                'master': master
+            }
+            if current != asked:
+                rc, cmd, out, err = exec_commands(module, modify_zonegroup(module, container_image=container_image))
                 changed = True
-            rc, cmd, out, err = exec_commands(module, set_password(module, container_image=container_image))
         else:
-            rc, cmd, out, err = exec_commands(module, create_user(module, container_image=container_image))
-            rc, cmd, out, err = exec_commands(module, set_roles(module, container_image=container_image))
+            rc, cmd, out, err = exec_commands(module, create_zonegroup(module, container_image=container_image))
             changed = True
 
     elif state == "absent":
-        rc, cmd, out, err = exec_commands(module, get_user(module, container_image=container_image))
+        rc, cmd, out, err = exec_commands(module, get_zonegroup(module, container_image=container_image))
         if rc == 0:
-            rc, cmd, out, err = exec_commands(module, remove_user(module, container_image=container_image))
+            rc, cmd, out, err = exec_commands(module, remove_zonegroup(module, container_image=container_image))
             changed = True
         else:
             rc = 0
-            out = "Dashboard User {} doesn't exist".format(name)
+            out = "Zonegroup {} doesn't exist".format(name)
 
     elif state == "info":
-        rc, cmd, out, err = exec_commands(module, get_user(module, container_image=container_image))
+        rc, cmd, out, err = exec_commands(module, get_zonegroup(module, container_image=container_image))
 
     exit_module(module=module, out=out, rc=rc, cmd=cmd, err=err, startd=startd, changed=changed)
 
