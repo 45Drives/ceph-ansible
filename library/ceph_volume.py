@@ -317,6 +317,7 @@ def batch(module, container_image):
     cmd = build_cmd(action, container_image, cluster)
     cmd.extend(['--%s' % objectstore])
     cmd.append('--yes')
+    cmd.append('--no-auto')
 
     if container_image:
         cmd.append('--prepare')
