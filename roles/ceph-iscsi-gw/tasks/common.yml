@@ -56,9 +56,10 @@
   ceph_pool:
     name: "{{ iscsi_pool_name }}"
     cluster: "{{ cluster }}"
-    pg_num: "{{ osd_pool_default_pg_num }}"
-    size: "{{ iscsi_pool_size | default(osd_pool_default_size) }}"
+    size: "{{ iscsi_pool_size | default(omit) }}"
     application: "rbd"
+  run_once: true
+  delegate_to: "{{ groups[mon_group_name][0] }}"
   environment:
     CEPH_CONTAINER_IMAGE: "{{ ceph_docker_registry + '/' + ceph_docker_image + ':' + ceph_docker_image_tag if containerized_deployment else None }}"
     CEPH_CONTAINER_BINARY: "{{ container_binary }}"

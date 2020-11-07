@@ -1,8 +1,20 @@
 ---
 - name: configure_cephfs_backend | Create directory for samba shares
-  shell: /usr/local/bin/cephfs-shell "mkdir -m 755 -p /fsgw"
+  shell: /usr/bin/cephfs-shell "mkdir -m 755 -p /fsgw"
   delegate_to: "{{ groups[mon_group_name][0] }}"
   run_once: true
+
+- name: configure_cephfs_backend | Fetch ceph.conf from a monitor
+  fetch:
+    src: /etc/ceph/ceph.conf
+    dest: fetch/conf/
+    flat: yes
+  delegate_to: "{{ groups[mon_group_name][0] }}"
+
+- name: configure_cephfs_backend | Copy ceph.conf to smb gateways
+  copy:
+    src: fetch/conf/ceph.conf
+    dest: /etc/ceph/ceph.conf
 
 - name: configure_cephfs_backend | Create samba cephx user
   ceph_key:
@@ -48,11 +60,4 @@
     owner: ceph
     mode: "0600"
 
-- name: configure_cephfs_backend | mount {{ shared_storage_mountpoint }}/fsgw
-  mount:
-    name: "{{ shared_storage_mountpoint }}/fsgw"
-    src: "{{ groups[mon_group_name][0] }}:/fsgw"
-    fstype: "ceph"
-    opts: "name=samba,secretfile=/etc/ceph/samba.secret,_netdev,noatime"
-    state: mounted
 

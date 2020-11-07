@@ -1,7 +1,7 @@
 # DONT EDIT THIS FILE. IT IS MANAGED BY ANSIBLE
 # ANY EDITS WILL BE LOST WHEN THIS PLAYBOOK IS RUN
-# SHARES ARE TO BE CREATED IN REGISTRY "net conf addshare"
-# GLOBAL OPTIONS CAN BE ADDED OR OVERIRDDEN IN REGISTRY  
+# SHARES ARE TO BE CREATED IN REGISTRY "net conf addshare ..."
+# GLOBAL OPTIONS CAN BE ADDED OR OVERIRDDEN IN REGISTRY "net conf setparm global 'PARAMETER' 'VALUE'"
 #======================= Global Settings =======================
 [global]
 {% if domain_member %}
@@ -32,8 +32,9 @@
   winbind enum users = {{ active_directory_info.winbind_enum_users }}
   winbind use default domain = {{ active_directory_info.winbind_use_default_domain }}
   winbind refresh tickets = yes
-  winbind offline logon = yes 
-
+  winbind offline logon = yes
+  template shell = /bin/bash
+  
 {% endif %}
 
 {% if windows_acl %}

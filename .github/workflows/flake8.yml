@@ -1,0 +1,14 @@
+name: flake8
+on: [pull_request]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+          architecture: x64
+      - run: pip install flake8
+      - run: flake8 --max-line-length 160 ./library/ ./tests/library/ ./tests/conftest.py ./tests/functional/tests/

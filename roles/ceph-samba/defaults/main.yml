@@ -44,11 +44,14 @@ active_directory_info:
   winbind_enum_groups: yes
   winbind_enum_users: yes
   winbind_use_default_domain: yes
+  # "domain_join_user" user used to join the domain. Needs only permission for joins, not full admin.
   domain_join_user: ''
-  # Use ansible vault to create encrypted varible "domain_password"
-  # domain_join_password: '{{ domain_password }}'
   domain_join_password: ''
-  ad_admin_group: "Domain Admins" 
+  # "ad_admin_user" and "ad_admin_group" are used to administer permissions on shares.
+  # Defaults to join user credentials, replace below if join user and admin user are different
+  ad_admin_user: ''
+  ad_admin_password: ''
+  ad_admin_group: "Domain Admins"
 
 # Samba Share (SMB) Definitions
 configure_shares: false
@@ -93,7 +96,9 @@ ctdb_tunables:
   - key: 'TakeoverTimeout'
     value: '5'
 
+# If setting up multiple ctdb clusters that use the cluster backend, choose a new lock name or else ctdb will never start due to lock contention
 ctdb_lock_name: ctdb_lock
 
+# Dont touch 
 rados_locking: true
 
