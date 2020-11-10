@@ -57,21 +57,22 @@ active_directory_info:
 configure_shares: false
 windows_acl: true
 samba_shares:
-  - name: 'share1'
-    path: '{{ shared_storage_mountpoint }}/fsgw/share1'
+  - name: 'public'
+    path: '{{ shared_storage_mountpoint }}/fsgw/public'
+    type: 'vfs'
+    writeable: 'yes'
+    guest_ok: 'yes'
+#    no_password_login: 'no'
+    comment: "public rw access"
+
+  - name: 'secure'
+    path: '{{ shared_storage_mountpoint }}/fsgw/secure'
+    type: 'kernel'    
     writeable: 'yes'
     guest_ok: 'no'
-    comment: "comment for share1"
-  - name: 'share2'
-    path: '{{ shared_storage_mountpoint }}/fsgw/share2'
-    writeable: 'yes'
-    guest_ok: 'no'
-    comment: "comment for share2"
-  - name: 'share3'
-    path: '{{ shared_storage_mountpoint }}/fsgw/share3'
-    writeable: 'yes'
-    guest_ok: 'no'
-    comment: "comment for share3"
+    comment: "secure rw access"
+#
+
 
 ## Samba Cluster (CTDB) Settings
 ctdb_public_addresses:
