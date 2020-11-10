@@ -1,0 +1,9 @@
+---
+- name: print share name and path
+  debug:
+    msg: "{{ item.name }}, {{ item.path }}"
+
+- name: print vfs when share type is vfs
+  debug:
+    msg: "{{ item.name }} VFS !!!!!!!"
+  when: item.type == "vfs"

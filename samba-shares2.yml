@@ -1,0 +1,20 @@
+---
+- hosts:
+  - smbs
+
+  gather_facts: false
+  any_errors_fatal: true
+  become: true
+
+  tags:
+    - always
+
+  vars:
+    delegate_facts_host: True
+
+  tasks:
+    - import_role:
+        name: ceph-samba
+        tasks_from: loop_shares.yml
+      when:
+        - configure_shares | bool
