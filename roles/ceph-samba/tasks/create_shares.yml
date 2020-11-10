@@ -58,23 +58,19 @@
     shell: net conf setparm {{ item.name }} "vfs objects" ceph
     failed_when: false
     run_once: true
-    loop: "{{ samba_shares }}"
   
   - name: configure_vfs_shares - add parameters kernel share modes
     shell: net conf setparm {{ item.name }} "kernel share modes" no
     failed_when: false
     run_once: true   
-    loop: "{{ samba_shares }}"
 
   - name: configure_vfs_shares - add parameters ceph config
     shell: net conf setparm {{ item.name }} ceph:config_file /etc/ceph/ceph.conf
     failed_when: false
     run_once: true
-    loop: "{{ samba_shares }}"
   
   - name: configure_vfs_shares - add parameters ceph user
     shell: net conf setparm {{ item.name }} ceph:user_id samba
     failed_when: false
     run_once: true
-    loop: "{{ samba_shares }}"
 
