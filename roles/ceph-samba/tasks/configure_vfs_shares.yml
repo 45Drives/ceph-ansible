@@ -15,8 +15,6 @@
     mode: '0775'
     state: directory
   run_once: true
-  with_items:
-    - "{{ samba_shares }}"
 
 # If using vfs_cephfs, use relative paths 
 - name: vfs_ceph share configuration

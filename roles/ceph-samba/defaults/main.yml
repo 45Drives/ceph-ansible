@@ -54,20 +54,23 @@ active_directory_info:
   ad_admin_group: "Domain Admins"
 
 # Samba Share (SMB) Definitions
+# Path is relative to cephfs root
 configure_shares: false
-windows_acl: true
+
 samba_shares:
   - name: 'public'
-    path: '{{ shared_storage_mountpoint }}/fsgw/public'
+    path: '/fsgw/public'
     type: 'vfs'
+    windows_acl: false
     writeable: 'yes'
     guest_ok: 'yes'
 #    no_password_login: 'no'
     comment: "public rw access"
 
   - name: 'secure'
-    path: '{{ shared_storage_mountpoint }}/fsgw/secure'
-    type: 'kernel'    
+    path: '/fsgw/secure'
+    type: 'kernel'
+    windows_acl: true    
     writeable: 'yes'
     guest_ok: 'no'
     comment: "secure rw access"

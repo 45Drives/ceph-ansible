@@ -91,3 +91,8 @@
   when:
     - samba_cluster | bool
 
+- name: Grant the SeDiskOperatorPrivilege Privilege for windows ACLs
+  shell: net rpc rights grant "{{ active_directory_info.workgroup|upper }}\{{ active_directory_info.ad_admin_group }}" SeDiskOperatorPrivilege -U "{{ active_directory_info.domain_join_user }}"%"{{ active_directory_info.domain_join_password }}"
+  run_once: true
+  when:
+    - windows_acl | bool
