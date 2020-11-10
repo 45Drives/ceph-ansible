@@ -55,3 +55,36 @@
       register: result
       until: result is succeeded
       when: nfs_obj_gw | bool
+
+- name: red hat based systems - install pacemaker/corosync/pcs
+  block:
+    - name: install pacemaker
+      package:
+        name: pacemaker
+        state: "{{ (upgrade_ceph_packages|bool) | ternary('latest','present') }}"
+      register: result
+      until: result is succeeded
+      when:
+        - ceph_nfs_rados_backend_driver == "rados_ng"
+        - groups['nfss'] | length > 1
+
+    - name: install corosync
+      package:
+        name: corosync
+        state: "{{ (upgrade_ceph_packages|bool) | ternary('latest','present') }}"
+      register: result
+      until: result is succeeded
+      when:
+        - ceph_nfs_rados_backend_driver == "rados_ng"
+        - groups['nfss'] | length > 1
+
+    - name: install pcs
+      package:
+        name: pcs
+        state: "{{ (upgrade_ceph_packages|bool) | ternary('latest','present') }}"
+      register: result
+      until: result is succeeded
+      when:
+        - ceph_nfs_rados_backend_driver == "rados_ng"
+        - groups['nfss'] | length > 1
+
