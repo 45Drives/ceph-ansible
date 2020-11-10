@@ -59,10 +59,8 @@ ceph_nfs_rados_backend_driver: "rados_ng"
 
 # Name of the rados pool and namespace used to store a list of the export and grace rados
 # object URLS
-ceph_nfs_ganesha_pool: 
-  - name: "nfs_ganesha"
-  - pg_num: 1
-  - pg_autoscale_mode: true
+ceph_nfs_ganesha_pool: 'nfs_ganesha'
+
 ceph_nfs_export_namespace: "ganesha-export"
 ceph_nfs_grace_namespace: "ganesha-grace"
 
