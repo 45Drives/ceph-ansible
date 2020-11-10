@@ -25,7 +25,7 @@
 
 ###### CREATE GRACE DB
 - name: check if rados rados grace db object exists
-  shell: "{{ docker_exec_cmd_nfs | default('') }} rados -p {{ ceph_nfs_ganesha_pool.name }} -n {{ ceph_nfs_grace_namespace }} --cluster {{ cluster }} ls | grep grace/"
+  shell: "{{ docker_exec_cmd_nfs | default('') }} rados -p {{ ceph_nfs_ganesha_pool }} -n {{ ceph_nfs_grace_namespace }} --cluster {{ cluster }} ls | grep grace/"
   changed_when: false
   failed_when: false
   register: rados_grace_exists
@@ -36,7 +36,7 @@
   delegate_to: "{{ groups[mon_group_name][0] }}"
   
 - name: initialize ganesha rados grace database
-  command: "{{ docker_exec_cmd_nfs | default('') }} ganesha-rados-grace -p {{ ceph_nfs_ganesha_pool.name }} -n {{ ceph_nfs_grace_namespace }} add {{ ansible_hostname }}"
+  command: "{{ docker_exec_cmd_nfs | default('') }} ganesha-rados-grace -p {{ ceph_nfs_ganesha_pool }} -n {{ ceph_nfs_grace_namespace }} add {{ ansible_hostname }}"
   when:
     - ceph_nfs_rados_backend | bool
     - ceph_nfs_rados_backend_driver == 'rados_cluster'
@@ -45,7 +45,7 @@
 
 ##### CREATE EXPORT INDEX OBJECTS
 - name: check if rados export index object exists
-  shell: "{{ docker_exec_cmd_nfs | default('') }} rados -p {{ ceph_nfs_ganesha_pool.name }} -N {{ ceph_nfs_export_namespace }} --cluster {{ cluster }} ls|grep conf-{{ ansible_hostname }}/"
+  shell: "{{ docker_exec_cmd_nfs | default('') }} rados -p {{ ceph_nfs_ganesha_pool  }} -N {{ ceph_nfs_export_namespace }} --cluster {{ cluster }} ls|grep conf-{{ ansible_hostname }}/"
   changed_when: false
   failed_when: false
   register: rados_index_exists
@@ -55,7 +55,7 @@
   delegate_to: "{{ groups[mon_group_name][0] }}"
 
 - name: create an empty rados export index object
-  command: "{{ docker_exec_cmd_nfs | default('') }} rados -p {{ ceph_nfs_ganesha_pool.name }} -N {{ ceph_nfs_export_namespace }} --cluster {{ cluster }} put conf-{{ ansible_hostname }} /dev/null"
+  command: "{{ docker_exec_cmd_nfs | default('') }} rados -p {{ ceph_nfs_ganesha_pool }} -N {{ ceph_nfs_export_namespace }} --cluster {{ cluster }} put conf-{{ ansible_hostname }} /dev/null"
   when:
     - ceph_nfs_rados_backend | bool 
     - rados_index_exists.rc != 0
