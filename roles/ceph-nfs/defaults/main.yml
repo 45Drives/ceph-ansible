@@ -59,11 +59,11 @@ ceph_nfs_rados_backend_driver: "rados_ng"
 
 # Name of the rados pool and namespace used to store a list of the export rados
 # object URLS
-ceph_nfs_export_pool: "{{ cephfs_metadata }}"
+ceph_nfs_export_pool: "{{ cephfs_metadata_pool }}"
 ceph_nfs_export_namespace: "ganesha-export"
 # Name of the rados pool and namespace used to store a list of the grace rados
 # object URLS
-ceph_nfs_grace_pool: "{{ cephfs_metadata }}"
+ceph_nfs_grace_pool: "{{ cephfs_metadata_pool }}"
 ceph_nfs_grace_namespace: "ganesha-grace"
 # Address ganesha service should listen on, by default ganesha listens on all
 # addresses. (Note: ganesha ignores this parameter in current version due to
