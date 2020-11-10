@@ -1,0 +1,47 @@
+---
+- name: config_cephfs | Get admin secret
+  command: "{{ container_exec_cmd }} ceph auth get-key client.admin"
+  register: command_output_admin
+  delegate_to: "{{ groups[mon_group_name][0] }}"
+  changed_when: false
+
+- name: config_cephfs | Set admin secret fact
+  set_fact:
+    cephfs_admin_secret: "{{ command_output_admin.stdout }}"
+
+- name: config_cephfs | Ensure cephfs root dir exists
+  file:
+    path: "/mnt/cephfs/root"
+    state: directory
+    mode: 0755
+
+- name: config_cephfs | Mount cephfs as admin user 
+  mount:
+    name: "/mnt/cephfs/root"
+    src: "{{ groups[mon_group_name][0] }}:6789:/"
+    fstype: "ceph"
+    opts: "name=admin,secret={{ cephfs_admin_secret }},_netdev,noatime"
+    state: mounted
+
+- name: config_cephfs | Create directory for nfsroot
+  file:
+    path: "/mnt/cephfs/root/{{ ceph_nfs_fs_root }}"
+    state: directory
+    owner: root
+    group: ceph
+    mode: 0775
+
+- name: config_cephfs | Unmount cephfs as admin user 
+  mount:
+    name: "/mnt/cephfs/root"
+    state: absent 
+
+- name: config_cephfs | Create NFS cephx user
+  ceph_key:
+    name: "{{ item.name }}"
+    state: present
+    caps: "{{ item.caps }}"
+    cluster: "{{ cluster }}"
+    secret: "{{ item.key | default('') }}"
+  with_items: "{{ nfs_keyring }}"
+  delegate_to: "{{ groups[mon_group_name][0] }}"
