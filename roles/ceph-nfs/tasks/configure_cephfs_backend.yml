@@ -1,0 +1,15 @@
+---
+- name: configure_cephfs_backend | Create directory for samba shares
+  shell: /usr/bin/cephfs-shell "mkdir -m 755 -p /{{ ceph_nfs_fs_root }}"
+  delegate_to: "{{ groups[mon_group_name][0] }}"
+  run_once: true
+
+- name: config_cephfs | Create NFS cephx user
+  ceph_key:
+    name: "{{ item.name }}"
+    state: present
+    caps: "{{ item.caps }}"
+    cluster: "{{ cluster }}"
+    secret: "{{ item.key | default('') }}"
+  with_items: "{{ nfs_keyring }}"
+  delegate_to: "{{ groups[mon_group_name][0] }}"
