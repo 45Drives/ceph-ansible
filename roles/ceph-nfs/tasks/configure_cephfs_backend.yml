@@ -13,3 +13,22 @@
     secret: "{{ item.key | default('') }}"
   with_items: "{{ nfs_keyring }}"
   delegate_to: "{{ groups[mon_group_name][0] }}"
+
+- name: create pool for nfs ganesha data
+  ceph_pool:
+    name: "{{ item.name }}"
+    cluster: "{{ cluster }}"
+    pg_num: "{{ item.pg_num | default(omit) }}"
+    pgp_num: "{{ item.pgp_num | default(omit) }}"
+    size: "{{ item.size | default(omit) }}"
+    min_size: "{{ item.min_size | default(omit) }}"
+    pool_type: "{{ item.type | default('replicated') }}"
+    rule_name: "{{ item.rule_name | default(omit) }}"
+    erasure_profile: "{{ item.erasure_profile | default(omit) }}"
+    pg_autoscale_mode: "{{ item.pg_autoscale_mode | default(omit) }}"
+    target_size_ratio: "{{ item.target_size_ratio | default(omit) }}"
+  delegate_to: "{{ groups[mon_group_name][0] }}"
+  with_items: "{{ ceph_nfs_ganesha_pool }}"
+  environment:
+    CEPH_CONTAINER_IMAGE: "{{ ceph_docker_registry + '/' + ceph_docker_image + ':' + ceph_docker_image_tag if containerized_deployment else None }}"
+    CEPH_CONTAINER_BINARY: "{{ container_binary }}"
