@@ -56,7 +56,7 @@ active_directory_info:
 # Samba Share (SMB) Definitions
 # Path is relative to cephfs root
 configure_shares: false
-
+enable_windows_acl: true
 samba_shares:
   - name: 'public'
     path: '/fsgw/public'
@@ -64,7 +64,10 @@ samba_shares:
     windows_acl: false
     writeable: 'yes'
     guest_ok: 'yes'
-#    no_password_login: 'no'
+#   no_password_login: false
+#   shadow_copy: false
+#   audit: false
+#   apple: false
     comment: "public rw access"
 
   - name: 'secure'
@@ -73,6 +76,10 @@ samba_shares:
     windows_acl: true    
     writeable: 'yes'
     guest_ok: 'no'
+#   no_password_login: false
+#   shadow_copy: false
+#   audit: false
+#   apple: false
     comment: "secure rw access"
 #
 

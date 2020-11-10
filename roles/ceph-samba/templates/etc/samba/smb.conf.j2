@@ -37,12 +37,11 @@
   
 {% endif %}
 
-{% if windows_acl %}
+{% if enable_windows_acl %}
   ea support = yes
   map acl inherit = yes
   store dos attributes = yes
   vfs objects = acl_xattr
-{% endif %}
 
   log level = {{ samba_global_options.log_level }}
   registry shares = yes
