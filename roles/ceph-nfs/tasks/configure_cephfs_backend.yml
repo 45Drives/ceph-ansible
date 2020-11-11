@@ -20,6 +20,7 @@
     cluster: "{{ cluster }}"
     pg_num: 1
     pgp_num: 1
+    application: "nfs_ganesha_conf"
     size: "{{ ceph_nfs_ganesha_pool.size | default(omit) }}"
     min_size: "{{ ceph_nfs_ganesha_pool.min_size | default(omit) }}"
     pool_type: "{{ ceph_nfs_ganesha_pool.type | default('replicated') }}"
