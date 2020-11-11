@@ -2,7 +2,7 @@
 - hosts:
   - smbs
 
-  gather_facts: false
+  gather_facts: true
   any_errors_fatal: true
   become: true
 
@@ -15,8 +15,8 @@
   tasks:
     - import_role:
         name: ceph-facts
-      when:
-        - configure_shares | bool
+    - import_role:
+        name: ceph-defaults
     - import_role:
         name: ceph-smb
         tasks_from: loop_shares.yml
