@@ -14,16 +14,11 @@
 
   tasks:
     - import_role:
-        name: ceph-samba
-        tasks_from: configure_vfs_shares.yml
+        name: ceph-facts
       when:
         - configure_shares | bool
-        - samba_cephfs_module | bool
-
     - import_role:
-        name: ceph-samba
-        tasks_from: configure_kernel_shares.yml
+        name: ceph-smb
+        tasks_from: loop_shares.yml
       when:
         - configure_shares | bool
-        - not samba_cephfs_module | bool
-
