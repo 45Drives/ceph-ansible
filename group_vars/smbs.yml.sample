@@ -62,24 +62,25 @@ dummy:
 #  ad_admin_group: "Domain Admins"
 
 # Samba Share (SMB) Definitions
+# Path is relative to cephfs root
 #configure_shares: false
-#windows_acl: true
+#enable_windows_acl: true
 #samba_shares:
-#  - name: 'share1'
-#    path: '{{ shared_storage_mountpoint }}/fsgw/share1'
+#  - name: 'public'
+#    path: '/fsgw/public'
+#    type: 'vfs'
+#    windows_acl: false
+#    writeable: 'yes'
+#    guest_ok: 'yes'
+#    comment: "public rw access"
+
+#  - name: 'secure'
+#    path: '/fsgw/secure'
+#    type: 'kernel'
+#    windows_acl: true    
 #    writeable: 'yes'
 #    guest_ok: 'no'
-#    comment: "comment for share1"
-#  - name: 'share2'
-#    path: '{{ shared_storage_mountpoint }}/fsgw/share2'
-#    writeable: 'yes'
-#    guest_ok: 'no'
-#    comment: "comment for share2"
-#  - name: 'share3'
-#    path: '{{ shared_storage_mountpoint }}/fsgw/share3'
-#    writeable: 'yes'
-#    guest_ok: 'no'
-#    comment: "comment for share3"
+#    comment: "secure rw access"
 
 ## Samba Cluster (CTDB) Settings
 #ctdb_public_addresses:

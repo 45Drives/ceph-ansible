@@ -1,0 +1,76 @@
+---
+- name: create_shares | create share directory in cephfs
+  shell: /usr/bin/cephfs-shell "mkdir -m 755 -p {{ item.path }}"
+  delegate_to: "{{ groups[mon_group_name][0] }}"
+  run_once: true
+
+- name: create_shares | create local directory for share mount
+  file:
+    path: "{{ shared_storage_mountpoint }}{{ item.path }}"
+    owner: "root"
+    group: "root"
+    mode: '0775'
+    state: directory
+  run_once: true
+
+- name: create_shares | mount share
+  mount:
+    name: "{{ shared_storage_mountpoint }}{{ item.path }}"
+    src: "{{ groups[mon_group_name][0] }}:{{ item.path }}"
+    fstype: "ceph"
+    opts: "name=samba,secretfile=/etc/ceph/samba.secret,_netdev,relatime"
+    state: mounted
+
+- name: create_shares | Update directory ownership
+  file:
+    path: "{{ shared_storage_mountpoint }}{{ item.path }}"
+    owner: "root"
+    group: '{{ active_directory_info.workgroup|upper }}\{{ active_directory_info.ad_admin_group }}'
+    mode: '0770'
+    state: directory
+  run_once: true
+  when:
+    - item.windows_acl | bool
+    - domain_member | bool
+
+- name: create_shares | unmount {{ shared_storage_mountpoint }}{{ item.path }}
+  mount:
+    name: "{{ shared_storage_mountpoint }}{{ item.path }}"
+    src: "{{ groups[mon_group_name][0] }}:{{ item.path }}"
+    state: absent
+  when: item.type == "vfs"
+
+- name: create_shares | Create Kernel Share {{ item.name }}-{{shared_storage_mountpoint }}{{ item.path }}
+  shell: net conf addshare {{ item.name }} {{ shared_storage_mountpoint}}{{ item.path }} writeable={{ item.writeable[:1] }} guest_ok={{ item.guest_ok[:1] }} "{{ item.comment }}"
+  failed_when: false
+  run_once: true
+  when: item.type =="kernel"
+
+- name: vfs_ceph share configuration
+  when: item.type == "vfs"
+  block:
+  - name: create_shares | Create VFS Share {{ item.name }}-{{ item.path }}
+    shell: net conf addshare {{ item.name }} {{ item.path }} writeable={{ item.writeable[:1] }} guest_ok={{ item.guest_ok[:1] }} "{{ item.comment }}"
+    failed_when: false
+    run_once: true
+
+  - name: configure_vfs_shares - add parameters vfs_objects
+    shell: net conf setparm {{ item.name }} "vfs objects" ceph
+    failed_when: false
+    run_once: true
+  
+  - name: configure_vfs_shares - add parameters kernel share modes
+    shell: net conf setparm {{ item.name }} "kernel share modes" no
+    failed_when: false
+    run_once: true   
+
+  - name: configure_vfs_shares - add parameters ceph config
+    shell: net conf setparm {{ item.name }} ceph:config_file /etc/ceph/ceph.conf
+    failed_when: false
+    run_once: true
+  
+  - name: configure_vfs_shares - add parameters ceph user
+    shell: net conf setparm {{ item.name }} ceph:user_id samba
+    failed_when: false
+    run_once: true
+

@@ -37,7 +37,8 @@
   
 {% endif %}
 
-{% if windows_acl %}
+
+{% if enable_windows_acl %}
   ea support = yes
   map acl inherit = yes
   store dos attributes = yes
