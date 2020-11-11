@@ -2,7 +2,7 @@
 - hosts:
   - smbs
 
-  gather_facts: false
+  gather_facts: true
   any_errors_fatal: true
   become: true
 
@@ -14,16 +14,11 @@
 
   tasks:
     - import_role:
-        name: ceph-smb
-        tasks_from: configure_vfs_shares.yml
-      when:
-        - configure_shares | bool
-        - samba_cephfs_module | bool
-
+        name: ceph-facts
+    - import_role:
+        name: ceph-defaults
     - import_role:
         name: ceph-smb
-        tasks_from: configure_kernel_shares.yml
+        tasks_from: loop_shares.yml
       when:
         - configure_shares | bool
-        - not samba_cephfs_module | bool
-

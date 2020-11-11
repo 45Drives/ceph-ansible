@@ -12,7 +12,6 @@
     delegate_facts_host: True
 
   pre_tasks:
-
     - import_tasks: raw_install_python.yml
 
     - name: gather facts
@@ -59,6 +58,7 @@
 - hosts: nfss
   gather_facts: false
   order: sorted
+
   become: True
   any_errors_fatal: true
   pre_tasks:
@@ -95,4 +95,4 @@
           installer_phase_ceph_nfs:
             status: "Complete"
             end: "{{ lookup('pipe', 'date +%Y%m%d%H%M%SZ') }}"
-
+            
