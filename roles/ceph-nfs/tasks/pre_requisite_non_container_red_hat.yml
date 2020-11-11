@@ -42,7 +42,7 @@
   block:
     - name: install nfs cephfs gateway
       package:
-        name: ['nfs-ganesha-ceph', 'nfs-ganesha-rados-grace']
+        name: ['nfs-ganesha-ceph', 'nfs-ganesha-rados-grace', 'nfs-ganesha-rados-urls']
         state: "{{ (upgrade_ceph_packages|bool) | ternary('latest','present') }}"
       register: result
       until: result is succeeded
