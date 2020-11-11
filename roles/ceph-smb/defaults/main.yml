@@ -64,10 +64,6 @@ samba_shares:
     windows_acl: false
     writeable: 'yes'
     guest_ok: 'yes'
-#   no_password_login: false
-#   shadow_copy: false
-#   audit: false
-#   apple: false
     comment: "public rw access"
 
   - name: 'secure'
@@ -76,12 +72,7 @@ samba_shares:
     windows_acl: true    
     writeable: 'yes'
     guest_ok: 'no'
-#   no_password_login: false
-#   shadow_copy: false
-#   audit: false
-#   apple: false
     comment: "secure rw access"
-#
 
 
 ## Samba Cluster (CTDB) Settings
