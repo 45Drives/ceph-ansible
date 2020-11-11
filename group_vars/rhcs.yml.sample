@@ -58,6 +58,7 @@ fetch_directory: ~/ceph-ansible-keys
 #mgr_group_name: mgrs
 #rgwloadbalancer_group_name: rgwloadbalancers
 #grafana_server_group_name: grafana-server
+#smb_group_name: smbs
 
 # If configure_firewall is true, then ansible will try to configure the
 # appropriate firewalling rules so that Ceph daemons can communicate
@@ -75,6 +76,7 @@ fetch_directory: ~/ceph-ansible-keys
 #ceph_iscsi_firewall_zone: public
 #ceph_dashboard_firewall_zone: public
 #ceph_rgwloadbalancer_firewall_zone: public
+#ceph_samba_firewall_zone: public
 
 # Generate local ceph.conf in fetch directory
 #ceph_conf_local: false
