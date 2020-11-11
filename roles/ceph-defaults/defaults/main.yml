@@ -354,7 +354,7 @@ osd_mkfs_type: xfs
 osd_mkfs_options_xfs: -f -i size=2048
 osd_mount_options_xfs: noatime,largeio,inode64,swalloc
 osd_objectstore: bluestore
-hybrid_cluster: false # HDD and SSD OSDs present in cluster
+hybrid_cluster: false 
 
 # Any device containing these patterns in their path will be excluded.
 osd_auto_discovery_exclude: "dm-*|loop*|md*|rbd*"
