@@ -82,7 +82,6 @@ dummy:
 #    guest_ok: 'no'
 #    comment: "secure rw access"
 
-
 ## Samba Cluster (CTDB) Settings
 #ctdb_public_addresses:
 #  - vip_address: '192.168.103.10'

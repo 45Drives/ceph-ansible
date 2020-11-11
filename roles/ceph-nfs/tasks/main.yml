@@ -7,6 +7,8 @@
     enabled: no
   failed_when: false
 
+# common used to be here
+
 - name: include pre_requisite_non_container.yml
   include_tasks: pre_requisite_non_container.yml
   when: not containerized_deployment | bool
@@ -60,5 +62,13 @@
         - not item.0.get('skipped', False)
         - item.0.item.name == 'client.' + ceph_nfs_ceph_user or item.0.item.name == rgw_client_name
 
+- name: include configure_cephfs_backend.yml
+  import_tasks: configure_cephfs_backend.yml
+
 - name: include start_nfs.yml
   import_tasks: start_nfs.yml
+
+- name: include start_nfs_cluster.yml
+  import_tasks: start_nfs_cluster.yml
+  when:
+    - ceph_nfs_rados_backend_driver == "rados_ng"

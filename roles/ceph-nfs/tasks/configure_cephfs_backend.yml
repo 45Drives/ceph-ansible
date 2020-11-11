@@ -1,0 +1,35 @@
+---
+- name: configure_cephfs_backend | Create directory for samba shares
+  shell: /usr/bin/cephfs-shell "mkdir -m 755 -p /{{ ceph_nfs_fs_root }}"
+  delegate_to: "{{ groups[mon_group_name][0] }}"
+  run_once: true
+
+- name: config_cephfs | Create NFS cephx user
+  ceph_key:
+    name: "{{ item.name }}"
+    state: present
+    caps: "{{ item.caps }}"
+    cluster: "{{ cluster }}"
+    secret: "{{ item.key | default('') }}"
+  with_items: "{{ nfs_keyring }}"
+  delegate_to: "{{ groups[mon_group_name][0] }}"
+
+- name: create pool for nfs ganesha data
+  ceph_pool:
+    name: "{{ ceph_nfs_ganesha_pool }}"
+    cluster: "{{ cluster }}"
+    pg_num: 1
+    pgp_num: 1
+    application: "nfs_ganesha_conf"
+    size: "{{ ceph_nfs_ganesha_pool.size | default(omit) }}"
+    min_size: "{{ ceph_nfs_ganesha_pool.min_size | default(omit) }}"
+    pool_type: "{{ ceph_nfs_ganesha_pool.type | default('replicated') }}"
+    rule_name: "{{ ceph_nfs_ganesha_pool.rule_name | default(omit) }}"
+    erasure_profile: "{{ ceph_nfs_ganesha_pool.erasure_profile | default(omit) }}"
+    pg_autoscale_mode: "{{ ceph_nfs_ganesha_pool.pg_autoscale_mode | default(omit) }}"
+    target_size_ratio: "{{ ceph_nfs_ganesha_pool.target_size_ratio | default(omit) }}"
+  delegate_to: "{{ groups[mon_group_name][0] }}"
+  environment:
+    CEPH_CONTAINER_IMAGE: "{{ ceph_docker_registry + '/' + ceph_docker_image + ':' + ceph_docker_image_tag if containerized_deployment else None }}"
+    CEPH_CONTAINER_BINARY: "{{ container_binary }}"
+  run_once: true

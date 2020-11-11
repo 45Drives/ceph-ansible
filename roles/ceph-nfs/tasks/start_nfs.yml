@@ -1,35 +1,11 @@
 ---
-- block:
-  - name: set_fact container_exec_cmd_nfs - external
-    set_fact:
-      exec_cmd_nfs: "{{ container_binary + ' run --rm --net=host -v /etc/ceph:/etc/ceph:z -v /var/lib/ceph/:/var/lib/ceph/:z -v /var/log/ceph/:/var/log/ceph/:z --entrypoint=rados ' + ceph_docker_registry + '/' + ceph_docker_image + ':' + ceph_docker_image_tag if containerized_deployment | bool else 'rados' }} -n client.{{ ceph_nfs_ceph_user }} -k /var/lib/ceph/radosgw/{{ cluster }}-rgw.{{ ceph_nfs_ceph_user }}/keyring"
-      delegate_node: "{{ inventory_hostname }}"
-    when: groups.get(mon_group_name, []) | length == 0
+- name: set_fact docker_exec_cmd_nfs
+  set_fact:
+    docker_exec_cmd_nfs: "{{ container_binary }} exec ceph-mon-{{ hostvars[groups[mon_group_name][0]]['ansible_hostname'] }}"
+  when:
+    - containerized_deployment | bool
 
-  - name: set_fact container_exec_cmd_nfs - internal
-    set_fact:
-      exec_cmd_nfs: "{{ container_binary + ' exec ceph-mon-' + hostvars[groups[mon_group_name][0]]['ansible_hostname'] if containerized_deployment | bool else '' }} rados"
-      delegate_node: "{{ groups[mon_group_name][0] }}"
-    when: groups.get(mon_group_name, []) | length > 0
-
-  - name: check if rados index object exists
-    shell: "{{ exec_cmd_nfs | default('') }} -p {{ cephfs_data_pool.name }} --cluster {{ cluster }} ls|grep {{ ceph_nfs_rados_export_index }}"
-    changed_when: false
-    failed_when: false
-    register: rados_index_exists
-    check_mode: no
-    when: ceph_nfs_rados_backend | bool
-    delegate_to: "{{ delegate_node }}"
-    run_once: true
-
-  - name: create an empty rados index object
-    command: "{{ exec_cmd_nfs | default('') }} -p {{ cephfs_data_pool.name }} --cluster {{ cluster }} put {{ ceph_nfs_rados_export_index }} /dev/null"
-    when:
-      - ceph_nfs_rados_backend | bool
-      - rados_index_exists.rc != 0
-    delegate_to: "{{ delegate_node }}"
-    run_once: true
-
+#### GENERATE CONF
 - name: create /etc/ganesha
   file:
     path: /etc/ganesha
@@ -41,34 +17,64 @@
 - name: generate ganesha configuration file
   template:
     src: "ganesha.conf.j2"
-    dest: /etc/ganesha/ganesha.conf
+    dest: "/etc/ganesha/ganesha.conf"
+    owner: root
+    group: root
+    mode: 0644
+###### GENERATE CONF
+
+###### CREATE GRACE DB
+- name: check if rados rados grace db object exists
+  shell: "{{ docker_exec_cmd_nfs | default('') }} rados -p {{ ceph_nfs_ganesha_pool }} -n {{ ceph_nfs_grace_namespace }} --cluster {{ cluster }} ls | grep grace/"
+  changed_when: false
+  failed_when: false
+  register: rados_grace_exists
+  check_mode: no
+  when:
+    - ceph_nfs_rados_backend | bool
+    - ceph_nfs_rados_backend_driver == 'rados_cluster'
+  delegate_to: "{{ groups[mon_group_name][0] }}"
+  
+- name: initialize ganesha rados grace database
+  command: "{{ docker_exec_cmd_nfs | default('') }} ganesha-rados-grace -p {{ ceph_nfs_ganesha_pool }} -n {{ ceph_nfs_grace_namespace }} add {{ ansible_hostname }}"
+  when:
+    - ceph_nfs_rados_backend | bool
+    - ceph_nfs_rados_backend_driver == 'rados_cluster'
+    - rados_grace_exists.rc != 0
+######## CREATE GRACE DB
+
+##### CREATE EXPORT INDEX OBJECTS
+- name: check if rados export index object exists
+  shell: "{{ docker_exec_cmd_nfs | default('') }} rados -p {{ ceph_nfs_ganesha_pool  }} -N {{ ceph_nfs_export_namespace }} --cluster {{ cluster }} ls|grep conf-{{ ansible_hostname }}/"
+  changed_when: false
+  failed_when: false
+  register: rados_index_exists
+  check_mode: no
+  when:
+    - ceph_nfs_rados_backend | bool
+  delegate_to: "{{ groups[mon_group_name][0] }}"
+
+- name: create an empty rados export index object
+  command: "{{ docker_exec_cmd_nfs | default('') }} rados -p {{ ceph_nfs_ganesha_pool }} -N {{ ceph_nfs_export_namespace }} --cluster {{ cluster }} put conf-{{ ansible_hostname }} /dev/null"
+  when:
+    - ceph_nfs_rados_backend | bool 
+    - rados_index_exists.rc != 0
+  delegate_to: "{{ groups[mon_group_name][0] }}"
+
+####### CREATE EXPORT INDEX OBJECTS
+
+- name: generate systemd unit file
+  become: true
+  template:
+    src: "{{ role_path }}/templates/ceph-nfs.service.j2"
+    dest: /etc/systemd/system/ceph-nfs@.service
     owner: "root"
     group: "root"
     mode: "0644"
-  notify: restart ceph nfss
-
-- name: create exports directory
-  file:
-    path: /etc/ganesha/export.d
-    state: directory
-    owner: "root"
-    group: "root"
-    mode: "0755"
-  when: ceph_nfs_dynamic_exports | bool
-
-- name: create exports dir index file
-  copy:
-    content: ""
-    force: no
-    dest: /etc/ganesha/export.d/INDEX.conf
-    owner: "root"
-    group: "root"
-    mode: "0644"
-  when: ceph_nfs_dynamic_exports | bool
-
-- name: include_tasks systemd.yml
-  include_tasks: systemd.yml
-  when: containerized_deployment | bool
+  when:
+    - containerized_deployment | bool
+  notify:
+    - restart ceph nfss
 
 - name: systemd start nfs container
   systemd:
@@ -81,7 +87,7 @@
     - containerized_deployment | bool
     - ceph_nfs_enable_service | bool
 
-- name: start nfs gateway service
+- name: start nfs gateway service - active active
   systemd:
     name: nfs-ganesha
     state: started
@@ -90,3 +96,16 @@
   when:
     - not containerized_deployment | bool
     - ceph_nfs_enable_service | bool
+    - ceph_nfs_rados_backend_driver == 'rados_cluster'
+
+- name: start nfs gateway service - active passive
+  systemd:
+    name: nfs-ganesha
+    state: started
+    enabled: yes
+    masked: no
+  run_once: true
+  when:
+    - not containerized_deployment | bool
+    - ceph_nfs_enable_service | bool
+    - ceph_nfs_rados_backend_driver == 'rados_ng'

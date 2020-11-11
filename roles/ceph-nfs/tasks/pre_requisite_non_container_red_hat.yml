@@ -42,7 +42,7 @@
   block:
     - name: install nfs cephfs gateway
       package:
-        name: ['nfs-ganesha-ceph', 'nfs-ganesha-rados-grace']
+        name: ['nfs-ganesha-ceph', 'nfs-ganesha-rados-grace', 'nfs-ganesha-rados-urls']
         state: "{{ (upgrade_ceph_packages|bool) | ternary('latest','present') }}"
       register: result
       until: result is succeeded
@@ -55,3 +55,22 @@
       register: result
       until: result is succeeded
       when: nfs_obj_gw | bool
+
+- name: red hat based systems - install pacemaker/corosync/pcs
+  block:
+    - name: install pacemaker
+      dnf:
+        name: "{{ item }}"
+        state: "{{ (upgrade_ceph_packages|bool) | ternary('latest','present') }}"
+        enablerepo: "HighAvailability"
+      register: result
+      until: result is succeeded
+      with_items:
+        - pacemaker
+        - corosync
+        - pcs
+      when:
+        - ceph_nfs_rados_backend_driver == "rados_ng"
+        - groups['nfss'] | length > 1
+
+

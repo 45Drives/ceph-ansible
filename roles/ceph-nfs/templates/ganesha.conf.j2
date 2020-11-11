@@ -10,18 +10,24 @@ NFS_Core_Param
 {% if ceph_nfs_bind_addr is defined %}
        Bind_Addr={{ ceph_nfs_bind_addr }};
 {% endif %}
+        Enable_NLM = false;
+        Enable_RQUOTA = false;
+{% if ceph_nfs_limit_nfs4 %}
+        Protocols = 4;
+{% else %}
+        Protocols = 3,4;
+{% endif %}
 }
 
 {% if ceph_nfs_disable_caching or nfs_file_gw %}
 EXPORT_DEFAULTS {
-	Attr_Expiration_Time = 0;
+        Attr_Expiration_Time = 0;
 }
 
 CACHEINODE {
-	Dir_Chunk = 0;
-
-	NParts = 1;
-	Cache_Size = 1;
+        Dir_Chunk = 0;
+        NParts = 1;
+        Cache_Size = 1;
 }
 {% endif %}
 
@@ -29,44 +35,60 @@ CACHEINODE {
 RADOS_URLS {
    ceph_conf = '/etc/ceph/{{ cluster }}.conf';
    userid = "{{ ceph_nfs_ceph_user }}";
+   {% if ceph_nfs_dynamic_exports %}
+   watch_url = "rados://{{ ceph_nfs_ganesha_pool }}/{{ ceph_nfs_export_namespace }}/conf-{{ ansible_hostname }}";
+   {% endif %}
 }
-%url rados://{{ cephfs_data_pool.name }}/{{ ceph_nfs_rados_export_index }}
-
+{% if ceph_nfs_rados_backend_driver is defined %}
 NFSv4 {
-	RecoveryBackend = 'rados_kv';
+        RecoveryBackend = '{{ ceph_nfs_rados_backend_driver }}';
 }
-RADOS_KV {
-	ceph_conf = '/etc/ceph/{{ cluster }}.conf';
-	userid = "{{ ceph_nfs_ceph_user }}";
-	pool = "{{ cephfs_data_pool.name }}";
+{% else %}
+NFSv4 {
+        RecoveryBackend = 'rados_ng';
 }
 {% endif %}
 
+
+RADOS_KV {
+        ceph_conf = '/etc/ceph/{{ cluster }}.conf';
+        userid = "{{ ceph_nfs_ceph_user }}";
+        pool = "{{ ceph_nfs_ganesha_pool }}";
+        namespace = "{{ ceph_nfs_grace_namespace }}";
+        {% if 'rados_cluster' in ceph_nfs_rados_backend_driver %}
+        nodeid = "{{ ansible_hostname }}";
+        {% endif %}
+}
+{% endif %}
+
+{% if ceph_nfs_dynamic_exports %}
+%url rados://{{ ceph_nfs_ganesha_pool }}/{{ ceph_nfs_export_namespace }}/conf-{{ ansible_hostname }}
+{% else %}
 {% if nfs_file_gw %}
 EXPORT
 {
-	Export_id={{ ceph_nfs_ceph_export_id }};
+        Export_id={{ ceph_nfs_ceph_export_id }};
 
-	Path = "/";
+        Path = "/";
 
-	Pseudo = {{ ceph_nfs_ceph_pseudo_path }};
+        Pseudo = {{ ceph_nfs_ceph_pseudo_path }};
 
-	Access_Type = {{ ceph_nfs_ceph_access_type }};
+        Access_Type = {{ ceph_nfs_ceph_access_type }};
 
-	Protocols = {{ ceph_nfs_ceph_protocols }};
+        Protocols = {{ ceph_nfs_ceph_protocols }};
 
-	Transports = TCP;
+        Transports = TCP;
 
-	SecType = {{ ceph_nfs_ceph_sectype }};
+        SecType = sys,krb5,krb5i,krb5p;
 
-	Squash = {{ ceph_nfs_ceph_squash }};
+        Squash = {{ ceph_nfs_ceph_squash }};
 
-	Attr_Expiration_Time = 0;
+        Attr_Expiration_Time = 0;
 
-	FSAL {
-		Name = CEPH;
-		User_Id = "{{ ceph_nfs_ceph_user }}";
-	}
+        FSAL {
+                Name = CEPH;
+                User_Id = "{{ ceph_nfs_ceph_user }}";
+        }
 
         {{ ganesha_ceph_export_overrides | default(None) }}
 }
@@ -74,39 +96,39 @@ EXPORT
 {% if nfs_obj_gw %}
 EXPORT
 {
-	Export_id={{ ceph_nfs_rgw_export_id }};
+        Export_id={{ ceph_nfs_rgw_export_id }};
 
-	Path = "/";
+        Path = "/";
 
-	Pseudo = {{ ceph_nfs_rgw_pseudo_path }};
+        Pseudo = {{ ceph_nfs_rgw_pseudo_path }};
 
-	Access_Type = {{ ceph_nfs_rgw_access_type }};
+        Access_Type = {{ ceph_nfs_rgw_access_type }};
 
-	Protocols = {{ ceph_nfs_rgw_protocols }};
+        Protocols = {{ ceph_nfs_rgw_protocols }};
 
-	Transports = TCP;
+        Transports = TCP;
 
-	SecType = {{ ceph_nfs_rgw_sectype }};
+        SecType = sys,krb5,krb5i,krb5p;
 
-	Squash = {{ ceph_nfs_rgw_squash }};
+        Squash = {{ ceph_nfs_rgw_squash }};
 
-	FSAL {
-		Name = RGW;
-		User_Id = "{{ ceph_nfs_rgw_user }}";
-		Access_Key_Id ="{{ ceph_nfs_rgw_access_key }}";
-		Secret_Access_Key = "{{ ceph_nfs_rgw_secret_key }}";
-	}
+        FSAL {
+                Name = RGW;
+                User_Id = "{{ ceph_nfs_rgw_user }}";
+                Access_Key_Id ="{{ ceph_nfs_rgw_access_key }}";
+                Secret_Access_Key = "{{ ceph_nfs_rgw_secret_key }}";
+        }
 
         {{ ganesha_rgw_export_overrides | default(None) }}
 
 }
-
 RGW {
         ceph_conf = "/etc/ceph/{{ cluster }}.conf";
         cluster = "{{ cluster }}";
         name = "{{ rgw_client_name }}";
         {{ ganesha_rgw_section_overrides | default(None) }}
 }
+{% endif %}
 {% endif %}
 
 LOG {
