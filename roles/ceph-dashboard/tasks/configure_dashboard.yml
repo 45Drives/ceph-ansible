@@ -178,6 +178,14 @@
   changed_when: false
   when: dashboard_frontend_vip is defined and dashboard_frontend_vip |length > 0
 
+- name: dashboard nfs gateway management frontend
+  when: groups.get(nfs_group_name, []) | length > 0
+  block:
+    - name: set the NFS ganesha pool namespace
+      command: "{{ container_exec_cmd }} ceph dashboard set-ganesha-clusters-rados-pool-namespace {{ ceph_nfs_ganesha_pool }}/{{ ceph_nfs_export_namespace }}"
+      changed_when: false
+      delegate_to: "{{ groups[mon_group_name][0] }}"
+
 - name: dashboard object gateway management frontend
   when: groups.get(rgw_group_name, []) | length > 0
   run_once: true
