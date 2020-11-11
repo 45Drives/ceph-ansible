@@ -120,25 +120,25 @@ osds_per_device: 1
 ###############
 # CRUSH RULES #
 ###############
-crush_rule_config: false
+crush_rule_config: true
 
-crush_rule_hdd:
-  name: HDD
-  root: default
-  type: host
-  class: hdd
-  default: false
-
-crush_rule_ssd:
-  name: SSD
+device_crush_ssd_rule:
+  name: replicated_ssd
   root: default
   type: host
   class: ssd
   default: false
 
+device_crush_hdd_rule:
+  name: replicated_hdd
+  root: default
+  type: host
+  class: hdd
+  default: true
+
 crush_rules:
-  - "{{ crush_rule_hdd }}"
-  - "{{ crush_rule_ssd }}"
+  - "{{ device_crush_hdd_rule }}"
+  - "{{ device_crush_ssd_rule }}"
 
 # Caution: this will create crush roots and racks according to hostvars {{ osd_crush_location }}
 # and will move hosts into them which might lead to significant data movement in the cluster!
