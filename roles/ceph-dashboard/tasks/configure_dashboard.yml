@@ -185,6 +185,7 @@
       command: "{{ container_exec_cmd }} ceph dashboard set-ganesha-clusters-rados-pool-namespace {{ ceph_nfs_ganesha_pool }}/{{ ceph_nfs_export_namespace }}"
       changed_when: false
       delegate_to: "{{ groups[mon_group_name][0] }}"
+      run_once: true
 
 - name: dashboard object gateway management frontend
   when: groups.get(rgw_group_name, []) | length > 0
