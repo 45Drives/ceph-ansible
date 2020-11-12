@@ -2,6 +2,16 @@
 - name: configure nfs directory on cephfs
   delegate_to: "{{ groups[mon_group_name][0] }}"
   block:
+    - name: config_cephfs | Get admin secret
+      command: "{{ container_exec_cmd }} ceph auth get-key client.admin"
+      register: command_output_admin
+      delegate_to: "{{ groups[mon_group_name][0] }}"
+      changed_when: false
+
+    - name: config_cephfs | Set admin secret fact
+      set_fact:
+        cephfs_admin_secret: "{{ command_output_admin.stdout }}"
+
     - name: config_cephfs | Ensure cephfs root dir exists
       file:
         path: "/mnt/cephfs/root"
