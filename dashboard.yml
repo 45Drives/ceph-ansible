@@ -9,6 +9,7 @@
     - "{{ nfs_group_name|default('nfss') }}"
     - "{{ iscsi_gw_group_name|default('iscsigws') }}"
     - "{{ grafana_server_group_name|default('grafana-server') }}"
+    - "{{ smb_group_name|default('smbs') }}"
   gather_facts: false
   become: true
   pre_tasks:

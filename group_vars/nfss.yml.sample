@@ -65,13 +65,6 @@ dummy:
 # rados_cluster is for active-active nfs cluster. Requires ganesha-grace-db to be initilaized
 #ceph_nfs_rados_backend_driver: "rados_ng"
 
-# Name of the rados pool and namespace used to store a list of the export and grace rados
-# object URLS
-#ceph_nfs_ganesha_pool: 'nfs_ganesha'
-
-#ceph_nfs_export_namespace: "ganesha-export"
-#ceph_nfs_grace_namespace: "ganesha-grace"
-
 # Address ganesha service should listen on, by default ganesha listens on all
 # addresses. (Note: ganesha ignores this parameter in current version due to
 # this bug: https://github.com/nfs-ganesha/nfs-ganesha/issues/217)

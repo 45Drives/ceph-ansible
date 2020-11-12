@@ -348,6 +348,15 @@ dummy:
 #  - "{{ cephfs_data_pool }}"
 #  - "{{ cephfs_metadata_pool }}"
 
+##########
+# NFS    #
+##########
+# Name of the rados pool and namespace used to store a list of the export and grace rados
+# object URLS
+#ceph_nfs_ganesha_pool: 'nfs_ganesha'
+#ceph_nfs_export_namespace: "ganesha-export"
+#ceph_nfs_grace_namespace: "ganesha-grace"
+
 ## OSD options
 #
 #is_hci: false
@@ -362,7 +371,7 @@ dummy:
 #osd_mkfs_options_xfs: -f -i size=2048
 #osd_mount_options_xfs: noatime,largeio,inode64,swalloc
 #osd_objectstore: bluestore
-#hybrid_cluster: false # HDD and SSD OSDs present in cluster
+#hybrid_cluster: false 
 
 # Any device containing these patterns in their path will be excluded.
 #osd_auto_discovery_exclude: "dm-*|loop*|md*|rbd*"
