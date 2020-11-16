@@ -4,6 +4,11 @@ ceph-ansible
 
 Ansible playbooks for Ceph, the distributed filesystem.
 
+.. toctree::
+   :maxdepth: 1
+
+   ceph_doc_test
+
 
 Installation
 ============
