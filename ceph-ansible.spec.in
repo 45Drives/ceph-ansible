@@ -1,7 +1,7 @@
 %global commit @COMMIT@
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 
-Name:           ceph-ansible
+Name:           ceph-ansible-45d
 Version:        @VERSION@
 Release:        @RELEASE@%{?dist}
 Summary:        Ansible playbooks for Ceph
