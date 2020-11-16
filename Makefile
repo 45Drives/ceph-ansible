@@ -1,7 +1,7 @@
 # Makefile for constructing RPMs.
 # Try "make" (for SRPMS) or "make rpm"
 
-NAME = ceph-ansible
+NAME = ceph-ansible-45d
 
 # Set the RPM package NVR from "git describe".
 # Examples:
@@ -66,11 +66,11 @@ echo:
 
 clean:
 	rm -rf dist/
-	rm -rf ceph-ansible-$(VERSION)-$(SHORTCOMMIT).tar.gz
+	rm -rf $(NAME)-$(VERSION)-$(SHORTCOMMIT).tar.gz
 	rm -rf $(NVR).src.rpm
 
 dist:
-	git archive --format=tar.gz --prefix=ceph-ansible-$(VERSION)/ HEAD > ceph-ansible-$(VERSION)-$(SHORTCOMMIT).tar.gz
+	git archive --format=tar.gz --prefix=$(NAME)-$(VERSION)/ HEAD > $(NAME)-$(VERSION)-$(SHORTCOMMIT).tar.gz
 
 spec:
 	sed ceph-ansible.spec.in \
