@@ -30,6 +30,7 @@
     state: directory
   run_once: true
   when:
+    - enable_windows_acl | bool
     - item.windows_acl | bool
     - domain_member | bool
 

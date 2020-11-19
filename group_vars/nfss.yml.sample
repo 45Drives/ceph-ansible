@@ -60,9 +60,9 @@ dummy:
 # run multiple nfs-ganesha servers in active/passive mode and
 # want to do failover
 #ceph_nfs_rados_backend: true
-# backend mode, either rados_kv,rados_ng, or rados_cluster
-# Default (rados_ng) is for for single gateway/active-passive use. rados_kv is obseleted by rados_ng
-# rados_cluster is for active-active nfs cluster. Requires ganesha-grace-db to be initilaized
+# backend mode, either rados_ng, or rados_cluster
+# Default (rados_ng) is for single gateway/active-passive use.
+# rados_cluster is for active-active nfs cluster. Requires ganesha-grace-db to be initialized
 #ceph_nfs_rados_backend_driver: "rados_ng"
 
 # Address ganesha service should listen on, by default ganesha listens on all

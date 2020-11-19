@@ -55,7 +55,7 @@ active_directory_info:
 
 # Samba Share (SMB) Definitions
 # Path is relative to cephfs root
-configure_shares: false
+configure_shares: true
 enable_windows_acl: true
 samba_shares:
   - name: 'public'
