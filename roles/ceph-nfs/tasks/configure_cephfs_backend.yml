@@ -22,7 +22,7 @@
     - name: config_cephfs | Mount cephfs as admin user 
       mount:
         name: "/mnt/cephfs/root"
-        src: "{{ groups[mon_group_name][0] }}:/"
+        src: ":/"
         fstype: "ceph"
         opts: "name=admin,secret={{ cephfs_admin_secret }},_netdev,noatime"
         state: mounted

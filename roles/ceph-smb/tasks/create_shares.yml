@@ -16,7 +16,7 @@
 - name: create_shares | mount share
   mount:
     name: "{{ shared_storage_mountpoint }}{{ item.path }}"
-    src: "{{ groups[mon_group_name][0] }}:{{ item.path }}"
+    src: ":{{ item.path }}"
     fstype: "ceph"
     opts: "name=samba,secretfile=/etc/ceph/samba.secret,_netdev,relatime"
     state: mounted
@@ -37,7 +37,7 @@
 - name: create_shares | unmount {{ shared_storage_mountpoint }}{{ item.path }}
   mount:
     name: "{{ shared_storage_mountpoint }}{{ item.path }}"
-    src: "{{ groups[mon_group_name][0] }}:{{ item.path }}"
+    src: ":{{ item.path }}"
     state: absent
   when: item.type == "vfs"
 
