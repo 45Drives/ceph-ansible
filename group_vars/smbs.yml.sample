@@ -24,9 +24,6 @@ dummy:
 
 # Which backend_fs to use. Currently only cephfs supported
 #backend_fs: cephfs
-# True = use samba cephfs vfs module
-# False = use kernel cephfs mount
-#samba_cephfs_module: false
 
 ## Cephfs Options
 #samba_keyring:

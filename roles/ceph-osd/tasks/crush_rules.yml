@@ -10,12 +10,20 @@
     - hostvars[groups[mon_group_name][0]]['create_crush_tree'] | default(create_crush_tree) | bool
     - osd_crush_location is defined
 
+- name: create configured HDD crush rules when not hybrid cluster
+  command: "{{ hostvars[groups[mon_group_name][0]]['container_exec_cmd'] | default('') }} ceph --cluster {{ cluster }} osd crush rule create-replicated {{ device_crush_hdd_rule.name }} {{ device_crush_hdd_rule.root }} {{ device_crush_hdd_rule.type }} {{ device_crush_hdd_rule.class }}"
+  changed_when: false
+  delegate_to: '{{ groups[mon_group_name][0] }}'
+  run_once: true
+  when: not hybrid_cluster | bool
+
 - name: create configured crush rules
   command: "{{ hostvars[groups[mon_group_name][0]]['container_exec_cmd'] | default('') }} ceph --cluster {{ cluster }} osd crush rule {{ 'create-replicated' if item.class is defined else 'create-simple' }} {{ item.name }} {{ item.root }} {{ item.type }} {{ item.class | default('') }}"
   changed_when: false
   with_items: "{{ hostvars[groups[mon_group_name][0]]['crush_rules'] | default(crush_rules) | unique }}"
   delegate_to: '{{ groups[mon_group_name][0] }}'
   run_once: true
+  when: hybrid_cluster | bool
 
 - name: get id for new default crush rule
   command: "{{ hostvars[groups[mon_group_name][0]]['container_exec_cmd'] | default('') }} ceph --cluster {{ cluster }} osd -f json crush rule dump {{ item.name }}"

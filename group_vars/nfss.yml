@@ -17,12 +17,12 @@ dummy:
 # at their disposal, some people might want to have it
 # distributed on RGW nodes. Setting 'copy_admin_key' to 'true'
 # will copy the admin key to the /etc/ceph/ directory
-#copy_admin_key: true
+copy_admin_key: true
 
 # Whether docker container or systemd service should be enabled
 # and started, it's useful to set it to false if nfs-ganesha
 # service is managed by pacemaker
-#ceph_nfs_enable_service: true
+ceph_nfs_enable_service: true
 
 # ceph-nfs systemd service uses ansible's hostname as an instance id,
 # so service name is ceph-nfs@{{ ansible_hostname }}, this is not
@@ -40,9 +40,9 @@ dummy:
 # Ceph filesystem, and ganesha's attribute and directory caching is disabled
 # as much as possible since libcephfs clients also caches the same
 # information.
-#nfs_file_gw: true
+nfs_file_gw: true
 # Enable NFS Object access
-#nfs_obj_gw: false
+nfs_obj_gw: false
 
 ######################
 # NFS Ganesha Config #
@@ -51,19 +51,19 @@ dummy:
 #ceph_nfs_ceph_user: "admin"
 #ceph_nfs_fs_root: "nfs"
 
-#nfs_keyring:
-#  - { name: client.nfs, caps: { mds: "allow r path=/, allow rwps path=/{{ ceph_nfs_fs_root }}", mon: "allow r", osd: "allow *" }, mode: "0600" }
+nfs_keyring:
+  - { name: client.nfs, caps: { mds: "allow r path=/, allow rwps path=/{{ ceph_nfs_fs_root }}", mon: "allow r", osd: "allow *" }, mode: "0600" }
 
-#ceph_nfs_dynamic_exports: true
+ceph_nfs_dynamic_exports: true
 # If set to true then rados is used to store ganesha exports
 # and client sessions information, this is useful if you
 # run multiple nfs-ganesha servers in active/passive mode and
 # want to do failover
-#ceph_nfs_rados_backend: true
-# backend mode, either rados_ng, or rados_cluster
-# Default (rados_ng) is for single gateway/active-passive use.
-# rados_cluster is for active-active nfs cluster. Requires ganesha-grace-db to be initialized
-#ceph_nfs_rados_backend_driver: "rados_ng"
+ceph_nfs_rados_backend: true
+# backend mode, either rados_kv,rados_ng, or rados_cluster
+# Default (rados_ng) is for for single gateway/active-passive use. rados_kv is obseleted by rados_ng
+# rados_cluster is for active-active nfs cluster. Requires ganesha-grace-db to be initilaized
+ceph_nfs_rados_backend_driver: "rados_ng"
 
 # Address ganesha service should listen on, by default ganesha listens on all
 # addresses. (Note: ganesha ignores this parameter in current version due to
@@ -76,18 +76,18 @@ dummy:
 # ganesha's caching as the libcephfs clients also cache the same information.
 # Note: Irrespective of this option's setting, ganesha's caching is disabled
 # when setting 'nfs_file_gw' option as true.
-#ceph_nfs_disable_caching: false
+ceph_nfs_disable_caching: false
 
-#ceph_nfs_limit_nfs4: false
+ceph_nfs_limit_nfs4: false
 
 ####################
 #    PCS Config    #
 ####################
-#pcmk_cluster_name: hacluster
-#pcmk_user: hacluster
+pcmk_cluster_name: hacluster
+pcmk_user: hacluster
 
-#ceph_nfs_floating_ip_address: '192.168.18.73'
-#ceph_nfs_floating_ip_cidr: '16'
+ceph_nfs_floating_ip_address: '192.168.122.41'
+ceph_nfs_floating_ip_cidr: '16'
 
 
 ####################
@@ -141,8 +141,8 @@ dummy:
 # DOCKER #
 ##########
 
-#ceph_docker_image: "ceph/daemon"
-#ceph_docker_image_tag: latest
-#ceph_nfs_docker_extra_env:
-#ceph_config_keys: [] # DON'T TOUCH ME
+ceph_docker_image: "ceph/daemon"
+ceph_docker_image_tag: latest
+ceph_nfs_docker_extra_env:
+ceph_config_keys: [] # DON'T TOUCH ME
 
