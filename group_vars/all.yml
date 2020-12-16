@@ -132,7 +132,7 @@ nfs_ganesha_stable: true # use stable repos for nfs-ganesha
 nfs_ganesha_stable_branch: V3.3-stable
 nfs_ganesha_stable_deb_repo: "{{ ceph_mirror }}/nfs-ganesha/deb-{{ nfs_ganesha_stable_branch }}/{{ ceph_stable_release }}"
 
-ceph_45drives_repo_url: "http://images.45drives.com/ceph/rpm/el8" 
+ceph_45drives_repo_url: "http://images.45drives.com/ceph/rpm/el7" 
 
 ######################
 # CEPH CONFIGURATION #

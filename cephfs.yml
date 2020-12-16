@@ -18,6 +18,7 @@
     # so just try what we can to get it installed
 
     - import_tasks: raw_install_python.yml
+    - import_tasks: centos7_python_deps.yml
 
     - name: gather facts
       setup:
@@ -105,7 +106,7 @@
         gpgcheck: no
         enabled: yes
         state: present
-        baseurl: "http://images.45drives.com/ceph/rpm/el8/"
+        baseurl: "{{ ceph_45drives_repo_url }}"
         file: ceph_45drives
         priority: "1"
       register: result

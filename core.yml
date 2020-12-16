@@ -20,6 +20,7 @@
     # so just try what we can to get it installed
 
     - import_tasks: raw_install_python.yml
+    - import_tasks: centos7_python_deps.yml
 
     - name: gather facts
       setup:

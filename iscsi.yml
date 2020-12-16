@@ -18,6 +18,8 @@
     # If we can't get python2 installed before any module is used we will fail
     # so just try what we can to get it installed
 
+    - import_tasks: centos7_python_deps.yml
+
     - import_tasks: raw_install_python.yml
 
     - name: gather facts
