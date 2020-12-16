@@ -8,7 +8,7 @@
         gpgcheck: no
         enabled: yes
         state: present
-        baseurl: http://images.45drives.com/ceph/rpm/el8/
+        baseurl: http://images.45drives.com/ceph/rpm/el7/
         file: ceph_45drives
         priority: "1"
       register: result
