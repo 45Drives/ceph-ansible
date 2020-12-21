@@ -59,18 +59,12 @@
 - name: red hat based systems - install pacemaker/corosync/pcs
   block:
     - name: install pacemaker
-      dnf:
-        name: "{{ item }}"
+      package:
+        name: ['pacemaker', 'corosync', 'pcs']
         state: "{{ (upgrade_ceph_packages|bool) | ternary('latest','present') }}"
-        enablerepo: "HighAvailability"
       register: result
       until: result is succeeded
-      with_items:
-        - pacemaker
-        - corosync
-        - pcs
       when:
         - ceph_nfs_rados_backend_driver == "rados_ng"
         - groups['nfss'] | length > 1
-
 
