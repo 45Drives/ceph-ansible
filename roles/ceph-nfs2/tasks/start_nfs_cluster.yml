@@ -26,7 +26,7 @@
     password: "{{ pcmk_password | password_hash('sha512') }}"
 
 - name: Authenticate all nodes
-  command: pcs host auth {{ ansible_play_batch | join(' ') }} -u "{{ pcmk_user }}" -p "{{ pcmk_password | quote }}"
+  command: pcs cluster auth {{ ansible_play_batch | join(' ') }} -u "{{ pcmk_user }}" -p "{{ pcmk_password | quote }}"
   run_once: true
   args:
     creates: /var/lib/pcsd/tokens
