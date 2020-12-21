@@ -1,25 +1,25 @@
 ---
-# global/common requirement
-- name: stop nfs server service
-  systemd:
-    name: "{{ 'nfs-server' if ansible_os_family == 'RedHat' else 'nfsserver' if ansible_os_family == 'Suse' else 'nfs-kernel-server' if ansible_os_family == 'Debian' }}"
-    state: stopped
-    enabled: no
-  failed_when: false
+- name: set_fact docker_exec_cmd
+  set_fact:
+    docker_exec_cmd: "{{ container_binary }} exec ceph-nfs-{{ ansible_hostname }}"
+  when:
+    - containerized_deployment | bool
 
-# common used to be here
+- name: include common.yml
+  include_tasks: common.yml
 
 - name: include pre_requisite_non_container.yml
   include_tasks: pre_requisite_non_container.yml
-  when: not containerized_deployment | bool
+  when:
+    - not containerized_deployment | bool
 
 - name: include pre_requisite_container.yml
   include_tasks: pre_requisite_container.yml
-  when: containerized_deployment | bool
+  when:
+    - containerized_deployment | bool
 
 - name: include create_rgw_nfs_user.yml
   import_tasks: create_rgw_nfs_user.yml
-  when: groups.get(mon_group_name, []) | length > 0
 
 # NOTE (leseb): workaround for issues with ganesha and librgw
 - name: include ganesha_selinux_fix.yml
@@ -27,43 +27,12 @@
   when:
     - not containerized_deployment | bool
     - ansible_os_family == 'RedHat'
+    - ansible_distribution_version >= '7.4'
 
-- name: nfs with external ceph cluster task related
+- name: include config_cephfs.yml
+  import_tasks: config_cephfs.yml
   when:
-    - groups.get(mon_group_name, []) | length == 0
-    - ceph_nfs_ceph_user is defined
-  block:
-    - name: create keyring directory
-      file:
-        path: "/var/lib/ceph/radosgw/{{ cluster }}-rgw.{{ item }}"
-        state: directory
-        owner: "{{ ceph_uid if containerized_deployment else 'ceph' }}"
-        group: "{{ ceph_uid if containerized_deployment else 'ceph' }}"
-        mode: "0755"
-      with_items:
-        - "{{ ceph_nfs_ceph_user }}"
-        - "{{ ansible_hostname }}"
-
-    - name: set_fact rgw_client_name
-      set_fact:
-        rgw_client_name: "client.rgw.{{ ceph_nfs_ceph_user }}"
-
-    - name: get client cephx keys
-      copy:
-        dest: "{{ item.1 }}"
-        content: "{{ item.0.content | b64decode }}"
-        mode: "{{ item.0.item.get('mode', '0600') }}"
-        owner: "{{ ceph_uid if containerized_deployment else 'ceph' }}"
-        group: "{{ ceph_uid if containerized_deployment else 'ceph' }}"
-      with_nested:
-        - "{{ hostvars[groups['_filtered_clients'][0]]['slurp_client_keys']['results'] | default([]) }}"
-        - ['/var/lib/ceph/radosgw/{{ cluster }}-rgw.{{ ceph_nfs_ceph_user }}/keyring', '/var/lib/ceph/radosgw/{{ cluster }}-rgw.{{ ansible_hostname }}/keyring']
-      when:
-        - not item.0.get('skipped', False)
-        - item.0.item.name == 'client.' + ceph_nfs_ceph_user or item.0.item.name == rgw_client_name
-
-- name: include configure_cephfs_backend.yml
-  import_tasks: configure_cephfs_backend.yml
+    - nfs_file_gw | bool
 
 - name: include start_nfs.yml
   import_tasks: start_nfs.yml
@@ -72,3 +41,5 @@
   import_tasks: start_nfs_cluster.yml
   when:
     - ceph_nfs_rados_backend_driver == "rados_ng"
+  tags:
+    nfs_cluster

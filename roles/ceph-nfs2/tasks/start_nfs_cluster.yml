@@ -26,14 +26,14 @@
     password: "{{ pcmk_password | password_hash('sha512') }}"
 
 - name: Authenticate all nodes
-  command: pcs cluster auth {{ ansible_play_batch | join(' ') }} -u "{{ pcmk_user }}" -p "{{ pcmk_password | quote }}"
+  command: pcs host auth {{ ansible_play_batch | join(' ') }} -u "{{ pcmk_user }}" -p "{{ pcmk_password | quote }}"
   run_once: true
   args:
     creates: /var/lib/pcsd/tokens
 
 - name: Setup message bus
   run_once: true
-  command: pcs cluster setup --name {{ pcmk_cluster_name | quote }} {{  ansible_play_batch | join(' ') }}
+  command: pcs cluster setup {{ pcmk_cluster_name | quote }} {{  ansible_play_batch | join(' ') }}
   args:
     creates: /etc/corosync/corosync.conf
 
