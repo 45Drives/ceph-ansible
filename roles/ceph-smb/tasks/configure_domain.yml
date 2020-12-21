@@ -12,7 +12,7 @@
     - name: config nsswitch.conf
       template:
         src: etc/nsswitch.conf.j2
-        dest: /etc/samba/smb.conf
+        dest: /etc/nsswitch.conf
         owner: "root"
         group: "root"
         mode: 0644
@@ -39,15 +39,7 @@
         dest: /etc/pam.d/postlogin
         owner: "root"
         group: "root"
-        mode: 0644
-
-    - name: config pam.d/postlogin
-      template:
-        src: etc/pam.d/postlogin.j2
-        dest: /etc/pam.d/postlogin
-        owner: "root"
-        group: "root"
-        mode: 0644        
+        mode: 0644      
 
     - name: start_config_domain | enable oddjobd
       systemd:
