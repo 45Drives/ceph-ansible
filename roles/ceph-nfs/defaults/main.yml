@@ -52,19 +52,11 @@ ceph_nfs_dynamic_exports: true
 # run multiple nfs-ganesha servers in active/passive mode and
 # want to do failover
 ceph_nfs_rados_backend: true
-# backend mode, either rados_kv,rados_ng, or rados_cluster
-# Default (rados_ng) is for for single gateway/active-passive use. rados_kv is obseleted by rados_ng
-# rados_cluster is for active-active nfs cluster. Requires ganesha-grace-db to be initilaized
+# backend mode, either rados_ng, or rados_cluster
+# Default (rados_ng) is for single gateway/active-passive use.
+# rados_cluster is for active-active nfs cluster. Requires ganesha-grace-db to be initialized
 ceph_nfs_rados_backend_driver: "rados_ng"
 
-# Name of the rados pool and namespace used to store a list of the export rados
-# object URLS
-ceph_nfs_export_pool: "{{ cephfs_metadata }}"
-ceph_nfs_export_namespace: "ganesha-export"
-# Name of the rados pool and namespace used to store a list of the grace rados
-# object URLS
-ceph_nfs_grace_pool: "{{ cephfs_metadata }}"
-ceph_nfs_grace_namespace: "ganesha-grace"
 # Address ganesha service should listen on, by default ganesha listens on all
 # addresses. (Note: ganesha ignores this parameter in current version due to
 # this bug: https://github.com/nfs-ganesha/nfs-ganesha/issues/217)
