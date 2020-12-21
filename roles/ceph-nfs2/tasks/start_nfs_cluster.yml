@@ -33,7 +33,7 @@
 
 - name: Setup message bus
   run_once: true
-  command: pcs cluster setup {{ pcmk_cluster_name | quote }} {{  ansible_play_batch | join(' ') }}
+  command: pcs cluster setup --name {{ pcmk_cluster_name | quote }} {{  ansible_play_batch | join(' ') }}
   args:
     creates: /etc/corosync/corosync.conf
 
