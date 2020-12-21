@@ -1,7 +1,7 @@
 ---
 - name: install centos7 python dependencies
   yum:
-    name: "{{ items }}"
+    name: "{{ item }}"
     state: present
   register: result
   until: result is succeeded

@@ -9,9 +9,46 @@
 
 - name: config_domain | configure domain user login
   block:
-    - name: config_domain | use authselect to configure nsswitch.conf
-      shell: "/usr/bin/authselect select winbind with-mkhomedir --force"
-    
+    - name: config nsswitch.conf
+      template:
+        src: etc/nsswitch.conf.j2
+        dest: /etc/samba/smb.conf
+        owner: "root"
+        group: "root"
+        mode: 0644
+
+    - name: config pam.d/system-auth
+      template:
+        src: etc/pam.d/system-auth.j2
+        dest: /etc/pam.d/system-auth
+        owner: "root"
+        group: "root"
+        mode: 0644
+
+    - name: config pam.d/password-auth
+      template:
+        src: etc/pam.d/password-auth.j2
+        dest: /etc/pam.d/password-auth
+        owner: "root"
+        group: "root"
+        mode: 0644
+
+    - name: config pam.d/postlogin
+      template:
+        src: etc/pam.d/postlogin.j2
+        dest: /etc/pam.d/postlogin
+        owner: "root"
+        group: "root"
+        mode: 0644
+
+    - name: config pam.d/postlogin
+      template:
+        src: etc/pam.d/postlogin.j2
+        dest: /etc/pam.d/postlogin
+        owner: "root"
+        group: "root"
+        mode: 0644        
+
     - name: start_config_domain | enable oddjobd
       systemd:
         name: oddjobd
