@@ -7,19 +7,19 @@ NAME = ceph-ansible-45d
 # Examples:
 #
 #  A "git describe" value of "v2.2.0beta1" would create an NVR
-#  "ceph-ansible-2.2.0-0.beta1.1.el8"
+#  "ceph-ansible-2.2.0-0.beta1.1.el7"
 #
 #  A "git describe" value of "v2.2.0rc1" would create an NVR
-#  "ceph-ansible-2.2.0-0.rc1.1.el8"
+#  "ceph-ansible-2.2.0-0.rc1.1.el7"
 #
 #  A "git describe" value of "v2.2.0rc1-1-gc465f85" would create an NVR
-#  "ceph-ansible-2.2.0-0.rc1.1.gc465f85.el8"
+#  "ceph-ansible-2.2.0-0.rc1.1.gc465f85.el7"
 #
 #  A "git describe" value of "v2.2.0" creates an NVR
-#  "ceph-ansible-2.2.0-1.el8"
+#  "ceph-ansible-2.2.0-1.el7"
 
-DIST ?= "el8"
-MOCK_CONFIG ?= "epel-8-x86_64"
+DIST ?= "el7"
+MOCK_CONFIG ?= "epel-7-x86_64"
 TAG := $(shell git describe --tags --abbrev=0 --match 'v*')
 VERSION := $(shell echo $(TAG) | sed 's/^v//')
 COMMIT := $(shell git rev-parse HEAD)

@@ -20,8 +20,8 @@ BuildRequires: ansible >= 2.9
 Requires: ansible >= 2.9
 
 %if 0%{?rhel} == 7
-BuildRequires: python2-devel
-Requires: python2-netaddr
+BuildRequires: python-devel
+Requires: python-netaddr
 %else
 BuildRequires: python3-devel
 Requires: python3-netaddr
