@@ -1,6 +1,11 @@
 ---
 - hosts: osds
   tasks:
+    - name: yum-clean-all
+      command: yum clean all
+      args:
+        warn: no
+
     - name: 45Drives Repository - Configure 45drives repository
       yum_repository:
         name: ceph_45drives
