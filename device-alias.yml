@@ -12,29 +12,28 @@
         file: ceph_45drives
         priority: "1"
       register: result
-      until: result is success
+      until: result is succeeded
 
     - name: install tools
       package:
         name: 45drives-tools
-        state: present
+        state: latest
       register: result
       until: result is succeeded
-
-- name: Import generate-osd-vars playbook
-  import_playbook: generate-osd-vars.yml
 
 - hosts: osds
   vars:
       tools_install_dir: "/opt/tools" 
   tasks:
     - name: Create drive alias' for standard chassis
-      command: /usr/bin/python3 "{{ tools_install_dir }}"/dmap -s "{{ chassis_size }}"
-      when: not hybrid_chassis | bool
+      command: /usr/bin/python3 "{{ tools_install_dir }}"/dmap 
+      register: dmap_output
 
-    - name: Create drive alias' for hybrid chassis
-      command: /usr/bin/python3 "{{ tools_install_dir }}"/hmap -s "{{ chassis_size }}"
-      when: hybrid_chassis | bool
+    - name: Show dmap output
+      debug:
+        msg: "{{ dmap_output.stdout_lines }}"
+      when:
+      - dmap_output.failed
 
     - name: Get drive layout
       command: /usr/bin/python3 "{{ tools_install_dir }}"/lsdev -n
@@ -46,7 +45,7 @@
         msg: "{{ drive_layout.stdout_lines }}"
       when: 
       - not drive_layout.failed
-        
+
 - name: Import generate-osd-vars playbook
   import_playbook: generate-osd-vars.yml
 
