@@ -32,8 +32,6 @@ dummy:
 #  pacific: 16
 #  dev: 99
 
-# Directory to fetch cluster fsid, keys etc...
-fetch_directory: ~/ceph-ansible-keys
 
 # The 'cluster' variable determines the name of the cluster.
 # Changing the default value to something else means that you will
@@ -78,8 +76,6 @@ fetch_directory: ~/ceph-ansible-keys
 #ceph_rgwloadbalancer_firewall_zone: public
 #ceph_samba_firewall_zone: public
 
-# Generate local ceph.conf in fetch directory
-#ceph_conf_local: false
 
 ############
 # PACKAGES #
@@ -248,8 +244,8 @@ ceph_iscsi_config_dev: false
 ## Ceph options
 #
 # Each cluster requires a unique, consistent filesystem ID. By
-# default, the playbook generates one for you and stores it in a file
-# in `fetch_directory`. If you want to customize how the fsid is
+# default, the playbook generates one for you.
+# If you want to customize how the fsid is
 # generated, you may find it useful to disable fsid generation to
 # avoid cluttering up your ansible repo. If you set `generate_fsid` to
 # false, you *must* generate `fsid` in another way.
@@ -389,7 +385,7 @@ ceph_iscsi_config_dev: false
 
 ## Rados Gateway options
 #
-#radosgw_frontend_type: beast # For additionnal frontends see: http://docs.ceph.com/docs/nautilus/radosgw/frontends/
+#radosgw_frontend_type: beast # For additional frontends see: https://docs.ceph.com/en/octopus/radosgw/frontends/
 
 #radosgw_civetweb_port: 8080
 #radosgw_civetweb_num_threads: 512
@@ -664,7 +660,7 @@ ceph_docker_registry_auth: true
 # For https, you should set dashboard.crt/key and grafana.crt/key
 # If you define the dashboard_crt and dashboard_key variables, but leave them as '',
 # then we will autogenerate a cert and keyfile
-#dashboard_protocol: http
+#dashboard_protocol: https
 #dashboard_port: 8443
 #dashboard_admin_user: admin
 #dashboard_admin_user_ro: false
@@ -674,12 +670,12 @@ ceph_docker_registry_auth: true
 #dashboard_crt: ''
 #dashboard_key: ''
 #dashboard_tls_external: false
-#dashboard_grafana_api_no_ssl_verify: False
+#dashboard_grafana_api_no_ssl_verify: "{{ true if dashboard_protocol == 'https' and not grafana_crt and not grafana_key else false }}"
 #dashboard_rgw_api_user_id: ceph-dashboard
 #dashboard_rgw_api_admin_resource: ''
 #dashboard_rgw_api_no_ssl_verify: False
 #dashboard_frontend_vip: ''
-node_exporter_container_image: registry.redhat.io/openshift4/ose-prometheus-node-exporter:v4.1
+node_exporter_container_image: registry.redhat.io/openshift4/ose-prometheus-node-exporter:v4.6
 #node_exporter_port: 9100
 #grafana_admin_user: admin
 # This variable must be set with a strong custom password when dashboard_enabled is True
@@ -715,7 +711,8 @@ grafana_container_image: registry.redhat.io/rhceph/rhceph-4-dashboard-rhel8:4
 #  - grafana-piechart-panel
 #grafana_allow_embedding: True
 #grafana_port: 3000
-prometheus_container_image: registry.redhat.io/openshift4/ose-prometheus:4.1
+#grafana_conf_overrides: {}
+prometheus_container_image: registry.redhat.io/openshift4/ose-prometheus:v4.6
 #prometheus_container_cpu_period: 100000
 #prometheus_container_cpu_cores: 2
 # container_memory is in GB
@@ -724,7 +721,8 @@ prometheus_container_image: registry.redhat.io/openshift4/ose-prometheus:4.1
 #prometheus_conf_dir: /etc/prometheus
 #prometheus_user_id: '65534'  # This is the UID used by the prom/prometheus container image
 #prometheus_port: 9092
-alertmanager_container_image: registry.redhat.io/openshift4/ose-prometheus-alertmanager:4.1
+#prometheus_conf_overrides: {}
+alertmanager_container_image: registry.redhat.io/openshift4/ose-prometheus-alertmanager:v4.6
 #alertmanager_container_cpu_period: 100000
 #alertmanager_container_cpu_cores: 2
 # container_memory is in GB
@@ -733,6 +731,7 @@ alertmanager_container_image: registry.redhat.io/openshift4/ose-prometheus-alert
 #alertmanager_conf_dir: /etc/alertmanager
 #alertmanager_port: 9093
 #alertmanager_cluster_port: 9094
+#alertmanager_conf_overrides: {}
 
 
 ##################################

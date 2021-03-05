@@ -87,6 +87,7 @@
 
     - name: ensure cephfs mountpoint(s) are unmounted
       command: umount -a -t ceph
+      changed_when: false
 
     - name: find mapped rbd ids
       find:
@@ -96,6 +97,7 @@
 
     - name: use sysfs to unmap rbd devices
       shell: "echo {{ item.path | basename }} > /sys/bus/rbd/remove_single_major"
+      changed_when: false
       with_items: "{{ rbd_mapped_ids.files }}"
 
     - name: unload ceph kernel modules
@@ -268,7 +270,7 @@
 
   - name: stop ceph mgrs with systemd
     service:
-      name: ceph-mgr@{{ ansible_hostname}}
+      name: ceph-mgr@{{ ansible_hostname }}
       state: stopped
       enabled: no
     failed_when: false
@@ -364,16 +366,16 @@
 
   - name: wait for server to boot
     become: false
-    local_action:
-      module: wait_for
+    wait_for:
       port: 22
       host: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}"
       state: started
       delay: 10
       timeout: 500
+      delegate_to: localhost
 
   - name: remove data
-    shell: rm -rf /var/lib/ceph/*
+    shell: rm -rf /var/lib/ceph/*  # noqa 302
 
   tasks:
 
@@ -386,13 +388,13 @@
     when: lvm_volumes is not defined
 
   - name: get osd numbers
-    shell: "if [ -d /var/lib/ceph/osd ] ; then ls /var/lib/ceph/osd | sed 's/.*-//' ; fi"
+    shell: if [ -d /var/lib/ceph/osd ] ; then ls /var/lib/ceph/osd | sed 's/.*-//' ; fi  # noqa 306
     register: osd_ids
     changed_when: false
 
   - name: stop ceph-osd with systemd
     service:
-      name: ceph-osd@{{item}}
+      name: ceph-osd@{{ item }}
       state: stopped
       enabled: no
     with_items: "{{ osd_ids.stdout_lines }}"
@@ -408,20 +410,23 @@
 
   # NOTE(leseb): hope someone will find a more elegant way one day...
   - name: see if encrypted partitions are present
-    shell: |
-      blkid -t TYPE=crypto_LUKS -s PARTLABEL -s PARTUUID | grep "ceph.*." | grep -o PARTUUID.* | cut -d '"' -f 2
+    shell: blkid -t TYPE=crypto_LUKS -s PARTLABEL -s PARTUUID | grep "ceph.*." | grep -o PARTUUID.* | cut -d '"' -f 2  # noqa 306
     register: encrypted_ceph_partuuid
+    changed_when: false
 
   - name: get osd data and lockbox mount points
-    shell: "(grep /var/lib/ceph/osd /proc/mounts || echo -n) | awk '{ print $2 }'"
+    shell: (grep /var/lib/ceph/osd /proc/mounts || echo -n) | awk '{ print $2 }'  # noqa 306
     register: mounted_osd
     changed_when: false
 
   - name: drop all cache
     shell: "sync && sleep 1 && echo 3 > /proc/sys/vm/drop_caches"
+    changed_when: false
 
   - name: umount osd data partition
-    shell: umount {{ item }}
+    mount:
+      path: "{{ item }}"
+      state: unmounted
     with_items: "{{ mounted_osd.stdout_lines }}"
 
   - name: remove osd mountpoint tree
@@ -432,9 +437,8 @@
     ignore_errors: true
 
   - name: is reboot needed
-    local_action:
-      module: command
-        echo requesting reboot
+    command: echo requesting reboot
+    delegate_to: localhost
     become: false
     notify:
       - restart machine
@@ -455,19 +459,21 @@
     when: encrypted_ceph_partuuid.stdout_lines | length > 0
 
   - name: get payload_offset
-    shell: cryptsetup luksDump /dev/disk/by-partuuid/{{ item }} | awk '/Payload offset:/ { print $3 }'
+    shell: cryptsetup luksDump /dev/disk/by-partuuid/{{ item }} | awk '/Payload offset:/ { print $3 }'  # noqa 306
     register: payload_offset
     with_items: "{{ encrypted_ceph_partuuid.stdout_lines }}"
     when: encrypted_ceph_partuuid.stdout_lines | length > 0
 
   - name: get physical sector size
     command: blockdev --getpbsz /dev/disk/by-partuuid/{{ item }}
+    changed_when: false
     with_items: "{{ encrypted_ceph_partuuid.stdout_lines }}"
     when: encrypted_ceph_partuuid.stdout_lines | length > 0
     register: phys_sector_size
 
   - name: wipe dmcrypt device
     command: dd if=/dev/zero of=/dev/disk/by-partuuid/{{ item.0 }} bs={{ item.1.stdout }} count={{ item.2.stdout }} oflag=direct
+    changed_when: false
     with_together:
       - "{{ encrypted_ceph_partuuid.stdout_lines }}"
       - "{{ payload_offset.results }}"
@@ -476,17 +482,20 @@
   - name: get ceph data partitions
     shell: |
       blkid -o device -t PARTLABEL="ceph data"
+    changed_when: false
     failed_when: false
     register: ceph_data_partition_to_erase_path
 
   - name: get ceph lockbox partitions
     shell: |
       blkid -o device -t PARTLABEL="ceph lockbox"
+    changed_when: false
     failed_when: false
     register: ceph_lockbox_partition_to_erase_path
 
   - name: see if ceph-volume is installed
-    shell: "command -v ceph-volume"
+    command: command -v ceph-volume
+    changed_when: false
     failed_when: false
     register: ceph_volume_present
 
@@ -503,10 +512,8 @@
       action: "zap"
     environment:
       CEPH_VOLUME_DEBUG: "{{ ceph_volume_debug }}"
-    with_items: "{{ lvm_volumes }}"
-    when:
-      - lvm_volumes | default([]) | length > 0
-      - ceph_volume_present.rc == 0
+    with_items: "{{ lvm_volumes | default([]) }}"
+    when: ceph_volume_present.rc == 0
 
   - name: zap and destroy osds created by ceph-volume with devices
     ceph_volume:
@@ -514,32 +521,37 @@
       action: "zap"
     environment:
       CEPH_VOLUME_DEBUG: "{{ ceph_volume_debug }}"
-    with_items: "{{ devices | default([]) }}"
-    when:
-      - devices | default([]) | length > 0
-      - ceph_volume_present.rc == 0
+    with_items:
+      - "{{ devices | default([]) }}"
+      - "{{ dedicated_devices | default([]) }}"
+      - "{{ bluestore_wal_devices | default([]) }}"
+    when: ceph_volume_present.rc == 0
 
   - name: get ceph block partitions
     shell: |
       blkid -o device -t PARTLABEL="ceph block"
+    changed_when: false
     failed_when: false
     register: ceph_block_partition_to_erase_path
 
   - name: get ceph journal partitions
     shell: |
       blkid -o device -t PARTLABEL="ceph journal"
+    changed_when: false
     failed_when: false
     register: ceph_journal_partition_to_erase_path
 
   - name: get ceph db partitions
     shell: |
       blkid -o device -t PARTLABEL="ceph block.db"
+    changed_when: false
     failed_when: false
     register: ceph_db_partition_to_erase_path
 
   - name: get ceph wal partitions
     shell: |
       blkid -o device -t PARTLABEL="ceph block.wal"
+    changed_when: false
     failed_when: false
     register: ceph_wal_partition_to_erase_path
 
@@ -555,6 +567,7 @@
   - name: resolve parent device
     command: lsblk --nodeps -no pkname "{{ item }}"
     register: tmp_resolved_parent_device
+    changed_when: false
     with_items: "{{ combined_devices_list }}"
 
   - name: set_fact resolved_parent_device
@@ -565,9 +578,10 @@
     shell: |
       wipefs --all "{{ item }}"
       dd if=/dev/zero of="{{ item }}" bs=1 count=4096
+    changed_when: false
     with_items: "{{ combined_devices_list }}"
 
-  - name: zap ceph journal/block db/block wal partitions
+  - name: zap ceph journal/block db/block wal partitions  # noqa 306
     shell: |
       # if the disk passed is a raw device AND the boot system disk
       if parted -s /dev/"{{ item }}" print | grep -sq boot; then
@@ -582,6 +596,7 @@
       partprobe /dev/"{{ item }}"
       udevadm settle --timeout=600
     with_items: "{{ resolved_parent_device }}"
+    changed_when: false
 
 - name: purge ceph mon cluster
 
@@ -704,12 +719,14 @@
     listen: "remove data"
 
   - name: umount osd data partition
-    shell: umount {{ item }}
+    mount:
+      path: "{{ item }}"
+      state: unmounted
     with_items: "{{ mounted_osd.stdout_lines }}"
     listen: "remove data"
 
   - name: remove data
-    shell: rm -rf /var/lib/ceph/*
+    shell: rm -rf /var/lib/ceph/*  # noqa 302
     listen: "remove data"
 
   tasks:
@@ -763,7 +780,7 @@
       state: absent
     when:
       - ansible_pkg_mgr == 'yum'
-      - purge_all_packages == true
+      - purge_all_packages | bool
 
   - name: purge extra packages with dnf
     dnf:
@@ -771,7 +788,7 @@
       state: absent
     when:
       - ansible_pkg_mgr == 'dnf'
-      - purge_all_packages == true
+      - purge_all_packages | bool
 
   - name: purge extra packages with apt
     apt:
@@ -779,7 +796,7 @@
       state: absent
     when:
       - ansible_pkg_mgr == 'apt'
-      - purge_all_packages == true
+      - purge_all_packages | bool
 
   - name: remove config and any ceph socket left
     file:
@@ -797,10 +814,9 @@
      state: absent
 
   - name: request data removal
-    local_action:
-      module: command
-        echo requesting data removal
+    command: echo requesting data removal  # noqa 301
     become: false
+    delegate_to: localhost
     notify: remove data
 
   - name: purge dnf cache
@@ -813,7 +829,7 @@
       state: absent
 
   - name: clean apt
-    command: apt-get clean
+    command: apt-get clean  # noqa 303
     when: ansible_pkg_mgr == 'apt'
 
   - name: purge ceph repo file in /etc/yum.repos.d
@@ -829,6 +845,7 @@
   - name: check for anything running ceph
     command: "ps -u ceph -U ceph"
     register: check_for_running_ceph
+    changed_when: false
     failed_when: check_for_running_ceph.rc == 0
 
   - name: find ceph systemd unit files to remove
@@ -862,5 +879,5 @@
 
   - name: purge fetch directory for localhost
     file:
-      path: "{{ fetch_directory }}"
+      path: "{{ fetch_directory | default('fetch/') }}"
       state: absent

@@ -260,6 +260,7 @@
   gather_facts: false
   become: True
   any_errors_fatal: true
+  tags: 'ceph_client'
   pre_tasks:
     - name: set ceph client install 'In Progress'
       run_once: true
@@ -490,4 +491,6 @@
         msg: "{{ ceph_status.stdout_lines }}"
       delegate_to: "{{ groups[mon_group_name][0] }}"
       run_once: true
-      when: not ceph_status.failed
+      when:
+        - ceph_status is not skipped
+        - ceph_status is successful

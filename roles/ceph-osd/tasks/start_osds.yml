@@ -11,12 +11,11 @@
 
 # this is for ceph-disk, the ceph-disk command is gone so we have to list /var/lib/ceph
 - name: get osd ids
-  shell: |
-    set -o pipefail;
-    ls /var/lib/ceph/osd/ | sed 's/.*-//'
+  shell: ls /var/lib/ceph/osd/ | sed 's/.*-//'  # noqa 306
   args:
     executable: /bin/bash
   changed_when: false
+  failed_when: false
   register: osd_ids_non_container
 
 - name: set_fact container_exec_start_osd
@@ -32,15 +31,6 @@
 - name: include_tasks systemd.yml
   include_tasks: systemd.yml
   when: containerized_deployment | bool
-
-- name: systemd start osd
-  systemd:
-    name: ceph-osd@{{ item }}
-    state: started
-    enabled: yes
-    masked: no
-    daemon_reload: yes
-  with_items: "{{ ((ceph_osd_ids.stdout | default('{}') | from_json).keys() | list) + osd_ids_non_container.stdout_lines | default([]) }}"
 
 - name: ensure systemd service override directory exists
   file:
@@ -59,3 +49,21 @@
   when:
     - ceph_osd_systemd_overrides is defined
     - ansible_service_mgr == 'systemd'
+
+- name: ensure "/var/lib/ceph/osd/{{ cluster }}-{{ item }}" is present
+  file:
+    state: directory
+    path: "/var/lib/ceph/osd/{{ cluster }}-{{ item }}"
+    mode: "{{ ceph_directories_mode }}"
+    owner: "{{ ceph_uid if containerized_deployment | bool else 'ceph' }}"
+    group: "{{ ceph_uid if containerized_deployment | bool else 'ceph' }}"
+  with_items: "{{ ((ceph_osd_ids.stdout | default('{}') | from_json).keys() | list) | union(osd_ids_non_container.stdout_lines | default([])) }}"
+
+- name: systemd start osd
+  systemd:
+    name: ceph-osd@{{ item }}
+    state: started
+    enabled: yes
+    masked: no
+    daemon_reload: yes
+  with_items: "{{ ((ceph_osd_ids.stdout | default('{}') | from_json).keys() | list) | union(osd_ids_non_container.stdout_lines | default([])) }}"

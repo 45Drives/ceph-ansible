@@ -71,6 +71,7 @@
 
     - name: ensure cephfs mountpoint are unmounted
       command: umount -a -t ceph
+      changed_when: false
 
     - name: find mapped rbd ids
       find:
@@ -80,6 +81,7 @@
 
     - name: use sysfs to unmap rbd devices
       shell: "echo {{ item.path | basename }} > /sys/bus/rbd/remove_single_major"
+      changed_when: false
       with_items: "{{ rbd_mapped_ids.files }}"
 
     - name: unload ceph kernel modules
@@ -265,9 +267,9 @@
       name: ceph-facts
 
   - name: get all the running osds
-    shell: |
-      systemctl list-units --all | grep -oE "ceph-osd@([0-9]+).service"
+    shell: systemctl list-units --all | grep -oE "ceph-osd@([0-9]+).service"  # noqa 303
     register: osd_units
+    changed_when: false
     ignore_errors: true
 
   - name: disable ceph osd service
@@ -314,8 +316,10 @@
       CEPH_VOLUME_DEBUG: "{{ ceph_volume_debug }}"
       CEPH_CONTAINER_IMAGE: "{{ ceph_docker_registry }}/{{ ceph_docker_image }}:{{ ceph_docker_image_tag }}"
       CEPH_CONTAINER_BINARY: "{{ container_binary }}"
-    with_items: "{{ devices | default([]) }}"
-    when: devices | default([]) | length > 0
+    with_items:
+      - "{{ devices | default([]) }}"
+      - "{{ dedicated_devices | default([]) }}"
+      - "{{ bluestore_wal_devices | default([]) }}"
 
   - name: remove ceph osd service
     file:
@@ -522,7 +526,7 @@
 
   - name: remove stopped/exited containers
     command: >
-      {{ container_binary }} container prune{% if container_binary == 'docker' %} -f{% endif %}
+      {{ container_binary }} container prune -f
     changed_when: false
 
   - name: show container list on all the nodes (should be empty)
@@ -576,6 +580,7 @@
 
     - name: remove ceph container image
       command: "{{ container_binary }} rmi {{ ceph_docker_registry }}/{{ ceph_docker_image }}:{{ ceph_docker_image_tag }}"
+      changed_when: false
       tags:
         - remove_img
 
@@ -640,6 +645,27 @@
         ansible_os_family == 'RedHat' and
         not is_atomic
 
+    - name: find any service-cid file left
+      find:
+        paths: /run
+        patterns:
+          - "ceph-*.service-cid"
+          - "rbd-target-api.service-cid"
+          - "rbd-target-gw.service-cid"
+          - "tcmu-runner.service-cid"
+          - "node_exporter.service-cid"
+          - "prometheus.service-cid"
+          - "grafana-server.service-cid"
+          - "alertmanager.service-cid"
+      register: service_cid_files
+
+    - name: rm any service-cid file
+      file:
+        path: "{{ item.path }}"
+        state: absent
+      with_items: "{{ service_cid_files.files }}"
+
+
 - name: purge ceph directories
 
   hosts:
@@ -667,12 +693,13 @@
       - "{{ ceph_osd_docker_run_script_path | default('/usr/share') }}/ceph-osd-run.sh"
 
   - name: remove ceph data
-    shell: rm -rf /var/lib/ceph/*
+    shell: rm -rf /var/lib/ceph/*  # noqa 302
+    changed_when: false
 
   # (todo): remove this when we are able to manage docker
   # service on atomic host.
   - name: remove docker data
-    shell: rm -rf /var/lib/docker/*
+    shell: rm -rf /var/lib/docker/*  # noqa 302
     when: not is_atomic | bool
 
 - name: purge fetch directory
@@ -690,5 +717,5 @@
 
   - name: purge fetch directory for localhost
     file:
-      path: "{{ fetch_directory }}/"
+      path: "{{ fetch_directory | default('fetch/') }}/"
       state: absent
