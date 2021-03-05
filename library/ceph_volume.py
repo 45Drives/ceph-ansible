@@ -311,13 +311,8 @@ def batch(module, container_image, report=None):
     action = ['lvm', 'batch']
     cmd = build_cmd(action, container_image, cluster)
     cmd.extend(['--%s' % objectstore])
-<<<<<<< HEAD
     cmd.append('--yes')
     cmd.append('--no-auto')
-=======
-    if not report:
-        cmd.append('--yes')
->>>>>>> v5.0.4
 
     if container_image:
         cmd.append('--prepare')
