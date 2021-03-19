@@ -66,6 +66,7 @@
 
     - name: exit playbook, if can not connect to the cluster
       command: "{{ container_exec_cmd | default('') }} timeout 5 ceph --cluster {{ cluster }} health"
+      changed_when: false
       register: ceph_health
       until: ceph_health is succeeded
       retries: 5
@@ -80,11 +81,13 @@
     # removes the MDS from the FS map.
     - name: exit mds when containerized deployment
       command: "{{ container_exec_cmd | default('') }} ceph tell mds.{{ mds_to_kill_hostname }} exit"
+      changed_when: false
       when: containerized_deployment | bool
 
     - name: get ceph status
       command: "{{ container_exec_cmd | default('') }} ceph --cluster {{ cluster }} -s -f json"
       register: ceph_status
+      changed_when: false
 
     - name: set_fact current_max_mds
       set_fact:
@@ -108,7 +111,7 @@
           failed_when: false
 
         - name: ensure that the mds is stopped
-          command: "systemctl is-active ceph-mds@{{ mds_to_kill_hostname }}"
+          command: "systemctl is-active ceph-mds@{{ mds_to_kill_hostname }}"  # noqa 303
           register: mds_to_kill_status
           failed_when: mds_to_kill_status.rc == 0
           delegate_to: "{{ mds_to_kill }}"
@@ -142,10 +145,16 @@
               (mds_to_kill in standby_mdss | default([]))
 
     - name: delete the filesystem when killing last mds
-      command: "{{ container_exec_cmd | default('') }} ceph --cluster {{ cluster }} fs rm --yes-i-really-mean-it {{ cephfs }}"
+      ceph_fs:
+        name: "{{ cephfs }}"
+        cluster: "{{ cluster }}"
+        state: absent
       when:
         - (ceph_status.stdout | from_json)['fsmap']['up'] | int == 0
         - (ceph_status.stdout | from_json)['fsmap']['up:standby'] | int == 0
+      environment:
+        CEPH_CONTAINER_IMAGE: "{{ ceph_docker_registry + '/' + ceph_docker_image + ':' + ceph_docker_image_tag if containerized_deployment | bool else None }}"
+        CEPH_CONTAINER_BINARY: "{{ container_binary }}"
 
     - name: purge mds store
       file:
@@ -156,3 +165,4 @@
   post_tasks:
     - name: show ceph health
       command: "{{ container_exec_cmd | default('') }} ceph --cluster {{ cluster }} -s"
+      changed_when: false

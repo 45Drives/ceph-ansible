@@ -17,9 +17,14 @@ At present (starting from stable-4.0), there is only one scenario, which default
 
 So there is no need to configure ``osd_scenario`` anymore, it defaults to ``lvm``.
 
-The ``lvm`` scenario mentionned above support both containerized and non-containerized cluster.
+The ``lvm`` scenario mentioned above support both containerized and non-containerized cluster.
 As a reminder, deploying a containerized cluster can be done by setting ``containerized_deployment``
 to ``True``.
+
+If you want to skip OSD creation during a ``ceph-ansible run``
+(e.g. because you have already provisioned your OSDs but disk IDs have
+changed), you can skip the ``prepare_osd`` tag i.e. by specifying
+``--skip-tags prepare_osd`` on the ``ansible-playbook`` command line.
 
 .. _osd_scenario_lvm:
 

@@ -46,7 +46,8 @@
   become: true
   gather_facts: false
   tasks:
-    - setup:
+    - name: gather facts
+      setup:
         gather_subset:
           - 'all'
           - '!facter'
@@ -71,17 +72,19 @@
     - name: exit playbook, if can not connect to the cluster
       command: "{{ container_exec_cmd | default('') }} timeout 5 ceph --cluster {{ cluster }} health"
       register: ceph_health
+      changed_when: false
       until: ceph_health is succeeded
       retries: 5
       delay: 2
 
     - name: get rgw instances
-      command: "{{ container_exec_cmd | default('') }} ceph --cluster {{ cluster }} -s -f json"
+      command: "{{ container_exec_cmd | default('') }} ceph --cluster {{ cluster }} service dump -f json"
       register: rgw_instances
+      changed_when: false
 
 
     - name: exit playbook, if the rgw_to_kill doesn't exist
-      when: rgw_to_kill not in (rgw_instances.stdout | from_json).servicemap.services.rgw.daemons.keys() | list
+      when: rgw_to_kill not in (rgw_instances.stdout | from_json).services.rgw.daemons.keys() | list
       fail:
         msg: >
           It seems that the rgw instance given is not part of the ceph cluster. Please
@@ -103,22 +106,24 @@
       failed_when: false
 
     - name: ensure that the rgw is stopped
-      command: "systemctl is-active ceph-radosgw@rgw.{{ rgw_to_kill }}"
+      command: "systemctl is-active ceph-radosgw@rgw.{{ rgw_to_kill }}"  # noqa 303
       register: rgw_to_kill_status
       failed_when: rgw_to_kill_status.rc == 0
+      changed_when: false
       delegate_to: "{{ rgw_host }}"
       retries: 5
       delay: 2
 
     - name: exit if rgw_to_kill is reported in ceph status
-      command: "{{ container_exec_cmd | default('') }} ceph --cluster {{ cluster }} -s -f json"
+      command: "{{ container_exec_cmd | default('') }} ceph --cluster {{ cluster }} service dump -f json"
       register: ceph_status
+      changed_when: false
       failed_when:
-        - (ceph_status.stdout | from_json).servicemap.services.rgw is defined
-        - rgw_to_kill in (ceph_status.stdout | from_json).servicemap.services.rgw.daemons.keys() | list
+        - (ceph_status.stdout | from_json).services.rgw is defined
+        - rgw_to_kill in (ceph_status.stdout | from_json).services.rgw.daemons.keys() | list
       until:
-        - (ceph_status.stdout | from_json).servicemap.services.rgw is defined
-        - rgw_to_kill not in (ceph_status.stdout | from_json).servicemap.services.rgw.daemons.keys() | list
+        - (ceph_status.stdout | from_json).services.rgw is defined
+        - rgw_to_kill not in (ceph_status.stdout | from_json).services.rgw.daemons.keys() | list
       retries: 3
       delay: 3
 
@@ -129,4 +134,5 @@
       delegate_to: "{{ rgw_host }}"
   post_tasks:
     - name: show ceph health
-      command: "{{ container_exec_cmd | default('')}} ceph --cluster {{ cluster }} -s"
+      command: "{{ container_exec_cmd | default('') }} ceph --cluster {{ cluster }} -s"
+      changed_when: false

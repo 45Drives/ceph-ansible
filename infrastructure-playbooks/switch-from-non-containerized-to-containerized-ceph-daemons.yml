@@ -98,7 +98,7 @@
     # The file module has to run checks on current ownership of all directories and files. This is unnecessary
     # as in this case we know we want all owned by ceph user
     - name: set proper ownership on ceph directories
-      command: "find /var/lib/ceph /etc/ceph -not -( -user {{ ceph_uid }} -or -group {{ ceph_uid }} -) -execdir chown {{ ceph_uid }}:{{ ceph_uid }} {} +"
+      command: "find /var/lib/ceph /etc/ceph -not -( -user {{ ceph_uid }} -or -group {{ ceph_uid }} -) -execdir chown -h {{ ceph_uid }}:{{ ceph_uid }} {} +"
       changed_when: false
 
     - name: check for existing old leveldb file extension (ldb)
@@ -135,10 +135,10 @@
 
   post_tasks:
     - name: waiting for the monitor to join the quorum...
-      command: "{{ container_exec_cmd }} ceph --cluster {{ cluster }} -s --format json"
+      command: "{{ container_binary }} run --rm  -v /etc/ceph:/etc/ceph:z --entrypoint=ceph {{ ceph_docker_registry }}/{{ ceph_docker_image }}:{{ ceph_docker_image_tag }} --cluster {{ cluster }} quorum_status --format json"
       register: ceph_health_raw
-      until: >
-        hostvars[mon_host]['ansible_hostname'] in (ceph_health_raw.stdout | from_json)["quorum_names"]
+      until: ansible_hostname in (ceph_health_raw.stdout | trim | from_json)["quorum_names"]
+      changed_when: false
       retries: "{{ health_mon_check_retries }}"
       delay: "{{ health_mon_check_delay }}"
 
@@ -183,7 +183,7 @@
     # The file module has to run checks on current ownership of all directories and files. This is unnecessary
     # as in this case we know we want all owned by ceph user
     - name: set proper ownership on ceph directories
-      command: "find /var/lib/ceph /etc/ceph -not -( -user {{ ceph_uid }} -or -group {{ ceph_uid }} -) -execdir chown {{ ceph_uid }}:{{ ceph_uid }} {} +"
+      command: "find /var/lib/ceph /etc/ceph -not -( -user {{ ceph_uid }} -or -group {{ ceph_uid }} -) -execdir chown -h {{ ceph_uid }}:{{ ceph_uid }} {} +"
       changed_when: false
 
   tasks:
@@ -211,7 +211,12 @@
         tasks_from: container_binary.yml
 
     - name: set osd flags
-      command: "{{ container_exec_cmd | default('') }} ceph --cluster {{ cluster }} osd set {{ item }}"
+      ceph_osd_flag:
+        name: "{{ item }}"
+        cluster: "{{ cluster }}"
+      environment:
+        CEPH_CONTAINER_IMAGE: "{{ ceph_docker_registry + '/' + ceph_docker_image + ':' + ceph_docker_image_tag if containerized_deployment | bool else None }}"
+        CEPH_CONTAINER_BINARY: "{{ container_binary }}"
       with_items:
         - noout
         - nodeep-scrub
@@ -235,18 +240,32 @@
 
     - name: collect running osds
       shell: |
-        systemctl list-units | grep -E "loaded * active" | grep -Eo 'ceph-osd@[0-9]+.service|ceph-volume|ceph\.target'
+        set -o pipefail;
+        systemctl list-units | grep -E "loaded * active" | grep -Eo 'ceph-osd@[0-9]+.service|ceph-volume'
       register: running_osds
       changed_when: false
       failed_when: false
+
+    # systemd module does not support --runtime option
+    - name: disable ceph-osd@.service runtime-enabled
+      command: "systemctl disable --runtime {{ item }}"  # noqa 303
+      changed_when: false
+      failed_when: false
+      with_items: "{{ running_osds.stdout_lines | default([]) }}"
+      when: item.startswith('ceph-osd@')
 
     - name: stop/disable/mask non-containerized ceph osd(s) (if any)
       systemd:
         name: "{{ item }}"
         state: stopped
         enabled: no
-      with_items: "{{ running_osds.stdout_lines | default([])}}"
+      with_items: "{{ running_osds.stdout_lines | default([]) }}"
       when: running_osds != []
+
+    - name: disable ceph.target
+      systemd:
+        name: ceph.target
+        enabled: no
 
     - name: remove old ceph-osd systemd units
       file:
@@ -320,15 +339,16 @@
   post_tasks:
     - name: container - waiting for clean pgs...
       command: >
-        {{ container_binary }} exec ceph-mon-{{ hostvars[groups[mon_group_name][0]]['ansible_hostname'] }} ceph --cluster {{ cluster }} -s --format json
+        {{ container_binary }} exec ceph-mon-{{ hostvars[groups[mon_group_name][0]]['ansible_hostname'] }} ceph --cluster {{ cluster }} pg stat --format json
       register: ceph_health_post
       until: >
-        (((ceph_health_post.stdout | from_json).pgmap.pgs_by_state | length) > 0)
+        (((ceph_health_post.stdout | from_json).pg_summary.num_pg_by_state | length) > 0)
         and
-        (((ceph_health_post.stdout | from_json).pgmap.pgs_by_state | selectattr('state_name', 'search', '^active\\+clean') | map(attribute='count') | list | sum) == (ceph_health_post.stdout | from_json).pgmap.num_pgs)
+        (((ceph_health_post.stdout | from_json).pg_summary.num_pg_by_state | selectattr('name', 'search', '^active\\+clean') | map(attribute='num') | list | sum) == (ceph_health_post.stdout | from_json).pg_summary.num_pgs)
       delegate_to: "{{ groups[mon_group_name][0] }}"
       retries: "{{ health_osd_check_retries }}"
       delay: "{{ health_osd_check_delay }}"
+      changed_when: false
 
 
 - name: unset osd flags
@@ -342,7 +362,13 @@
         tasks_from: container_binary.yml
 
     - name: set osd flags
-      command: "{{ container_exec_cmd | default('') }} ceph --cluster {{ cluster }} osd unset {{ item }}"
+      ceph_osd_flag:
+        name: "{{ item }}"
+        cluster: "{{ cluster }}"
+        state: absent
+      environment:
+        CEPH_CONTAINER_IMAGE: "{{ ceph_docker_registry + '/' + ceph_docker_image + ':' + ceph_docker_image_tag if containerized_deployment | bool else None }}"
+        CEPH_CONTAINER_BINARY: "{{ container_binary }}"
       with_items:
         - noout
         - nodeep-scrub
@@ -575,7 +601,6 @@
 
   vars:
     containerized_deployment: true
-  serial: 1
   become: true
   tasks:
     - name: stop non-containerized ceph-crash

@@ -143,10 +143,16 @@
         state: directory
 
     - name: bootstrap the new cluster
-      command: "{{ cephadm_cmd }} bootstrap --mon-ip {{ _current_monitor_address }} --skip-pull --skip-monitoring-stack {{ '--initial-dashboard-user ' + dashboard_admin_user + ' --initial-dashboard-password ' + dashboard_admin_password if dashboard_enabled | bool else '--skip-dashboard' }}"
-      changed_when: false
-      environment:
-        CEPHADM_IMAGE: '{{ ceph_docker_registry }}/{{ ceph_docker_image }}:{{ ceph_docker_image_tag }}'
+      cephadm_bootstrap:
+        mon_ip: "{{ _current_monitor_address }}"
+        image: "{{ ceph_docker_registry }}/{{ ceph_docker_image }}:{{ ceph_docker_image_tag }}"
+        docker: "{{ true if container_binary == 'docker' else false }}"
+        pull: false
+        dashboard: "{{ dashboard_enabled }}"
+        dashboard_user: "{{ dashboard_admin_user if dashboard_enabled | bool else omit }}"
+        dashboard_password: "{{ dashboard_admin_password if dashboard_enabled | bool else omit }}"
+        monitoring: false
+        firewalld: "{{ configure_firewall }}"
 
     - name: set default container image in ceph configuration
       command: "{{ cephadm_cmd }} shell -- ceph --cluster {{ cluster }} config set global container_image {{ ceph_docker_registry }}/{{ ceph_docker_image }}:{{ ceph_docker_image_tag }}"
@@ -225,26 +231,22 @@
         CEPHADM_IMAGE: '{{ ceph_docker_registry }}/{{ ceph_docker_image }}:{{ ceph_docker_image_tag }}'
 
     - name: manage nodes with cephadm
-      command: "{{ cephadm_cmd }} shell -- ceph --cluster {{ cluster }} orch host add {{ hostvars[item]['ansible_hostname'] }} {{ hostvars[item]['ansible_default_ipv4']['address'] }} {{ hostvars[item]['group_names'] | join(' ') }}"
+      command: "{{ cephadm_cmd }} shell -- ceph --cluster {{ cluster }} orch host add {{ ansible_hostname }} {{ ansible_default_ipv4.address }} {{ group_names | join(' ') }}"
       changed_when: false
-      run_once: true
-      loop: '{{ ansible_play_hosts_all }}'
       delegate_to: '{{ groups[mon_group_name][0] }}'
       environment:
         CEPHADM_IMAGE: '{{ ceph_docker_registry }}/{{ ceph_docker_image }}:{{ ceph_docker_image_tag }}'
 
     - name: add ceph label for core component
-      command: "{{ cephadm_cmd }} shell -- ceph --cluster {{ cluster }} orch host label add {{ hostvars[item]['ansible_hostname'] }} ceph"
+      command: "{{ cephadm_cmd }} shell -- ceph --cluster {{ cluster }} orch host label add {{ ansible_hostname }} ceph"
       changed_when: false
-      run_once: true
-      loop: '{{ ansible_play_hosts_all }}'
       delegate_to: '{{ groups[mon_group_name][0] }}'
-      when: item in groups.get(mon_group_name, []) or
-            item in groups.get(osd_group_name, []) or
-            item in groups.get(mds_group_name, []) or
-            item in groups.get(rgw_group_name, []) or
-            item in groups.get(mgr_group_name, []) or
-            item in groups.get(rbdmirror_group_name, [])
+      when: inventory_hostname in groups.get(mon_group_name, []) or
+            inventory_hostname in groups.get(osd_group_name, []) or
+            inventory_hostname in groups.get(mds_group_name, []) or
+            inventory_hostname in groups.get(rgw_group_name, []) or
+            inventory_hostname in groups.get(mgr_group_name, []) or
+            inventory_hostname in groups.get(rbdmirror_group_name, [])
       environment:
         CEPHADM_IMAGE: '{{ ceph_docker_registry }}/{{ ceph_docker_image }}:{{ ceph_docker_image_tag }}'
 
@@ -263,7 +265,7 @@
         CEPHADM_IMAGE: '{{ ceph_docker_registry }}/{{ ceph_docker_image }}:{{ ceph_docker_image_tag }}'
 
     - name: waiting for the monitor to join the quorum...
-      command: "{{ cephadm_cmd }} shell -- ceph --cluster {{ cluster }} -s --format json"
+      command: "{{ cephadm_cmd }} shell -- ceph --cluster {{ cluster }} quorum_status --format json"
       changed_when: false
       register: ceph_health_raw
       until: (ceph_health_raw.stdout | from_json)["quorum_names"] | length == groups.get(mon_group_name, []) | length

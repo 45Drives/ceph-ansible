@@ -16,7 +16,8 @@
           "You have aborted the purge of the iSCSI gateway configuration"
       when: purge_config == 'abort'
 
-    - set_fact:
+    - name: set_fact igw_purge_type
+      set_fact:
         igw_purge_type: "{{ purge_config }}"
 
 - name: stopping the gateways
@@ -24,7 +25,7 @@
     - iscsigws
   become: yes
   vars:
-    - igw_purge_type: "{{hostvars['localhost']['igw_purge_type']}}"
+    - igw_purge_type: "{{ hostvars['localhost']['igw_purge_type'] }}"
 
   tasks:
     - name: stopping and disabling iscsi daemons

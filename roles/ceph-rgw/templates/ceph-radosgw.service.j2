@@ -12,13 +12,14 @@ After=network.target
 EnvironmentFile=/var/lib/ceph/radosgw/{{ cluster }}-%i/EnvironmentFile
 {% if container_binary == 'podman' %}
 ExecStartPre=-/usr/bin/rm -f /%t/%n-pid /%t/%n-cid
+ExecStartPre=-/usr/bin/{{ container_binary }} rm --storage ceph-rgw-{{ ansible_hostname }}-${INST_NAME}
 {% else %}
 ExecStartPre=-/usr/bin/{{ container_binary }} stop ceph-rgw-{{ ansible_hostname }}-${INST_NAME}
 {% endif %}
 ExecStartPre=-/usr/bin/{{ container_binary }} rm ceph-rgw-{{ ansible_hostname }}-${INST_NAME}
 ExecStart=/usr/bin/{{ container_binary }} run --rm --net=host \
 {% if container_binary == 'podman' %}
-  -d --conmon-pidfile /%t/%n-pid --cidfile /%t/%n-cid \
+  -d --log-driver journald --conmon-pidfile /%t/%n-pid --cidfile /%t/%n-cid \
 {% endif %}
   --memory={{ ceph_rgw_docker_memory_limit }} \
   --cpus={{ cpu_limit }} \

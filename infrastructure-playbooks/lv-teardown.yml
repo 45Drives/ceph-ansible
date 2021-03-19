@@ -20,7 +20,7 @@
 
   - name: include vars of lv_vars.yaml
     include_vars:
-      file: lv_vars.yaml
+      file: lv_vars.yaml  # noqa 505
     failed_when: false
 
   # need to check if lvm2 is installed
@@ -33,16 +33,22 @@
 
 # BEGIN TEARDOWN
   - name: find any existing osd filesystems
-    shell: "grep /var/lib/ceph/osd /proc/mounts | awk '{print $2}'"
+    shell: |
+      set -o pipefail;
+      grep /var/lib/ceph/osd /proc/mounts | awk '{print $2}'
     register: old_osd_filesystems
+    changed_when: false
 
-  - name: tear down any existing osd filesystems
-    command: "umount -v {{ item }}"
+  - name: tear down any existing osd filesystem
+    mount:
+      path: "{{ item }}"
+      state: unmounted
     with_items: "{{ old_osd_filesystems.stdout_lines }}"
 
   - name: kill all lvm commands that may have been hung
     command: "killall -q lvcreate pvcreate vgcreate lvconvert || echo -n"
     failed_when: false
+    changed_when: false
 
   ## Logcal Vols
   - name: tear down existing lv for bucket index
@@ -53,7 +59,7 @@
       force: yes
     with_items: "{{ nvme_device_lvs }}"
 
-  - name: tear down any existing hdd data lvs 
+  - name: tear down any existing hdd data lvs
     lvol:
       lv: "{{ hdd_lv_prefix }}-{{ item.split('/')[-1] }}"
       vg: "{{ hdd_vg_prefix }}-{{ item.split('/')[-1] }}"
@@ -94,7 +100,9 @@
   ## Physical Vols
   - name: tear down pv for nvme device
     command: "pvremove --force --yes {{ nvme_device }}"
+    changed_when: false
 
   - name: tear down pv for each hdd device
     command: "pvremove --force --yes {{ item }}"
+    changed_when: false
     with_items: "{{ hdd_devices }}"

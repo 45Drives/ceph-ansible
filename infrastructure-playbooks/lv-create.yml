@@ -1,4 +1,4 @@
-- name: creates logical volumes for the bucket index or fs journals on a single device. 
+- name: creates logical volumes for the bucket index or fs journals on a single device.
   become: true
   hosts: osds
 
@@ -23,7 +23,7 @@
 
   - name: include vars of lv_vars.yaml
     include_vars:
-      file: lv_vars.yaml
+      file: lv_vars.yaml  # noqa 505
     failed_when: false
 
   # ensure nvme_device is set

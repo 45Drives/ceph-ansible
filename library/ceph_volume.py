@@ -140,12 +140,6 @@ options:
             - Results will be returned in json format.
             - Only applicable if action is 'batch'.
         required: false
-    containerized:
-        description:
-            - Wether or not this is a containerized cluster. The value is
-            assigned or not depending on how the playbook runs.
-        required: false
-        default: None
     list:
         description:
             - List potential Ceph LVM metadata on a device
@@ -286,7 +280,7 @@ def get_wal(wal, wal_vg):
     return wal
 
 
-def batch(module, container_image):
+def batch(module, container_image, report=None):
     '''
     Batch prepare OSD devices
     '''
@@ -564,7 +558,6 @@ def run_module():
         block_db_devices=dict(type='list', required=False, default=[]),
         wal_devices=dict(type='list', required=False, default=[]),
         report=dict(type='bool', required=False, default=False),
-        containerized=dict(type='str', required=False, default=False),
         osd_fsid=dict(type='str', required=False),
         destroy=dict(type='bool', required=False, default=True),
     )
@@ -657,6 +650,8 @@ def run_module():
         if any(skip) or module.params.get('osd_fsid', None):
             rc, cmd, out, err = exec_command(
                 module, cmd)
+            for scan_cmd in ['vgscan', 'lvscan']:
+                module.run_command([scan_cmd, '--cache'])
         else:
             out = 'Skipped, nothing to zap'
             err = ''
@@ -683,7 +678,7 @@ def run_module():
             '--format=json',
         ]
 
-        cmd = batch(module, container_image)
+        cmd = batch(module, container_image, report=True)
         batch_report_cmd = copy.copy(cmd)
         batch_report_cmd.extend(report_flags)
 

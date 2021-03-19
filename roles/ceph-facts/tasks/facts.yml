@@ -124,15 +124,6 @@
       rc: 1
   when: rolling_update or groups.get(mon_group_name, []) | length == 0
 
-- name: create a local fetch directory if it does not exist
-  file:
-    path: "{{ fetch_directory }}"
-    state: directory
-  delegate_to: localhost
-  changed_when: false
-  become: false
-  when: cephx | bool or generate_fsid | bool
-
 - name: get current fsid
   command: "{{ timeout_command }} {{ container_exec_cmd }} ceph --admin-daemon /var/run/ceph/{{ cluster }}-mon.{{ hostvars[mon_host | default(groups[mon_group_name][0])]['ansible_hostname'] }}.asok config get fsid"
   register: rolling_update_fsid
@@ -271,11 +262,11 @@
 
 - name: backward compatibility tasks related
   when:
-    - inventory_hostname in groups.get(rgw_group_name, [])
-      or inventory_hostname in groups.get(nfs_group_name, [])
+    - (inventory_hostname in groups.get(rgw_group_name, []) or inventory_hostname in groups.get(nfs_group_name, []))
+    - groups.get(mon_group_name, []) | length > 0
   block:
     - name: get ceph current status
-      command: "{{ timeout_command }} {{ _container_exec_cmd | default('') }} ceph --cluster {{ cluster }} -s -f json"
+      command: "{{ timeout_command }} {{ _container_exec_cmd | default('') }} ceph --cluster {{ cluster }} service dump -f json"
       changed_when: false
       failed_when: false
       check_mode: no
@@ -292,45 +283,49 @@
     - name: set_fact rgw_hostname
       set_fact:
         rgw_hostname: "{% set _value = ansible_hostname -%}
-        {% for key in (ceph_current_status['servicemap']['services']['rgw']['daemons'] | list) -%}
+        {% for key in (ceph_current_status['services']['rgw']['daemons'] | list) -%}
         {% if key == ansible_fqdn -%}
         {% set _value = key -%}
         {% endif -%}
         {% endfor -%}
         {{ _value }}"
       when:
-        - ceph_current_status['servicemap'] is defined
-        - ceph_current_status['servicemap']['services'] is defined
-        - ceph_current_status['servicemap']['services']['rgw'] is defined
+        - ceph_current_status['services'] is defined
+        - ceph_current_status['services']['rgw'] is defined
 
 - name: check if the ceph conf exists
   stat:
     path: '/etc/ceph/{{ cluster }}.conf'
   register: ceph_conf
 
+- name: set default osd_pool_default_crush_rule fact
+  set_fact:
+    osd_pool_default_crush_rule: "{{ ceph_osd_pool_default_crush_rule }}"
+
 - name: get default crush rule value from ceph configuration
-  command: grep 'osd pool default crush rule' /etc/ceph/{{ cluster }}.conf
-  register: crush_rule_variable
-  changed_when: false
-  check_mode: no
-  failed_when: false
+  block:
+    - &read-osd-pool-default-crush-rule
+      name: read osd pool default crush rule
+      command: grep 'osd pool default crush rule' /etc/ceph/{{ cluster }}.conf
+      register: crush_rule_variable
+      changed_when: false
+      check_mode: no
+      failed_when: crush_rule_variable.rc not in (0, 1)
+    - &set-osd-pool-default-crush-rule-fact
+      name: set osd_pool_default_crush_rule fact
+      set_fact:
+        osd_pool_default_crush_rule: "{{ crush_rule_variable.stdout.split(' = ')[1] }}"
+      when: crush_rule_variable.rc == 0
   when: ceph_conf.stat.exists | bool
 
 - name: get default crush rule value from running monitor ceph configuration
-  command: grep 'osd pool default crush rule' /etc/ceph/{{ cluster }}.conf
-  register: crush_rule_variable
-  changed_when: false
-  check_mode: no
-  failed_when: false
-  run_once: true
-  delegate_to: "{{ running_mon }}"
+  block:
+    - <<: *read-osd-pool-default-crush-rule
+      delegate_to: "{{ running_mon }}"
+    - *set-osd-pool-default-crush-rule-fact
   when:
     - running_mon is defined
     - not ceph_conf.stat.exists | bool
-
-- name: set_fact osd_pool_default_crush_rule
-  set_fact:
-    osd_pool_default_crush_rule: "{{ crush_rule_variable.stdout.split(' = ')[1] if crush_rule_variable.get('rc', 1) | int == 0 else ceph_osd_pool_default_crush_rule }}"
 
 - name: import_tasks set_monitor_address.yml
   import_tasks: set_monitor_address.yml
