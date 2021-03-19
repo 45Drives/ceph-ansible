@@ -10,7 +10,7 @@
       get_url:
         url: http://images.45drives.com/repo/centos/45drives-centos.repo
         dest: /etc/yum.repo.d/45drives-centos.repo
-      mode: '0644'
+        mode: '0644'
 
 - hosts: osds
   vars:
