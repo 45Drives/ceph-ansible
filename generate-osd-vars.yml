@@ -2,7 +2,7 @@
 - hosts: osds
   tasks:
     - name: execute generate-osd-vars script
-      command: /usr/bin/sh /opt/tools/generate-osd-vars.sh
+      command: /usr/bin/sh /opt/45drives/tools/generate-osd-vars.sh
       register: output
 
     - debug:
