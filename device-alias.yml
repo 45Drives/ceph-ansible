@@ -1,5 +1,5 @@
 ---
-- hosts: osds
+- hosts: all
   tasks:
     - name: yum-clean-all
       command: yum clean all
@@ -7,29 +7,22 @@
         warn: no
 
     - name: 45Drives Repository - Configure 45drives repository
-      yum_repository:
-        name: ceph_45drives
-        description: 45Drives $basearch repo
-        gpgcheck: no
-        enabled: yes
-        state: present
-        baseurl: "{{ ceph_45drives_repo_url }}"
-        file: ceph_45drives
-        priority: "1"
-      register: result
-      until: result is succeeded
+      get_url:
+        url: http://images.45drives.com/repo/centos/45drives-centos.repo
+        dest: /etc/yum.repo.d/45drives-centos.repo
+      mode: '0644'
 
+- hosts: osds
+  vars:
+      tools_install_dir: "/opt/45drives/tools" 
+  tasks:
     - name: install tools
       package:
         name: 45drives-tools
         state: latest
       register: result
       until: result is succeeded
-
-- hosts: osds
-  vars:
-      tools_install_dir: "/opt/tools" 
-  tasks:
+      
     - name: Create drive alias' for standard chassis
       command: /usr/bin/python3 "{{ tools_install_dir }}"/dmap 
       register: dmap_output
