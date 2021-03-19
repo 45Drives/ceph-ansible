@@ -2,7 +2,7 @@
 - name: 45Drives Repository - Configure 45drives repository
   get_url:
     url: http://images.45drives.com/repo/centos/45drives-centos.repo
-    dest: /etc/yum.repo.d/45drives-centos.repo
+    dest: /etc/yum.repos.d/45drives-centos.repo
     mode: '0644'
   when: '"45drives" in samba_repo'
 
