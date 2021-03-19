@@ -1,11 +1,8 @@
 ---
 - name: install centos7 python dependencies
   yum:
-    name: "{{ item }}"
+    name: ['python36-six', 'python36-PyYAML']
     state: present
   register: result
   until: result is succeeded
-  with_items:
-    - python36-six
-    - python36-PyYAML
 
