@@ -1,0 +1,32 @@
+---
+- hosts: all
+  tasks:
+    - name: Remove unneeded pkgs in ubuntu
+      block:
+        - name: Remove zfs-dkms, cockpit-zfs-manager, virtual machine packages
+          apt:
+            pkg:
+              - zfs-dkms
+              - cockpit-zfs-manager
+              - cockpit-machines
+            state: absent
+        - name: Remove useless packages from the cache
+          apt:
+            autoclean: yes
+        - name: Remove dependencies that are no longer required
+          apt:
+           autoremove: yes
+      when:
+        - ansible_distribution == 'Ubuntu'
+
+    - name: Remove unneeded pkgs in centos
+      block:
+        - name: Remove zfs-dkms, cockpit-zfs-manager, virtual machine packages
+          yum:
+            name: ['zfs', 'cockpit-zfs-manager', 'cockpit-machines']
+            state: absent
+          register: result
+          until: result is succeeded
+      when:
+        - ansible_distribution == 'CentOS'
+        - ansible_distribution_major_version == '7'
