@@ -2,6 +2,9 @@
   vars:
       tools_install_dir: "/opt/45drives/tools" 
   tasks:
+    - import_role:
+        name: ceph-prerun
+
     - name: Create drive alias' for standard chassis
       command: /usr/bin/python3 "{{ tools_install_dir }}"/dmap 
       register: dmap_output

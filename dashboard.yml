@@ -13,8 +13,6 @@
   gather_facts: false
   become: true
   pre_tasks:
-    - import_tasks: centos7_python_deps.yml
-    
     - name: set ceph node exporter install 'In Progress'
       run_once: true
       set_stats:
@@ -24,6 +22,8 @@
             start: "{{ lookup('pipe', 'date +%Y%m%d%H%M%SZ') }}"
 
   tasks:
+    - import_role:
+        name: ceph-prerun
     - import_role:
         name: ceph-defaults
       tags: ['ceph_update_config']

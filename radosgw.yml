@@ -16,10 +16,8 @@
   pre_tasks:
     # If we can't get python2 installed before any module is used we will fail
     # so just try what we can to get it installed
-
     - import_tasks: raw_install_python.yml
-    - import_tasks: centos7_python_deps.yml
-    
+
     - name: gather facts
       setup:
         gather_subset:
@@ -42,6 +40,8 @@
       when: delegate_facts_host | bool
 
   tasks:
+    - import_role:
+        name: ceph-prerun
     - import_role:
         name: ceph-defaults
     - import_role:
