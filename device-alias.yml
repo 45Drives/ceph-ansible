@@ -1,17 +1,3 @@
----
-- hosts: all
-  tasks:
-    - name: yum-clean-all
-      command: yum clean all
-      args:
-        warn: no
-
-    - name: 45Drives Repository - Configure 45drives repository
-      get_url:
-        url: http://images.45drives.com/repo/centos/45drives-centos.repo
-        dest: /etc/yum.repos.d/45drives-centos.repo
-        mode: '0644'
-
 - hosts: osds
   vars:
       tools_install_dir: "/opt/45drives/tools" 
