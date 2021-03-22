@@ -1,0 +1,21 @@
+---
+ubuntu_install_pkgs:
+  - "45drives-tools"
+
+centos_install_pkgs:
+  - "45drives-tools"
+  - "python36-six"
+  - "python36-PyYAML"
+
+ubuntu_cleanup_pkgs:
+  - "zfs-dkms"
+  - "cockpit-zfs-manager"
+  - "cockpit-machines"
+
+centos_cleanup_pkgs:
+  - "zfs" 
+  - "cockpit-zfs-manager"
+  - "cockpit-machines"
+
+
+

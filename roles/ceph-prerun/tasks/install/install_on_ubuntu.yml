@@ -1,0 +1,28 @@
+---
+- name: Configure Repository Ubuntu
+  block:
+    - name: Remove useless packages from the cache
+      apt:
+        autoclean: yes
+
+    - name: add 45drives apt gpg key
+      apt_key:
+        url: 'http://images.45drives.com/repo/keys/aptpubkey.asc'
+        state: present
+      register: result
+      until: result is succeeded
+
+    - name: add 45drives apt repository
+      get_url:
+        url: 'http://images.45drives.com/repo/debian/45drives.list'
+        dest: /etc/apt/sources.list.d/45drives.list
+        mode: '0644'
+
+- name: Install Extra Dependencies in Ubuntu 
+  apt:
+    name: "{{ ubuntu_install_pkgs | unique }}"
+    update_cache: no
+    state: "latest"
+  register: result
+  until: result is succeeded
+
