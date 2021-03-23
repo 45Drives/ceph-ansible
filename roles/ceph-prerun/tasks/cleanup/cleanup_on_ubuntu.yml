@@ -3,7 +3,7 @@
   block:
     - name: Remove packages
       apt:
-        name: "{{ubuntu_cleanup_pkgs | unique }}"
+        name: "{{ ubuntu_cleanup_pkgs }}"
         state: absent
     - name: Remove useless packages from the cache
       apt:
