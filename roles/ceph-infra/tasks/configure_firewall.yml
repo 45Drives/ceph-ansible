@@ -1,6 +1,6 @@
 ---
-- name: check firewalld installation on redhat or SUSE/openSUSE
-  command: command -v firewall-cmd
+- name: check firewalld installation
+  shell: command -v firewall-cmd
   register: firewalld_pkg_query
   changed_when: false
   failed_when: false
