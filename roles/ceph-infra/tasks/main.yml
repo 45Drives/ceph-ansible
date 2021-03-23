@@ -10,7 +10,7 @@
   include_tasks: configure_firewall.yml
   when:
     - configure_firewall | bool
-    - ansible_os_family in ['RedHat', 'Suse']
+    - ansible_os_family in ['RedHat', 'Suse'] or ansible_distribution == "Ubuntu"
   tags: configure_firewall
 
 - name: include_tasks setup_ntp.yml
