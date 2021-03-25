@@ -10,8 +10,8 @@
       with_items:
         - attr
         - samba
-        - samba-vfs-cephfs
-        - samba-common-tools
+        - samba-vfs-modules
+        - samba-common
       when:
         - samba_server | bool
 
