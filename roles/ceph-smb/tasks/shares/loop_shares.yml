@@ -1,4 +1,4 @@
 ---
 - name: loop thorugh shares
-  include_tasks: create_shares.yml
+  include_tasks: shares/create_shares.yml
   loop: "{{ samba_shares }}"

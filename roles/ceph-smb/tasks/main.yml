@@ -1,32 +1,38 @@
 ---
 # Install packages
-- include: install_redhat_samba.yml
+- include: install/redhat_samba.yml
+  when:
+    - ansible_distribution == 'CentOS'
+    - ansible_distribution_major_version == '7'
 
-- include: configure_cephfs_backend.yml
+- include: install/ubuntu_samba.yml
+  when: ansible_distribution == 'Ubuntu'
+
+- include: configure/cephfs_backend.yml
   when: 
    - backend_fs == 'cephfs'
   
 # Configure samba + winbind
-- include: configure_samba.yml
+- include: configure/samba.yml
   when:
     - samba_server | bool
 
 # Configure CTDB
-- include: configure_ctdb.yml
+- include: configure/ctdb.yml
   when:
     - samba_cluster | bool
 
 # Join Active Directory
-- include: configure_domain.yml
+- include: configure/domain.yml
   when:
     - domain_member | bool
   
-- include: start_samba_server.yml
+- include: configure/start_samba_server.yml
   when:
     - not domain_member | bool
 
 # Configure shares
-- include: loop_shares.yml
+- include: shares/loop_shares.yml
   when:
     - configure_shares | bool
 
