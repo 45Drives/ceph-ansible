@@ -23,10 +23,8 @@
       until: result is succeeded
       with_items:
         - samba-winbind
-        - samba-winbind-clients
         - oddjob
         - oddjob-mkhomedir
-        - krb5-workstation
       when:
         - domain_member | bool
 
