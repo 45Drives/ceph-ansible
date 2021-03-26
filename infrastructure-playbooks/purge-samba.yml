@@ -138,10 +138,6 @@
     file:
      path: /var/log/samba
      state: absent
-  
-  - name: yum-clean-metadata
-    command: yum clean metadata
-    args:
-      warn: no
+
 
 
