@@ -32,7 +32,7 @@
     - not domain_member | bool
 
 # Configure shares
-- include: shares/loop_shares.yml
+- include: loop_shares.yml
   when:
     - configure_shares | bool
 

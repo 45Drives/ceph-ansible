@@ -19,6 +19,6 @@
         name: ceph-defaults
     - import_role:
         name: ceph-smb
-        tasks_from: shares/loop_shares.yml
+        tasks_from: loop_shares.yml
       when:
         - configure_shares | bool
