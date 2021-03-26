@@ -125,7 +125,7 @@
     block:
       - name: purge samba packages
         package:
-          name: "{{ samba_packages }}"
+          name: "{{ centos_samba_packages }}"
           state: absent
 
       - name: remove config
@@ -155,7 +155,7 @@
     block:
       - name: purge samba packages
         apt:
-          name: "{{ samba_packages }}"
+          name: "{{ ubuntu_samba_packages }}"
           state: absent
           autoremove: yes
 
