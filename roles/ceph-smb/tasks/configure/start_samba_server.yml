@@ -1,22 +1,35 @@
 ---
 - name: start_samba_server | Standalone
   block:
-    - name: start_samba_server | enable samba
+    - name: start_samba_server | enable samba rhel
       systemd:
         name: smb
         state: started
         enabled: yes
+      when: ansible_os_family == 'RedHat'
+
+    - name: start_samba_server | enable samba ubuntu
+      systemd:
+        name: smbd
+        state: started
+        enabled: yes
+      when: ansible_os_family == 'Debian'
   when:
     - not samba_cluster | bool
 
 - name: start_samba_server | Clustered
   block:
-    - name: start_samba_server | disable samba
+    - name: start_samba_server | disable samba rhel
       systemd:
         name: smb
         enabled: no
-      when:
-        - samba_server | bool
+      when: ansible_os_family == 'RedHat'
+
+    - name: start_samba_server | disable samba ubuntu
+      systemd:
+        name: smbd
+        enabled: no
+      when: ansible_os_family == 'Debian'
 
     - name: start_samba_server | enable start ctdb
       systemd:
