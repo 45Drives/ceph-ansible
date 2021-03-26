@@ -9,6 +9,9 @@ centos_install_pkgs:
 
 ubuntu_cleanup_pkgs:
   - "zfs-dkms"
+  - "zfsutils-linux"
+  - "libzfs2linux"
+  - "libzfslinux-dev"
   - "cockpit-zfs-manager"
   - "cockpit-machines"
 
