@@ -147,8 +147,8 @@
 
       - name: remove logs
         file:
-        path: /var/log/samba
-        state: absent
+          path: /var/log/samba
+          state: absent
     when: ansible_os_family == 'RedHat'
 
   - name: purge samba ubuntu
@@ -178,7 +178,8 @@
 
       - name: remove logs
         file:
-        path: /var/log/samba
-        state: absent
+          path: /var/log/samba
+          state: absent
+    when: ansible_os_family == 'RedHat'
 
 
