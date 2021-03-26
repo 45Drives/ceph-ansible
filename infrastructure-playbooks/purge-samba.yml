@@ -157,6 +157,7 @@
         apt:
           name: "{{ ubuntu_samba_packages }}"
           state: absent
+          purge: yes
           autoremove: yes
 
       - name: remove config
