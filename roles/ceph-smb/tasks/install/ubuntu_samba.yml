@@ -12,6 +12,8 @@
       register: result
       until: result is succeeded
       with_items:
+        - samba-common
+        - samba-common-bin
         - samba
       when:
         - samba_server | bool
