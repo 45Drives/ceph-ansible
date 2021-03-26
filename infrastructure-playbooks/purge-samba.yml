@@ -113,6 +113,7 @@
       - attr
       - oddjob
       - oddjob-mkhomedir
+      - ctdb
 
   hosts:
     - smbs
@@ -159,17 +160,6 @@
           state: absent
           purge: yes
           autoremove: yes
-
-      - name: remove config
-        file:
-          path: "{{ item }}"
-          state: absent
-        with_items:
-          - /etc/samba
-          - /etc/ctdb
-          - /etc/krb5.conf
-          - /var/lib/ctdb
-          - /var/lib/samba
 
       - name: remove winbind from nsswitch
         replace:
