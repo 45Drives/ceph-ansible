@@ -95,7 +95,7 @@
 
 - name: final cleanup - purge samba packages and purge config
   vars:
-    samba_packages:
+    centos_samba_packages:
       - samba*
       - ctdb*
       - pam_krb5
@@ -104,6 +104,15 @@
       - attr
       - samba-common-tools
       - oddjob*
+    ubuntu_samba_packages:
+      - samba
+      - samba-common-bin
+      - samba-common
+      - libsmbclient
+      - libwbclient
+      - attr
+      - oddjob
+      - oddjob-mkhomedir
 
   hosts:
     - smbs
@@ -112,32 +121,64 @@
   become: true
   tasks:
 
-  - name: purge samba packages
-    package:
-      name: "{{ samba_packages }}"
-      state: absent
+  - name: purge samba centos
+    block:
+      - name: purge samba packages
+        package:
+          name: "{{ samba_packages }}"
+          state: absent
 
-  - name: remove config
-    file:
-      path: "{{ item }}"
-      state: absent
-    with_items:
-      - /etc/samba
-      - /etc/ctdb
-      - /etc/krb5.conf
-      - /var/lib/ctdb
-      - /var/lib/samba
+      - name: remove config
+        file:
+          path: "{{ item }}"
+          state: absent
+        with_items:
+          - /etc/samba
+          - /etc/ctdb
+          - /etc/krb5.conf
+          - /var/lib/ctdb
+          - /var/lib/samba
 
-  - name: remove winbind from nsswitch
-    replace:
-      path: /etc/nsswitch.conf
-      regexp: 'winbind'
-      replace: ""
+      - name: remove winbind from nsswitch
+        replace:
+          path: /etc/nsswitch.conf
+          regexp: 'winbind'
+          replace: ""
 
-  - name: remove logs
-    file:
-     path: /var/log/samba
-     state: absent
+      - name: remove logs
+        file:
+        path: /var/log/samba
+        state: absent
+    when: ansible_os_family == 'RedHat'
 
+  - name: purge samba ubuntu
+    block:
+      - name: purge samba packages
+        apt:
+          name: "{{ samba_packages }}"
+          state: absent
+          autoremove: yes
+
+      - name: remove config
+        file:
+          path: "{{ item }}"
+          state: absent
+        with_items:
+          - /etc/samba
+          - /etc/ctdb
+          - /etc/krb5.conf
+          - /var/lib/ctdb
+          - /var/lib/samba
+
+      - name: remove winbind from nsswitch
+        replace:
+          path: /etc/nsswitch.conf
+          regexp: 'winbind'
+          replace: ""
+
+      - name: remove logs
+        file:
+        path: /var/log/samba
+        state: absent
 
 
