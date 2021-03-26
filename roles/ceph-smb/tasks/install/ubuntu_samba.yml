@@ -1,4 +1,8 @@
 ---
+- name: Clean apt cache
+  apt:
+    autoclean: yes
+
 - name: Install samba packages
   block:
     - name: install samba
