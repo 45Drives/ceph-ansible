@@ -8,10 +8,7 @@
       register: result
       until: result is succeeded
       with_items:
-        - attr
         - samba
-        - samba-vfs-modules
-        - samba-common
       when:
         - samba_server | bool
 
@@ -22,7 +19,7 @@
       register: result
       until: result is succeeded
       with_items:
-        - samba-winbind
+        - winbind
         - oddjob
         - oddjob-mkhomedir
       when:
