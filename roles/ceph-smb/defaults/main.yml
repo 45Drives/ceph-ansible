@@ -1,11 +1,4 @@
 ---
-# samba_repo can either be '45drives' or 'community'.
-# Community will install Samba,CTDB & Winbind packages from the standard CentOS repo.
-# 45drives will install the same packages and version of Samba,CTDB & Winbind as communuty but rebuilt with support for storing CTDB locks in RADOS objects.
-# Default is to install with RADOS support. If not using samba with CephFS then "community" is fine.
-samba_repo: 45drives
-ceph_45drives_repo_url: http://images.45drives.com/ceph/rpm/el7/
-
 # Update samba packages if already installed
 upgrade_samba_packages: true
 
@@ -74,10 +67,7 @@ samba_shares:
 ## Samba Cluster (CTDB) Settings
 ctdb_public_addresses:
   - vip_address: '192.168.103.10'
-    vip_interface: 'eth1'
-    subnet_mask: '16'
-  - vip_address: '192.168.103.11'
-    vip_interface: 'eth1'
+    vip_interface: 'eth0'
     subnet_mask: '16'
 
 ctdb_tunables:
