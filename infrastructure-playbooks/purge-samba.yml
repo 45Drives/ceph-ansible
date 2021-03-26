@@ -138,16 +138,6 @@
     file:
      path: /var/log/samba
      state: absent
-     
-  - name: Check if samba_45drives repo is present
-    stat:
-      path: /etc/yum.repos.d/samba_45drives.repo
-    register: stat_result
-
-  - name: Remove samba_45drives repository (and clean up left-over metadata)
-    yum_repository:
-      name: samba_45drives
-      state: absent
   
   - name: yum-clean-metadata
     command: yum clean metadata
