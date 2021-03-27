@@ -31,7 +31,6 @@
       with_items:
         - samba-common=2:4.11.6+dfsg-0ubuntu1
         - samba-common-bin=2:4.11.6+dfsg-0ubuntu1
-        - samba-dsdb-modules=2:4.11.6+dfsg-0ubuntu1
         - samba-libs=2:4.11.6+dfsg-0ubuntu1
         - libsmbclient=2:4.11.6+dfsg-0ubuntu1
         - samba=2:4.11.6+dfsg-0ubuntu1
@@ -52,6 +51,7 @@
       with_items:
         - samba-common=2:4.11.6+dfsg-0ubuntu1
         - samba-common-bin=2:4.11.6+dfsg-0ubuntu1
+        - samba-libs=2:4.11.6+dfsg-0ubuntu1
         - libsmbclient=2:4.11.6+dfsg-0ubuntu1
         - samba=2:4.11.6+dfsg-0ubuntu1
         - samba-libs=2:4.11.6+dfsg-0ubuntu1
