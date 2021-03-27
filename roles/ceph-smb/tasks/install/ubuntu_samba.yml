@@ -49,13 +49,13 @@
           name: "{{ item }}"
           selection: hold
       with_items:
-        - samba-common=2:4.11.6+dfsg-0ubuntu1
-        - samba-common-bin=2:4.11.6+dfsg-0ubuntu1
-        - samba-libs=2:4.11.6+dfsg-0ubuntu1
-        - libsmbclient=2:4.11.6+dfsg-0ubuntu1
-        - samba=2:4.11.6+dfsg-0ubuntu1
-        - samba-libs=2:4.11.6+dfsg-0ubuntu1
-        - python3-samba=2:4.11.6+dfsg-0ubuntu1
-        - winbind=2:4.11.6+dfsg-0ubuntu1
-        - libwbclient0=2:4.11.6+dfsg-0ubuntu1
-        - ctdb=2:4.11.6+dfsg-0ubuntu1
+        - samba-common
+        - samba-common-bin
+        - samba-libs
+        - libsmbclient
+        - samba
+        - samba-libs
+        - python3-samba
+        - winbind
+        - libwbclient0
+        - ctdb
