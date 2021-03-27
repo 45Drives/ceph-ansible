@@ -1,7 +1,7 @@
 ---
 - name: Remove Samba (2:4.11.6+dfsg-0ubuntu1.6) Packages
   block:
-    - name: Remove samba Samba (2:4.11.6+dfsg-0ubuntu1.6)
+    - name: Ubuntu | Remove samba Samba (2:4.11.6+dfsg-0ubuntu1.6)
       apt:
         name: "{{ item }}=2:4.11.6+dfsg-0ubuntu1.6"
         state: "absent"
@@ -22,7 +22,7 @@
 
 - name: Install samba packages
   block:
-    - name: install samba
+    - name: Ubuntu | install samba
       apt:
         name: "{{ item }}"
         state: "present"
@@ -31,63 +31,31 @@
       with_items:
         - samba-common=2:4.11.6+dfsg-0ubuntu1
         - samba-common-bin=2:4.11.6+dfsg-0ubuntu1
+        - samba-dsdb-modules=2:4.11.6+dfsg-0ubuntu1
+        - samba-libs=2:4.11.6+dfsg-0ubuntu1
+        - libsmbclient=2:4.11.6+dfsg-0ubuntu1
         - samba=2:4.11.6+dfsg-0ubuntu1
-        - libwbclient=2:4.11.6+dfsg-0ubuntu1
         - samba-libs=2:4.11.6+dfsg-0ubuntu1
         - python3-samba=2:4.11.6+dfsg-0ubuntu1
-      when:
-        - samba_server | bool
-
-    - name: install packages for domain integration
-      apt:
-        name: "{{ item }}"
-        state: "present"
-      register: result
-      until: result is succeeded
-      with_items:
         - winbind=2:4.11.6+dfsg-0ubuntu1
+        - libwbclient0=2:4.11.6+dfsg-0ubuntu1
+        - ctdb=2:4.11.6+dfsg-0ubuntu1
         - oddjob
         - oddjob-mkhomedir
-      when:
-        - domain_member | bool
-
-    - name: install ctdb
-      apt:
-        name: ctdb=2:4.11.6+dfsg-0ubuntu1
-        state: "present"
-      register: result
-      until: result is succeeded
-      when:
-        - samba_cluster | bool
 
 - name: Hold samba packages at version 2:4.11.6+dfsg-0ubuntu1
   block:
-    - name: hold samba package versions
+    - name: Ubuntu | hold samba package versions
       dpkg_selections:
           name: "{{ item }}"
           selection: hold
       with_items:
         - samba-common=2:4.11.6+dfsg-0ubuntu1
         - samba-common-bin=2:4.11.6+dfsg-0ubuntu1
+        - libsmbclient=2:4.11.6+dfsg-0ubuntu1
         - samba=2:4.11.6+dfsg-0ubuntu1
-        - libwbclient=2:4.11.6+dfsg-0ubuntu1
         - samba-libs=2:4.11.6+dfsg-0ubuntu1
         - python3-samba=2:4.11.6+dfsg-0ubuntu1
-      when:
-        - samba_server | bool
-
-    - name: hold winbind version
-      dpkg_selections:
-          name: "{{ item }}"
-          selection: hold
-      with_items:
         - winbind=2:4.11.6+dfsg-0ubuntu1
-      when:
-        - domain_member | bool
-
-    - name: hold ctdb verison
-      dpkg_selections:
-          name: "{{ item }}"
-          selection: hold
-      when:
-        - samba_cluster | bool
+        - libwbclient0=2:4.11.6+dfsg-0ubuntu1
+        - ctdb=2:4.11.6+dfsg-0ubuntu1
