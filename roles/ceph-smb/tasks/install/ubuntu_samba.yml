@@ -6,11 +6,13 @@
         pkg:
         - samba-common=2:4.11.6+dfsg-0ubuntu1.6
         - samba-common-bin=2:4.11.6+dfsg-0ubuntu1.6
+        - samba-libs=2:4.11.6+dfsg-0ubuntu1.6
+        - libsmbclient=2:4.11.6+dfsg-0ubuntu1.6
         - samba=2:4.11.6+dfsg-0ubuntu1.6
-        - libwbclient=2:4.11.6+dfsg-0ubuntu1.6
         - samba-libs=2:4.11.6+dfsg-0ubuntu1.6
         - python3-samba=2:4.11.6+dfsg-0ubuntu1.6
         - winbind=2:4.11.6+dfsg-0ubuntu1.6
+        - libwbclient0=2:4.11.6+dfsg-0ubuntu1.6
         - ctdb=2:4.11.6+dfsg-0ubuntu1.6
         state: "absent"
         purge: yes
