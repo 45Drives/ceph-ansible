@@ -1,12 +1,29 @@
 ---
-- name: Clean apt cache
-  apt:
-    autoclean: yes
+- name: Remove Samba (2:4.11.6+dfsg-0ubuntu1.6) Packages
+  block:
+    - name: Remove samba Samba (2:4.11.6+dfsg-0ubuntu1.6)
+      apt:
+        name: "{{ item }}=2:4.11.6+dfsg-0ubuntu1.6"
+        state: "absent"
+        purge: yes
+        autoremove: yes
+        autoclean: yes
+      register: result
+      until: result is succeeded
+      with_items:
+        - samba-common
+        - samba-common-bin
+        - samba
+        - libwbclient
+        - samba-libs
+        - python3-samba
+        - winbind
+        - ctdb
 
 - name: Install samba packages
   block:
     - name: install samba
-      package:
+      apt:
         name: "{{ item }}"
         state: "{{ (upgrade_samba_packages|bool) | ternary('latest','present') }}"
       register: result
@@ -22,7 +39,7 @@
         - samba_server | bool
 
     - name: install packages for domain integration
-      package:
+      apt:
         name: "{{ item }}"
         state: "{{ (upgrade_samba_packages|bool) | ternary('latest','present') }}"
       register: result
@@ -35,7 +52,7 @@
         - domain_member | bool
 
     - name: install ctdb
-      package:
+      apt:
         name: ctdb=2:4.11.6+dfsg-0ubuntu1
         state: "{{ (upgrade_samba_packages|bool) | ternary('latest','present') }}"
       register: result
@@ -45,7 +62,7 @@
 
 - name: Hold samba packages at version 2:4.11.6+dfsg-0ubuntu1
   block:
-    - name: hold
+    - name: hold samba package versions
       dpkg_selections:
           name: "{{ item }}"
           selection: hold
@@ -56,3 +73,21 @@
         - libwbclient=2:4.11.6+dfsg-0ubuntu1
         - samba-libs=2:4.11.6+dfsg-0ubuntu1
         - python3-samba=2:4.11.6+dfsg-0ubuntu1
+      when:
+        - samba_server | bool
+
+    - name: hold winbind version
+      dpkg_selections:
+          name: "{{ item }}"
+          selection: hold
+      with_items:
+        - winbind=2:4.11.6+dfsg-0ubuntu1
+      when:
+        - domain_member | bool
+
+    - name: hold ctdb verison
+      dpkg_selections:
+          name: "{{ item }}"
+          selection: hold
+      when:
+        - samba_cluster | bool
