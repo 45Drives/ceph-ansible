@@ -25,7 +25,7 @@
     - name: install samba
       apt:
         name: "{{ item }}"
-        state: "{{ (upgrade_samba_packages|bool) | ternary('latest','present') }}"
+        state: "present"
       register: result
       until: result is succeeded
       with_items:
@@ -41,7 +41,7 @@
     - name: install packages for domain integration
       apt:
         name: "{{ item }}"
-        state: "{{ (upgrade_samba_packages|bool) | ternary('latest','present') }}"
+        state: "present"
       register: result
       until: result is succeeded
       with_items:
@@ -54,7 +54,7 @@
     - name: install ctdb
       apt:
         name: ctdb=2:4.11.6+dfsg-0ubuntu1
-        state: "{{ (upgrade_samba_packages|bool) | ternary('latest','present') }}"
+        state: "present"
       register: result
       until: result is succeeded
       when:
