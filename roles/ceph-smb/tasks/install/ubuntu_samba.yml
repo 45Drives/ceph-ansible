@@ -12,9 +12,12 @@
       register: result
       until: result is succeeded
       with_items:
-        - samba-common
-        - samba-common-bin
-        - samba
+        - samba-common=2:4.11.6+dfsg-0ubuntu1
+        - samba-common-bin=2:4.11.6+dfsg-0ubuntu1
+        - samba=2:4.11.6+dfsg-0ubuntu1
+        - libwbclient=2:4.11.6+dfsg-0ubuntu1
+        - samba-libs=2:4.11.6+dfsg-0ubuntu1
+        - python3-samba=2:4.11.6+dfsg-0ubuntu1
       when:
         - samba_server | bool
 
@@ -25,7 +28,7 @@
       register: result
       until: result is succeeded
       with_items:
-        - winbind
+        - winbind=2:4.11.6+dfsg-0ubuntu1
         - oddjob
         - oddjob-mkhomedir
       when:
@@ -33,9 +36,23 @@
 
     - name: install ctdb
       package:
-        name: ctdb
+        name: ctdb=2:4.11.6+dfsg-0ubuntu1
         state: "{{ (upgrade_samba_packages|bool) | ternary('latest','present') }}"
       register: result
       until: result is succeeded
       when:
         - samba_cluster | bool
+
+- name: Hold samba packages at version 2:4.11.6+dfsg-0ubuntu1
+  block:
+    - name: hold
+      dpkg_selections:
+          name: "{{ item }}"
+          selection: hold
+      with_items:
+        - samba-common=2:4.11.6+dfsg-0ubuntu1
+        - samba-common-bin=2:4.11.6+dfsg-0ubuntu1
+        - samba=2:4.11.6+dfsg-0ubuntu1
+        - libwbclient=2:4.11.6+dfsg-0ubuntu1
+        - samba-libs=2:4.11.6+dfsg-0ubuntu1
+        - python3-samba=2:4.11.6+dfsg-0ubuntu1
