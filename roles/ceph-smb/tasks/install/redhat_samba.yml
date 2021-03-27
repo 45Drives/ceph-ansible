@@ -1,7 +1,7 @@
 ---
 - name: Install samba packages
   block:
-    - name: install samba
+    - name: redhat | install samba
       package:
         name: "{{ item }}"
         state: "{{ (upgrade_samba_packages|bool) | ternary('latest','present') }}"
@@ -15,7 +15,7 @@
       when:
         - samba_server | bool
 
-    - name: install packages for domain integration
+    - name: redhat | install packages for domain integration
       package:
         name: "{{ item }}"
         state: "{{ (upgrade_samba_packages|bool) | ternary('latest','present') }}"
@@ -30,7 +30,7 @@
       when:
         - domain_member | bool
 
-    - name: install ctdb
+    - name: redhat | install ctdb
       package:
         name: ctdb
         state: "{{ (upgrade_samba_packages|bool) | ternary('latest','present') }}"
