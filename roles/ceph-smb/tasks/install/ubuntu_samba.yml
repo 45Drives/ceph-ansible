@@ -3,32 +3,27 @@
   block:
     - name: Ubuntu | Remove samba Samba (2:4.11.6+dfsg-0ubuntu1.6)
       apt:
-        name: "{{ item }}=2:4.11.6+dfsg-0ubuntu1.6"
+        pkg:
+        - samba-common=2:4.11.6+dfsg-0ubuntu1.6
+        - samba-common-bin=2:4.11.6+dfsg-0ubuntu1.6
+        - samba=2:4.11.6+dfsg-0ubuntu1.6
+        - libwbclient=2:4.11.6+dfsg-0ubuntu1.6
+        - samba-libs=2:4.11.6+dfsg-0ubuntu1.6
+        - python3-samba=2:4.11.6+dfsg-0ubuntu1.6
+        - winbind=2:4.11.6+dfsg-0ubuntu1.6
+        - ctdb=2:4.11.6+dfsg-0ubuntu1.6
         state: "absent"
         purge: yes
         autoremove: yes
         autoclean: yes
       register: result
       until: result is succeeded
-      with_items:
-        - samba-common
-        - samba-common-bin
-        - samba
-        - libwbclient
-        - samba-libs
-        - python3-samba
-        - winbind
-        - ctdb
 
 - name: Install samba packages
   block:
     - name: Ubuntu | install samba
       apt:
-        name: "{{ item }}"
-        state: "present"
-      register: result
-      until: result is succeeded
-      with_items:
+        pkg:
         - samba-common=2:4.11.6+dfsg-0ubuntu1
         - samba-common-bin=2:4.11.6+dfsg-0ubuntu1
         - samba-libs=2:4.11.6+dfsg-0ubuntu1
@@ -41,6 +36,9 @@
         - ctdb=2:4.11.6+dfsg-0ubuntu1
         - oddjob
         - oddjob-mkhomedir
+        state: "present"
+      register: result
+      until: result is succeeded
 
 - name: Hold samba packages at version 2:4.11.6+dfsg-0ubuntu1
   block:
