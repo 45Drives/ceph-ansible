@@ -9,7 +9,6 @@
         - samba-libs=2:4.11.6+dfsg-0ubuntu1
         - libsmbclient=2:4.11.6+dfsg-0ubuntu1
         - samba=2:4.11.6+dfsg-0ubuntu1
-        - samba-libs=2:4.11.6+dfsg-0ubuntu1
         - python3-samba=2:4.11.6+dfsg-0ubuntu1
         - winbind=2:4.11.6+dfsg-0ubuntu1
         - libwbclient0=2:4.11.6+dfsg-0ubuntu1
@@ -33,8 +32,8 @@
         - samba-libs
         - libsmbclient
         - samba
-        - samba-libs
         - python3-samba
         - winbind
         - libwbclient0
         - ctdb
+        - samba-vfs-modules
