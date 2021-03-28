@@ -109,6 +109,7 @@
         - samba-common-bin
         - samba-libs
         - libsmbclient
+        - smbclient
         - samba
         - samba-libs
         - python3-samba
@@ -116,6 +117,11 @@
         - libwbclient0
         - ctdb
         - samba-vfs-modules
+        - samba-dsdb-modules
+        - libldb2
+        - libnss-winbind
+        - libpam-winbind
+        - krb5-config
         - oddjob
         - oddjob-mkhomedir
 

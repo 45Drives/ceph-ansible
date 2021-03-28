@@ -9,11 +9,17 @@
         - samba-libs=2:4.11.6+dfsg-0ubuntu1
         - libsmbclient=2:4.11.6+dfsg-0ubuntu1
         - samba=2:4.11.6+dfsg-0ubuntu1
+        - smbclient=2:4.11.6+dfsg-0ubuntu1
         - python3-samba=2:4.11.6+dfsg-0ubuntu1
+        - ctdb=2:4.11.6+dfsg-0ubuntu1
         - winbind=2:4.11.6+dfsg-0ubuntu1
         - libwbclient0=2:4.11.6+dfsg-0ubuntu1
-        - ctdb=2:4.11.6+dfsg-0ubuntu1
         - samba-vfs-modules=2:4.11.6+dfsg-0ubuntu1
+        - samba-dsdb-modules=2:4.11.6+dfsg-0ubuntu1
+        - libldb2=2:2.0.8-2
+        - libnss-winbind=2:4.11.6+dfsg-0ubuntu1
+        - libpam-winbind=2:4.11.6+dfsg-0ubuntu1
+        - krb5-config
         - oddjob
         - oddjob-mkhomedir
         state: "present"
@@ -31,9 +37,14 @@
         - samba-common-bin
         - samba-libs
         - libsmbclient
+        - smbclient
         - samba
         - python3-samba
         - winbind
         - libwbclient0
         - ctdb
         - samba-vfs-modules
+        - samba-dsdb-modules
+        - libldb2
+        - libnss-winbind
+        - libpam-winbind
