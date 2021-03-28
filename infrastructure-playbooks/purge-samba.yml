@@ -171,6 +171,7 @@
           state: absent
           purge: yes
           autoremove: yes
+          force: yes
 
       - name: remove winbind from nsswitch
         replace:
