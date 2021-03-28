@@ -105,15 +105,19 @@
       - samba-common-tools
       - oddjob*
     ubuntu_samba_packages:
-      - samba
-      - samba-common-bin
-      - samba-common
-      - libsmbclient
-      - libwbclient
-      - attr
-      - oddjob
-      - oddjob-mkhomedir
-      - ctdb
+        - samba-common
+        - samba-common-bin
+        - samba-libs
+        - libsmbclient
+        - samba
+        - samba-libs
+        - python3-samba
+        - winbind
+        - libwbclient0
+        - ctdb
+        - samba-vfs-modules
+        - oddjob
+        - oddjob-mkhomedir
 
   hosts:
     - smbs

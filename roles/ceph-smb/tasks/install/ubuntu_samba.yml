@@ -1,26 +1,4 @@
 ---
-- name: Remove Samba (2:4.11.6+dfsg-0ubuntu1.6) Packages
-  block:
-    - name: Ubuntu | Remove samba Samba (2:4.11.6+dfsg-0ubuntu1.6)
-      apt:
-        pkg:
-        - samba-common=2:4.11.6+dfsg-0ubuntu1.6
-        - samba-common-bin=2:4.11.6+dfsg-0ubuntu1.6
-        - samba-libs=2:4.11.6+dfsg-0ubuntu1.6
-        - libsmbclient=2:4.11.6+dfsg-0ubuntu1.6
-        - samba=2:4.11.6+dfsg-0ubuntu1.6
-        - samba-libs=2:4.11.6+dfsg-0ubuntu1.6
-        - python3-samba=2:4.11.6+dfsg-0ubuntu1.6
-        - winbind=2:4.11.6+dfsg-0ubuntu1.6
-        - libwbclient0=2:4.11.6+dfsg-0ubuntu1.6
-        - ctdb=2:4.11.6+dfsg-0ubuntu1.6
-        state: "absent"
-        purge: yes
-        autoremove: yes
-        autoclean: yes
-      register: result
-      until: result is succeeded
-
 - name: Install samba packages
   block:
     - name: Ubuntu | install samba
@@ -36,6 +14,7 @@
         - winbind=2:4.11.6+dfsg-0ubuntu1
         - libwbclient0=2:4.11.6+dfsg-0ubuntu1
         - ctdb=2:4.11.6+dfsg-0ubuntu1
+        - samba-vfs-modules=2:4.11.6+dfsg-0ubuntu1
         - oddjob
         - oddjob-mkhomedir
         state: "present"
