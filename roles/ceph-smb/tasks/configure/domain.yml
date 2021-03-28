@@ -7,16 +7,16 @@
     group: root
     mode: 0644
 
-- name: config_domain | configure domain user login
-  block:
-    - name: config nsswitch.conf
-      template:
-        src: etc/nsswitch.conf.j2
-        dest: /etc/nsswitch.conf
-        owner: "root"
-        group: "root"
-        mode: 0644
+- name: config nsswitch.conf
+  template:
+    src: etc/nsswitch.conf.j2
+    dest: /etc/nsswitch.conf
+    owner: "root"
+    group: "root"
+    mode: 0644
 
+- name: config_domain | CentOS7 configure domain user login
+  block:
     - name: config pam.d/system-auth
       template:
         src: etc/pam.d/system-auth.j2
@@ -46,6 +46,22 @@
         name: oddjobd
         state: started
         enabled: yes
+  - when:
+    - ansible_distribution == 'CentOS'
+    - ansible_distribution_major_version == '7'
+
+- name: config_domain | Ubuntu configure domain user login
+  block:
+    - name: enable ssh login
+      shell: "/usr/sbin/pam-auth-update --enable mkhomedir"
+
+    - name: start_config_domain | enable oddjobd
+      systemd:
+        name: oddjobd
+        state: started
+        enabled: yes
+  - when:
+    - ansible_distribution == 'Ubuntu'
 
 - name: config_domain | Standalone
   block:
@@ -121,7 +137,7 @@
     - samba_cluster | bool
 
 - name: Grant the SeDiskOperatorPrivilege Privilege for windows ACLs
-  shell: net rpc rights grant "{{ active_directory_info.workgroup|upper }}\{{ active_directory_info.ad_admin_group }}" SeDiskOperatorPrivilege -U "{{ active_directory_info.domain_join_user }}"%"{{ active_directory_info.domain_join_password }}"
+  shell: net sam rights grant "{{ active_directory_info.workgroup|upper }}\{{ active_directory_info.ad_admin_group }}" SeDiskOperatorPrivilege -U "{{ active_directory_info.domain_join_user }}"%"{{ active_directory_info.domain_join_password }}"
   run_once: true
   when:
     - enable_windows_acl | bool
