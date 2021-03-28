@@ -121,6 +121,7 @@
         - libldb2
         - libnss-winbind
         - libpam-winbind
+        - python3-ldb
         - krb5-config
         - oddjob
         - oddjob-mkhomedir

@@ -19,6 +19,7 @@
         - libldb2=2:2.0.8-2
         - libnss-winbind=2:4.11.6+dfsg-0ubuntu1
         - libpam-winbind=2:4.11.6+dfsg-0ubuntu1
+        - python3-ldb=2:2.0.8-2
         - krb5-config
         - oddjob
         - oddjob-mkhomedir
@@ -48,3 +49,4 @@
         - libldb2
         - libnss-winbind
         - libpam-winbind
+        - python3-ldb
