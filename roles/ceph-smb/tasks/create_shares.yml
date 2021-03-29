@@ -75,32 +75,45 @@
 - name: vfs modules configuration
   block:
   - name: configure_vfs_modules | set vfs_ceph_snapshots fact
-    set_fact: item.vfs_ceph_snapshots="ceph_snapshots"
+    set_fact: vfs_ceph_snapshots="ceph_snapshots"
     when: item.ceph_snapshots | bool
 
   - name: configure_vfs_modules | set vfs_ceph fact
-    set_fact: item.vfs_ceph="ceph"
+    set_fact: vfs_ceph="ceph"
     when: item.type == "vfs"
 
   - name: configure_vfs_modules | set vfs_worm fact
-    set_fact: item.vfs_worm="worm"
+    set_fact: vfs_worm="worm"
     when: item.worm | bool
   
   - name: configure_vfs_modules | set share vfs_object fact
-    set_fact: item.vfs_objects="{{ vfs_ceph_snapshots | default('')}} {{ vfs_worm | default('') }} {{ vfs_ceph | default('') }}"
+    set_fact: vfs_objects="{{ vfs_ceph_snapshots | default('')}} {{ vfs_worm | default('') }} {{ vfs_ceph | default('') }}"
 
   - name: configure_vfs_modules | add vfs modules paramter
-    shell: net conf setparm {{ item.name }} "vfs objects" "{{ item.vfs_objects }}"
+    shell: net conf setparm {{ item.name }} "vfs objects" "{{ vfs_objects }}"
     failed_when: false
     run_once: true
 
 - name: vfs modules extra options
   block:
   - name: configure_vfs_options | set worm grace period
-    shell: net conf setparm {{ item.name }} "worm:grace_period" {{ worm_grace_period }}
+    shell: net conf setparm {{ item.name }} "worm:grace_period" {{ item.worm_grace_period }}
     failed_when: false
     run_once: true
     when: item.worm | bool
 
-    
+- name: unset vfs modules configuration
+  block:
+  - name: configure_vfs_modules | set vfs_ceph_snapshots fact
+    set_fact: vfs_ceph_snapshots=''
+
+  - name: configure_vfs_modules | set vfs_ceph fact
+    set_fact: vfs_ceph=''
+
+  - name: configure_vfs_modules | set vfs_worm fact
+    set_fact: vfs_worm=''
+  
+  - name: configure_vfs_modules | set share vfs_object fact
+    set_fact: vfs_objects=''
+
 
