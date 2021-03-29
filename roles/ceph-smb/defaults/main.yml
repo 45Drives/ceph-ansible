@@ -57,6 +57,7 @@ samba_shares:
     comment: "public rw access"
     ceph_snapshots: true
     worm: false
+    worm_grace_period: 300
 
   - name: 'secure'
     path: '/fsgw/secure'
@@ -67,6 +68,7 @@ samba_shares:
     comment: "secure rw access"
     ceph_snapshots: true
     worm: false
+    worm_grace_period: 300
 
 ## Samba Cluster (CTDB) Settings
 ctdb_public_addresses:
