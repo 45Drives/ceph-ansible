@@ -97,7 +97,7 @@
 - name: vfs modules extra options
   block:
   - name: configure_vfs_options | set worm grace period
-    shell: net conf setparm {{ item.name }} "worm:grace period" {{ worm_grace_period }}
+    shell: net conf setparm {{ item.name }} "worm:grace_period" {{ worm_grace_period }}
     failed_when: false
     run_once: true
     when: item.worm | bool
