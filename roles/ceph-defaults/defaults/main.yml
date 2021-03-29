@@ -199,7 +199,7 @@ nfs_ganesha_dev: false # use development repos for nfs-ganesha
 # flavors so far include: ceph_master, ceph_jewel, ceph_kraken, ceph_luminous
 nfs_ganesha_flavor: "ceph_master"
 
-ceph_iscsi_config_dev: true # special repo for deploying iSCSI gateways
+ceph_iscsi_config_dev: false # special repo for deploying iSCSI gateways
 
 
 # REPOSITORY: CUSTOM
