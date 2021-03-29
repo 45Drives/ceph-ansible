@@ -65,7 +65,7 @@
       set_fact:
         common_pkgs:
           - tcmu-runner
-          - targetcli
+          - targetcli-fb
 
     - name: set_fact base iscsi pkgs if new style ceph-iscsi
       set_fact:
