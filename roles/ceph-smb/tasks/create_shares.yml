@@ -87,10 +87,10 @@
     when: item.worm | bool
   
   - name: configure_vfs_modules | set share vfs_object fact
-    set_fact: vfs_objects="{{ vfs_ceph_snapshots | default(omit)}} {{ vfs_worm | default(omit) }} {{ vfs_ceph | default(omit) }}"
+    set_fact: vfs_objects="{{ vfs_ceph_snapshots | default('')}} {{ vfs_worm | default('') }} {{ vfs_ceph | default('') }}"
 
   - name: configure_vfs_modules | add vfs modules paramter
-    shell: net conf setparm {{ item.name }} "vfs objects" {{ vfs_objects }}
+    shell: net conf setparm {{ item.name }} "vfs objects" "{{ vfs_objects }}"
     failed_when: false
     run_once: true
 
