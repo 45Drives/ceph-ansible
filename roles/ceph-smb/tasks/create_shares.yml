@@ -41,11 +41,20 @@
     state: absent
   when: item.type == "vfs"
 
-- name: create_shares | Create Kernel Share {{ item.name }}-{{shared_storage_mountpoint }}{{ item.path }}
-  shell: net conf addshare {{ item.name }} {{ shared_storage_mountpoint}}{{ item.path }} writeable={{ item.writeable[:1] }} guest_ok={{ item.guest_ok[:1] }} "{{ item.comment }}"
-  failed_when: false
-  run_once: true
-  when: item.type =="kernel"
+
+- name: kernel cephfs share configuration
+  when: item.type == "kernel"
+  block:
+  - name: configure_kernel_shares | Create Kernel Share {{ item.name }}-{{shared_storage_mountpoint }}{{ item.path }}
+    shell: net conf addshare {{ item.name }} {{ shared_storage_mountpoint}}{{ item.path }} writeable={{ item.writeable[:1] }} guest_ok={{ item.guest_ok[:1] }} "{{ item.comment }}"
+    failed_when: false
+    run_once: true
+#  - name: configure_kernel_shares | add parameters vfs_objects
+#    shell: net conf setparm {{ item.name }} "vfs objects" ceph_snapshots
+#    failed_when: false
+#    run_once: true
+#    when: item.shadow_copy | bool
+
 
 - name: vfs_ceph share configuration
   when: item.type == "vfs"
@@ -55,23 +64,56 @@
     failed_when: false
     run_once: true
 
-  - name: configure_vfs_shares - add parameters vfs_objects
-    shell: net conf setparm {{ item.name }} "vfs objects" ceph
-    failed_when: false
-    run_once: true
+#  - name: configure_vfs_shares | add parameters vfs_objects
+#    shell: net conf setparm {{ item.name }} "vfs objects" ceph
+#    failed_when: false
+#    run_once: true
+
+#  - name: configure_vfs_shares | add parameters vfs_objects
+#    shell: net conf setparm {{ item.name }} "vfs objects" ceph_snapshots ceph
+#    failed_when: false
+#    run_once: true
+#    when: item.shadow_copy | bool
   
-  - name: configure_vfs_shares - add parameters kernel share modes
+  - name: configure_vfs_shares | add parameters kernel share modes
     shell: net conf setparm {{ item.name }} "kernel share modes" no
     failed_when: false
     run_once: true   
 
-  - name: configure_vfs_shares - add parameters ceph config
+  - name: configure_vfs_shares | add parameters ceph config
     shell: net conf setparm {{ item.name }} ceph:config_file /etc/ceph/ceph.conf
     failed_when: false
     run_once: true
   
-  - name: configure_vfs_shares - add parameters ceph user
+  - name: configure_vfs_shares | add parameters ceph user
     shell: net conf setparm {{ item.name }} ceph:user_id samba
     failed_when: false
     run_once: true
+
+- name: vfs modules configuration
+  block:
+  - name: configure_vfs_modules | set vfs_ceph_snapshots fact
+    set_fact: 
+      - vfs_ceph_snapshots="ceph_snapshots"
+    when: item.ceph_snapshots | bool
+
+  - name: configure_vfs_modules | set vfs_ceph fact
+    set_fact: 
+      - vfs_ceph="ceph"
+    when: item.type == "vfs"
+
+  - name: configure_vfs_modules | set vfs_worm fact
+    set_fact:
+      - vfs_worm="worm"
+    when: item.worm | bool
+  
+  - name: configure_vfs_modules | set share vfs_object fact
+    set_fact:
+      - vfs_objects="{{ vfs_ceph_snapshots | default(omit)}} {{ vfs_worm | default(omit) }} {{ vfs_ceph | default(omit) }}"
+
+  - name: configure_vfs_modules | add vfs modules paramter
+    shell: net conf setparm {{ item.name }} "vfs objects" {{ vfs_objects }}
+    failed_when: false
+    run_once: true
+
 

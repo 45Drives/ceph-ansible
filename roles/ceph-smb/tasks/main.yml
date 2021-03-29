@@ -31,6 +31,8 @@
   when:
     - not domain_member | bool
 
+# Turn on WSD service
+
 # Configure shares
 - include: loop_shares.yml
   when:
@@ -39,3 +41,4 @@
 - include: show_ctdb_status.yml
   when:
     - samba_cluster | bool
+

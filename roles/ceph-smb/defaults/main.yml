@@ -55,6 +55,8 @@ samba_shares:
     writeable: 'yes'
     guest_ok: 'yes'
     comment: "public rw access"
+    ceph_snapshots: true
+    worm: false
 
   - name: 'secure'
     path: '/fsgw/secure'
@@ -63,6 +65,8 @@ samba_shares:
     writeable: 'yes'
     guest_ok: 'no'
     comment: "secure rw access"
+    ceph_snapshots: true
+    worm: false
 
 ## Samba Cluster (CTDB) Settings
 ctdb_public_addresses:
