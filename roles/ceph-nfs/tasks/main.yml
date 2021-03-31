@@ -70,16 +70,16 @@
 
 - name: include start_nfs_cluster.yml
   block:
-    name: start nfs_cluster_centos7 
-    import_tasks: start_nfs_cluster_centos7.yml
-    when:
-      - ceph_nfs_rados_backend_driver == "rados_ng"
-      - ansible_distribution == 'CentOS'
-      - ansible_distribution_major_version == '7'
+    - name: start nfs_cluster_centos7 
+      import_tasks: start_nfs_cluster_centos7.yml
+      when:
+        - ceph_nfs_rados_backend_driver == "rados_ng"
+        - ansible_distribution == 'CentOS'
+        - ansible_distribution_major_version == '7'
 
-- name: include start_nfs_cluster.yml
-  import_tasks: start_nfs_cluster_ubuntu.yml
-  when:
-    - ceph_nfs_rados_backend_driver == "rados_ng"
-    - ansible_distribution == 'Ubuntu'
-    - ansible_distribution_major_version == '20'
+    - name: include start_nfs_cluster.yml
+      import_tasks: start_nfs_cluster_ubuntu.yml
+      when:
+        - ceph_nfs_rados_backend_driver == "rados_ng"
+        - ansible_distribution == 'Ubuntu'
+        - ansible_distribution_major_version == '20'
