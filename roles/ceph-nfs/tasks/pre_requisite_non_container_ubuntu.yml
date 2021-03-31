@@ -29,7 +29,7 @@
       until: result is succeeded
       when: nfs_file_gw
 
-    - name: install redhat nfs-ganesha-rgw and ceph-radosgw packages
+    - name: install ubuntu nfs-ganesha-rgw and ceph-radosgw packages
       apt:
         name: ['nfs-ganesha', 'nfs-ganesha-rgw', 'nfs-ganesha-rados-grace', 'nfs-ganesha-rados-urls', 'ceph-radosgw', 'radosgw']
         state: "{{ (upgrade_ceph_packages|bool) | ternary('latest','present') }}"
