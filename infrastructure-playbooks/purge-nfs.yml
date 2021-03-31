@@ -109,18 +109,3 @@
     file:
      path: /var/log/ganesha
      state: absent
-     
-  - name: Check if samba_45drives repo is present
-    stat:
-      path: /etc/yum.repo.d/nfs_ganesha_stable.repo
-    register: stat_result
-
-  - name: Remove samba_45drives repository (and clean up left-over metadata)
-    yum_repository:
-      name: nfs_ganesha_stable
-      state: absent
-  
-  - name: yum-clean-metadata
-    command: yum clean metadata
-    args:
-      warn: no
