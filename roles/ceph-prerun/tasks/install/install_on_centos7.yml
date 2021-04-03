@@ -15,7 +15,7 @@
 - name: Install Extra Dependencies in CentOS7
   yum:
     name: "{{ centos_install_pkgs }}"
-    state: absent
+    state: latest
   register: result
   until: result is succeeded
 
