@@ -382,6 +382,7 @@ dummy:
 ## MDS options
 #
 #mds_max_mds: 1
+#mds_max_file_size: 10995116277760
 
 ## Rados Gateway options
 #
