@@ -6,7 +6,7 @@
     create: yes
     line: "CLUSTER={{ cluster }}"
     regexp: "^CLUSTER="
-  when: ansible_os_family in ["RedHat", "Suse"]
+  when: ansible_os_family in ["RedHat", "Suse", "Rocky"]
 
 # NOTE(leseb): we are performing the following check
 # to ensure any Jewel installation will not fail.

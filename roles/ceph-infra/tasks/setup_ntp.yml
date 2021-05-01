@@ -9,7 +9,7 @@
   set_fact:
     chrony_daemon_name: chronyd
     ntp_service_name: ntpd
-  when: ansible_os_family in ['RedHat', 'Suse']
+  when: ansible_os_family in ['RedHat', 'Suse', 'Rocky']
 
 # Installation of NTP daemons needs to be a separate task since installations
 # can't happen on Atomic

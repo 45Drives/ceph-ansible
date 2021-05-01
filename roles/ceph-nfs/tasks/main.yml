@@ -2,7 +2,7 @@
 # global/common requirement
 - name: stop nfs server service
   systemd:
-    name: "{{ 'nfs-server' if ansible_os_family == 'RedHat' else 'nfsserver' if ansible_os_family == 'Suse' else 'nfs-kernel-server' if ansible_os_family == 'Debian' }}"
+    name: "{{ 'nfs-server' if ansible_os_family in ['RedHat', 'Rocky'] else 'nfsserver' if ansible_os_family == 'Suse' else 'nfs-kernel-server' if ansible_os_family == 'Debian' }}"
     state: stopped
     enabled: no
   failed_when: false
@@ -26,7 +26,7 @@
   import_tasks: ganesha_selinux_fix.yml
   when:
     - not containerized_deployment | bool
-    - ansible_os_family == 'RedHat'
+    - ansible_os_family in ['RedHat', 'Rocky']
 
 - name: nfs with external ceph cluster task related
   when:

@@ -642,7 +642,7 @@
           when:
             ansible_pkg_mgr == "dnf"
       when:
-        ansible_os_family == 'RedHat' and
+        ansible_os_family in ['RedHat', 'Rocky'] and
         not is_atomic
 
     - name: find any service-cid file left
