@@ -18,7 +18,7 @@
   until: result is succeeded
   when:
     - mds_group_name in group_names
-    - ansible_os_family in ['Suse', 'RedHat']
+    - ansible_os_family in ['Suse', 'RedHat', 'Rocky']
 
 - name: create mds keyring
   command: ceph --cluster {{ cluster }} --name client.bootstrap-mds --keyring /var/lib/ceph/bootstrap-mds/{{ cluster }}.keyring auth get-or-create mds.{{ ansible_hostname }} osd 'allow rwx' mds 'allow' mon 'allow profile mds' -o /var/lib/ceph/mds/{{ cluster }}-{{ ansible_hostname }}/keyring

@@ -1,7 +1,7 @@
 ---
 - name: include red hat based system related tasks
   include_tasks: pre_requisite_non_container_red_hat.yml
-  when: ansible_os_family == 'RedHat'
+  when: ansible_os_family in ['RedHat', 'Rocky']
 
 - name: include debian based system related tasks
   include_tasks: pre_requisite_non_container_debian.yml

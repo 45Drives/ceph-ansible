@@ -22,7 +22,7 @@
 - name: fail on unsupported distribution
   fail:
     msg: "Distribution not supported {{ ansible_os_family }}"
-  when: ansible_os_family not in ['Debian', 'RedHat', 'ClearLinux', 'Suse']
+  when: ansible_os_family not in ['Debian', 'RedHat', 'ClearLinux', 'Suse', 'Rocky']
 
 - name: red hat based systems tasks
   when:
