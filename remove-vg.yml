@@ -1,0 +1,14 @@
+---
+- hosts: osds
+  tasks:
+    - name: check to see if ceph is offline
+      raw: ceph -s
+      args:
+        executable: /bin/bash
+      register: ceph_online
+
+    - name: remove ceph volume groups
+      raw: for i in `vgs | grep ceph | awk '{print $1}'`;do vgremove $i -f ; done
+      args:
+        executable: /bin/bash
+      when: ceph_online.failed

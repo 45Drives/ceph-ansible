@@ -11,5 +11,24 @@
     - local_action: file path=/usr/share/ceph-ansible/host_vars/ state=directory
       when: not output.failed
 
-    - local_action: copy content={{ output.stdout }} dest=/usr/share/ceph-ansible/host_vars/{{ inventory_hostname }}.yml
+    - name: Check that inventory file exists
+      local_action: stat path=/usr/share/ceph-ansible/host_vars/{{ inventory_hostname }}.yml
+      register: stat_result
       when: not output.failed
+
+    - name: Create inventory file if it does not exist
+      local_action: file path=/usr/share/ceph-ansible/host_vars/{{ inventory_hostname }}.yml state=touch
+      when: not output.failed and not stat_result.stat.exists
+
+    - name: Append osd-vars output to host inventory files 
+      local_action: blockinfile dest=/usr/share/ceph-ansible/host_vars/{{ inventory_hostname }}.yml block={{ output.stdout }} marker="# {mark} **********  generate-osd-vars.sh output **********"
+      when: not output.failed
+    
+    - name: Check for existance of host inventory files for cockpit-ceph-deploy 
+      local_action: stat path=/usr/share/cockpit/ceph-deploy/ceph-ansible-files/{{ inventory_hostname }}.yml
+      register: stat_cockpit_ceph_deploy_inventory
+      when: not output.failed
+
+    - name: Add in cockpit-ceph-deploy defined variables to host inventory files
+      local_action: blockinfile dest=/usr/share/ceph-ansible/host_vars/{{ inventory_hostname }}.yml block={{ lookup('file','/usr/share/cockpit/ceph-deploy/ceph-ansible-files/{{ inventory_hostname }}.yml') }} marker="# {mark} **********  cockpit-ceph-deploy make_hosts output **********"
+      when: not output.failed and stat_cockpit_ceph_deploy_inventory.stat.exists
