@@ -60,30 +60,30 @@ active_directory_info:
 
 # Samba Share (SMB) Definitions
 # Path is relative to cephfs root
-configure_shares: true
-enable_windows_acl: true
-samba_shares:
-  - name: 'public'
-    path: '/fsgw/public'
-    type: 'vfs'
-    windows_acl: false
-    writeable: 'yes'
-    guest_ok: 'yes'
-    comment: "public rw access"
-    ceph_snapshots: true
-    worm: false
-    worm_grace_period: 300
+#configure_shares: true
+#enable_windows_acl: true
+#samba_shares:
+#  - name: 'public'
+#    path: '/fsgw/public'
+#    type: 'vfs'
+#    windows_acl: false
+#    writeable: 'yes'
+#    guest_ok: 'yes'
+#    comment: "public rw access"
+#    ceph_snapshots: true
+#    worm: false
+#    worm_grace_period: 300
 
-  - name: 'secure'
-    path: '/fsgw/secure'
-    type: 'kernel'
-    windows_acl: true    
-    writeable: 'yes'
-    guest_ok: 'no'
-    comment: "secure rw access"
-    ceph_snapshots: true
-    worm: false
-    worm_grace_period: 300
+#  - name: 'secure'
+#    path: '/fsgw/secure'
+#    type: 'kernel'
+#    windows_acl: true    
+#    writeable: 'yes'
+#    guest_ok: 'no'
+#    comment: "secure rw access"
+#    ceph_snapshots: true
+#    worm: false
+#    worm_grace_period: 300
 
 ## Samba Cluster (CTDB) Settings
 ctdb_public_addresses:

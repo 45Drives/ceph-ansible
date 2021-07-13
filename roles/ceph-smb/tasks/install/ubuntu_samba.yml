@@ -24,6 +24,7 @@
         - oddjob
         - oddjob-mkhomedir
         state: "present"
+        force: true
       register: result
       until: result is succeeded
 
