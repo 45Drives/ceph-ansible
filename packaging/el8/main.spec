@@ -28,5 +28,7 @@ make DESTDIR=%{buildroot} install
 /usr/share/ceph-ansible/*
 
 %changelog
+* Fri Jul 16 2021 Brett Kelly <bkelly@45drives.com> 5.2.0-1
+- Finalize auto-packaging.
 * Fri Jul 16 2021 Dawson Della Valle <ddellavalle@45drives.com> 0.0.0-1
 - First auto-package for ubuntu & rhel.
