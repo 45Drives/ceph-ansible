@@ -26,3 +26,5 @@ make DESTDIR=%{buildroot} install
 /usr/share/cockpit/package-name/*
 
 %changelog
+* Fri Jul 16 2021 Dawson Della Valle <ddellavalle@45drives.com> 0.0.0-1
+- First auto-package for ubuntu & rhel.

@@ -1,0 +1,5 @@
+ceph-ansible-45d (0.0.0-1focal) focal; urgency=medium
+
+  * First auto-package for ubuntu & rhel.
+
+ -- Dawson Della Valle <ddellavalle@45drives.com>  Fri, 16 Jul 2021 12:09:57 -0300
