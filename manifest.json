@@ -1,0 +1,55 @@
+{
+    "__version": "45D-R1",
+    "name": "ceph-ansible-45d",
+    "title": "Ceph Ansible",
+    "prerelease": true,
+    "version": "0.0.0",
+    "buildVersion": "1",
+    "author": "Brett Kelly <bkelly@45drives.com>",
+    "url": "https://github.com/45Drives/ceph-ansible",
+    "category": "utils",
+    "priority": "optional",
+    "licence": "GPL-3.0+",
+    "architecture": {
+        "deb": "all",
+        "el": "noarch"
+    },
+    "description": {
+        "long": "Ansible playbooks to deploy Ceph with 45Drives-specific changes.",
+        "short": "Ansible playbooks to deploy Ceph with 45Drives-specific changes."
+    },
+    "defaults": {
+        "urgency": "medium"
+    },
+    "dependencies": {
+        "deb": [
+            "ansible",
+            "python3"
+        ],
+        "el": [
+            "ansible",
+            "python3"
+        ]
+    },
+    "releases": [
+        {
+            "image": "ubuntu-focal-builder",
+            "codeName": "focal",
+            "type": "deb"
+        },
+        {
+            "image": "rocky-el8-builder",
+            "codeName": "el8",
+            "type": "el"
+        }
+    ],
+    "changelog": {
+        "urgency": "medium",
+        "version": "0.0.0",
+        "buildVersion": "1",
+        "ignore": [],
+        "date": null,
+        "packager": "Brett Kelly <bkelly@45drives.com>",
+        "changes": []
+    }
+}
