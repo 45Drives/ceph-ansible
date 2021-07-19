@@ -1,3 +1,3 @@
-## Ceph Ansible 5.2.0-1
+## Ceph Ansible 5.2.0-2
 
-* Finalize auto-packaging
+* modified remove-vg.yml playbook

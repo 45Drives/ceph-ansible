@@ -6,6 +6,7 @@
       args:
         executable: /bin/bash
       register: ceph_online
+      ignore_errors: yes
 
     - name: remove ceph volume groups
       raw: for i in `vgs | grep ceph | awk '{print $1}'`;do vgremove $i -f ; done

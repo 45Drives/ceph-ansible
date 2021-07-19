@@ -1,3 +1,9 @@
+ceph-ansible-45d (5.2.0-2focal) focal; urgency=medium
+
+  * modified remove-vg.yml playbook
+
+ -- Mark Hooper <mhooper@45drives.com>  Mon, 19 Jul 2021 08:09:22 -0300
+
 ceph-ansible-45d (5.2.0-1focal) focal; urgency=medium
 
   * Finalize auto-packaging.
