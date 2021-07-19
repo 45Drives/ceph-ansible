@@ -28,6 +28,8 @@ make DESTDIR=%{buildroot} install
 /usr/share/ceph-ansible/*
 
 %changelog
+* Mon Jul 19 2021 Mark Hooper <mhooper@45drives.com> 5.2.0-3
+- modified remove-vg.yml playbook
 * Mon Jul 19 2021 Mark Hooper <mhooper@45drives.com> 5.2.0-2
 - modified remove-vg.yml playbook
 * Fri Jul 16 2021 Dawson Della Valle <ddellavalle@45drives.com> 5.2.0-1
