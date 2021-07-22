@@ -1,0 +1,20 @@
+---
+- name: Configure Repository Rocky 8
+  block:
+    - name: dnf-clean-all
+      command: dnf clean all
+      args:
+        warn: no
+
+    - name: Configure 45drives YUM repository
+      get_url:
+        url: 'http://images.45drives.com/repo/centos/45drives-centos.repo'
+        dest: /etc/yum.repos.d/45drives-centos.repo
+        mode: '0644'
+
+- name: Install Extra Dependencies in Rocky 8
+  yum:
+    name: "{{ rocky_install_pkgs }}"
+    state: latest
+  register: result
+  until: result is succeeded
