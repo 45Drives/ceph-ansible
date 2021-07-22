@@ -6,6 +6,9 @@ centos_install_pkgs:
   - "45drives-tools"
   - "python36-six"
   - "python36-PyYAML"
+  
+rocky_install_pkgs:
+  - "45drives-tools"
 
 ubuntu_cleanup_pkgs:
   - "zfs-dkms"
@@ -20,5 +23,9 @@ centos_cleanup_pkgs:
   - "cockpit-zfs-manager"
   - "cockpit-machines"
 
+rocky_cleanup_pkgs:
+  - "zfs"
+  - "cockpit-zfs-manager"
+  - "cockpit-machines"
 
 
