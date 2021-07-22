@@ -1,3 +1,4 @@
-## Ceph Ansible 5.2.0-3
+## Ceph Ansible 5.2.1-1
 
-* modified remove-vg.yml playbook
+* rework prerun role to use new repo
+* rework prerun role to support rocky 8

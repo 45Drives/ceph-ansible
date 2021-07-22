@@ -28,6 +28,9 @@ make DESTDIR=%{buildroot} install
 /usr/share/ceph-ansible/*
 
 %changelog
+* Thu Jul 22 2021 Brett Kelly <bkelly@45drives.com> 5.2.1-1
+- rework prerun role to use new repo
+- rework prerun role to support rocky 8
 * Mon Jul 19 2021 Mark Hooper <mhooper@45drives.com> 5.2.0-3
 - modified remove-vg.yml playbook
 * Mon Jul 19 2021 Mark Hooper <mhooper@45drives.com> 5.2.0-2
