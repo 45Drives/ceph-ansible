@@ -1,4 +1,3 @@
-## Ceph Ansible 5.2.1-1
+## Ceph Ansible 5.2.1-2
 
-* rework prerun role to use new repo
-* rework prerun role to support rocky 8
+* modified generate-osd-vars.yml to ignore ceph-deploy host_vars files
