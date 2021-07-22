@@ -1,17 +1,4 @@
 ---
-- name: Configure Repository CentOS 7
-  block:
-    - name: yum-clean-all
-      command: yum clean all
-      args:
-        warn: no
-
-    - name: Configure 45drives YUM repository
-      get_url:
-        url: 'http://images.45drives.com/repo/centos/45drives-centos.repo'
-        dest: /etc/yum.repos.d/45drives-centos.repo
-        mode: '0644'
-
 - name: Install Extra Dependencies in CentOS7
   yum:
     name: "{{ centos_install_pkgs }}"
