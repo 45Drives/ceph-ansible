@@ -4,14 +4,13 @@
     url: https://repo.45drives.com/setup
     dest: /tmp/setup
 
+- name: Configure 45Drives repository | Run repo setup script
+  shell: bash /tmp/setup
+
 - name: Configure 45Drives repository | Remove repo setup script
   file:
     path: /tmp/setup
     state: absent
-
-- name: Configure 45Drives repository | Run repo setup script
-  shell: /tmp/setup
-  executable: /bin/bash
 
 - name: include_tasks cleanup/cleanup_on_ubuntu.yml
   include_tasks: cleanup/cleanup_on_ubuntu.yml
