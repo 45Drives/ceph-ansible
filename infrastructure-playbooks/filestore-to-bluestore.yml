@@ -36,7 +36,7 @@
     - name: set_fact container_run_cmd, container_exec_cmd
       set_fact:
         container_run_cmd: "{{ container_binary + ' run --rm --privileged=true --net=host --pid=host --ipc=host -v /dev:/dev -v /etc/ceph:/etc/ceph -v /var/lib/ceph:/var/lib/ceph -v /var/run:/var/run --entrypoint=' if containerized_deployment | bool else '' }}ceph-volume {{ ceph_docker_registry + '/' + ceph_docker_image + ':' + ceph_docker_image_tag if containerized_deployment | bool else '' }}"
-        container_exec_cmd: "{{ container_binary + ' exec ceph-mon-' + hostvars[groups[mon_group_name][0]]['ansible_hostname'] if containerized_deployment | bool else '' }}"
+        container_exec_cmd: "{{ container_binary + ' exec ceph-mon-' + hostvars[groups[mon_group_name][0]]['ansible_facts']['hostname'] if containerized_deployment | bool else '' }}"
 
     - name: get ceph osd tree data
       command: "{{ container_exec_cmd }} ceph --cluster {{ cluster }} osd tree -f json"
@@ -67,12 +67,6 @@
     - name: set_fact skip_this_node
       set_fact:
         skip_this_node: "{{ ('filestore' in _osd_objectstore and 'bluestore' in _osd_objectstore and not force_filestore_to_bluestore | default(False)) or ('filestore' not in _osd_objectstore) }}"
-
-    - name: add node to skipped node list
-      set_fact:
-        skipped_nodes: "{{ skipped_nodes | default([]) | union([inventory_hostname]) }}"
-      when:
-        - skip_this_node | bool
 
     - name: filestore to bluestore migration workflow
       when: not skip_this_node | bool
@@ -316,7 +310,7 @@
           set_fact:
             osd_ids: "{{ osd_ids | default([]) + [item] }}"
           with_items:
-            - "{{ ((osd_tree.stdout | default('{}') | from_json).nodes | selectattr('name', 'match', inventory_hostname) | map(attribute='children') | list) }}"
+            - "{{ ((osd_tree.stdout | default('{}') | from_json).nodes | selectattr('name', 'match', '^' + inventory_hostname + '$') | map(attribute='children') | list) }}"
 
         - name: purge osd(s) from the cluster
           command: >
@@ -382,14 +376,19 @@
         - import_role:
             name: ceph-osd
 
+- name: final play
+  hosts: "{{ osd_group_name }}"
+  become: true
+  gather_facts: false
+  tasks:
+
+    - import_role:
+        name: ceph-defaults
     - name: report any skipped node during this playbook
       debug:
         msg: |
           "WARNING:"
-          "The following nodes were skipped because OSDs are either"
-          "all bluestore ones or there's a mix of filestore and bluestore OSDs"
-
-          "{{ ' '.join(skipped_nodes) }}"
+          "This node has been skipped because OSDs are either"
+          "all bluestore or there's a mix of filestore and bluestore OSDs"
       when:
-        - inventory_hostname == ansible_play_hosts_all | last
-        - skipped_nodes is defined
+        - skip_this_node | bool

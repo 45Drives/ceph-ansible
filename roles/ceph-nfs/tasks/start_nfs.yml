@@ -21,7 +21,7 @@
     owner: root
     group: root
     mode: 0644
-###### GENERATE CONF
+###### 
 
 ###### CREATE GRACE DB
 - name: check if rados rados grace db object exists
@@ -41,7 +41,28 @@
     - ceph_nfs_rados_backend | bool
     - ceph_nfs_rados_backend_driver == 'rados_cluster'
     - rados_grace_exists.rc != 0
-######## CREATE GRACE DB
+######## 
+
+- name: generate ganesha idmap.conf file
+  action: config_template
+  args:
+    src: "idmap.conf.j2"
+    dest: "{{ ceph_nfs_idmap_conf }}"
+    owner: "root"
+    group: "root"
+    mode: "0644"
+    config_overrides: "{{ idmap_conf_overrides }}"
+    config_type: ini
+  notify: restart ceph nfss
+
+- name: create exports directory
+  file:
+    path: /etc/ganesha/export.d
+    state: directory
+    owner: "root"
+    group: "root"
+    mode: "0755"
+  when: ceph_nfs_dynamic_exports | bool
 
 ##### CREATE EXPORT INDEX OBJECTS
 - name: check if rados export index object exists
@@ -78,7 +99,7 @@
 
 - name: systemd start nfs container
   systemd:
-    name: ceph-nfs@{{ ceph_nfs_service_suffix | default(ansible_hostname) }}
+    name: ceph-nfs@{{ ceph_nfs_service_suffix | default(ansible_facts['hostname']) }}
     state: started
     enabled: yes
     masked: no

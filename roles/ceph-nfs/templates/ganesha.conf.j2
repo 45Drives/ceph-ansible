@@ -41,7 +41,12 @@ RADOS_URLS {
 }
 {% if ceph_nfs_rados_backend_driver is defined %}
 NFSv4 {
+<<<<<<< HEAD
         RecoveryBackend = '{{ ceph_nfs_rados_backend_driver }}';
+=======
+	RecoveryBackend = 'rados_kv';
+	IdmapConf = "{{ ceph_nfs_idmap_conf }}";
+>>>>>>> v5.0.8
 }
 {% else %}
 NFSv4 {

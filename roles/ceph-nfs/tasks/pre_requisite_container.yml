@@ -3,7 +3,7 @@
   block:
     - name: set_fact container_exec_cmd
       set_fact:
-        container_exec_cmd: "{{ container_binary }} exec ceph-mon-{{ hostvars[item]['ansible_hostname'] }}"
+        container_exec_cmd: "{{ container_binary }} exec ceph-mon-{{ hostvars[item]['ansible_facts']['hostname'] }}"
       with_items: "{{ groups.get(mon_group_name, []) }}"
       delegate_to: "{{ item }}"
       delegate_facts: true
@@ -13,7 +13,7 @@
       command: "{{ hostvars[groups.get(mon_group_name)[0]]['container_exec_cmd'] }} ceph --cluster {{ cluster }} auth get {{ item.name }}"
       register: _rgw_keys
       with_items:
-        - { name: "client.bootstrap-rgw", path: "/var/lib/ceph/bootstrap-rgw/{{ cluster }}.keyring", copy_key: true }
+        - { name: "client.bootstrap-rgw", path: "/var/lib/ceph/bootstrap-rgw/{{ cluster }}.keyring", copy_key: "{{ nfs_obj_gw }}" }
         - { name: "client.admin", path: "/etc/ceph/{{ cluster }}.client.admin.keyring", copy_key: "{{ copy_admin_key }}" }
       delegate_to: "{{ groups.get(mon_group_name)[0] }}"
       run_once: true
@@ -32,5 +32,25 @@
       when:
         - cephx | bool
         - item.item.copy_key | bool
+      no_log: true
   when: groups.get(mon_group_name, []) | length > 0
 
+- name: dbus related tasks
+  block:
+    - name: get file
+      command: "{{ container_binary }} run --rm --entrypoint=cat {{ ceph_docker_registry + '/' + ceph_docker_image + ':' + ceph_docker_image_tag }} /etc/dbus-1/system.d/org.ganesha.nfsd.conf"
+      register: dbus_ganesha_file
+      run_once: true
+      changed_when: false
+
+    - name: create dbus service file
+      copy:
+        content: "{{ dbus_ganesha_file.stdout }}"
+        dest: /etc/dbus-1/system.d/org.ganesha.nfsd.conf
+        owner: "root"
+        group: "root"
+        mode: "0644"
+
+    - name: reload dbus configuration
+      command: "killall -SIGHUP dbus-daemon"
+  when: ceph_nfs_dynamic_exports | bool

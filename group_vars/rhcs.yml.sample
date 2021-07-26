@@ -84,7 +84,7 @@ dummy:
 
 #centos_package_dependencies:
 #  - epel-release
-#  - "{{ 'python3-libselinux' if ansible_distribution_major_version | int >= 8 else 'libselinux-python' }}"
+#  - "{{ (ansible_facts['distribution_major_version'] is version('8', '>=')) | ternary('python3-libselinux', 'libselinux-python') }}"
 
 #redhat_package_dependencies: []
 
@@ -154,7 +154,7 @@ ceph_repository: rhcs
 # Use the option below to specify your applicable package tree, eg. when using non-LTS Ubuntu versions
 # # for a list of available Debian distributions, visit http://download.ceph.com/debian-{{ ceph_stable_release }}/dists/
 # for more info read: https://github.com/ceph/ceph-ansible/issues/305
-#ceph_stable_distro_source: "{{ ansible_distribution_release }}"
+#ceph_stable_distro_source: "{{ ansible_facts['distribution_release'] }}"
 
 
 # REPOSITORY: RHCS VERSION RED HAT STORAGE (from 5.0)
@@ -182,7 +182,7 @@ ceph_rhcs_version: 5
 #
 #ceph_stable_repo_uca: "http://ubuntu-cloud.archive.canonical.com/ubuntu"
 #ceph_stable_openstack_release_uca: queens
-#ceph_stable_release_uca: "{{ ansible_distribution_release }}-updates/{{ ceph_stable_openstack_release_uca }}"
+#ceph_stable_release_uca: "{{ ansible_facts['distribution_release'] }}-updates/{{ ceph_stable_openstack_release_uca }}"
 
 # REPOSITORY: openSUSE OBS
 #
@@ -192,7 +192,7 @@ ceph_rhcs_version: 5
 # usually has newer Ceph releases than the normal distro repository.
 #
 #
-#ceph_obs_repo: "https://download.opensuse.org/repositories/filesystems:/ceph:/{{ ceph_stable_release }}/openSUSE_Leap_{{ ansible_distribution_version }}/"
+#ceph_obs_repo: "https://download.opensuse.org/repositories/filesystems:/ceph:/{{ ceph_stable_release }}/openSUSE_Leap_{{ ansible_facts['distribution_version'] }}/"
 
 # REPOSITORY: DEV
 #
@@ -255,7 +255,7 @@ ceph_iscsi_config_dev: false
 
 #ceph_conf_key_directory: /etc/ceph
 
-#ceph_uid: "{{ '64045' if not containerized_deployment | bool and ansible_os_family == 'Debian' else '167' }}"
+#ceph_uid: "{{ '64045' if not containerized_deployment | bool and ansible_facts['os_family'] == 'Debian' else '167' }}"
 
 # Permissions for keyring files in /etc/ceph
 #ceph_keyring_permissions: '0600'
@@ -355,6 +355,7 @@ ceph_iscsi_config_dev: false
 
 ## OSD options
 #
+#lvmetad_disabled: false
 #is_hci: false
 #hci_safety_factor: 0.2
 #non_hci_safety_factor: 0.7
@@ -538,7 +539,7 @@ ceph_iscsi_config_dev: false
 #   global:
 #     foo: 1234
 #     bar: 5678
-#   "client.rgw.{{ hostvars[groups.get(rgw_group_name)[0]]['ansible_hostname'] }}":
+#   "client.rgw.{{ hostvars[groups.get(rgw_group_name)[0]]['ansible_facts']['hostname'] }}":
 #     rgw_zone: zone1
 #
 #ceph_conf_overrides: {}
@@ -558,7 +559,7 @@ ceph_iscsi_config_dev: false
 # For Debian & Red Hat/CentOS installs set TCMALLOC_MAX_TOTAL_THREAD_CACHE_BYTES
 # Set this to a byte value (e.g. 134217728)
 # A value of 0 will leave the package default.
-#ceph_tcmalloc_max_total_thread_cache: 0
+#ceph_tcmalloc_max_total_thread_cache: 134217728
 
 
 ##########
@@ -663,6 +664,8 @@ ceph_docker_registry_auth: true
 # then we will autogenerate a cert and keyfile
 #dashboard_protocol: https
 #dashboard_port: 8443
+# set this variable to the network you want the dashboard to listen on. (Default to public_network)
+#dashboard_network: "{{ public_network }}"
 #dashboard_admin_user: admin
 #dashboard_admin_user_ro: false
 # This variable must be set with a strong custom password when dashboard_enabled is True
@@ -670,12 +673,15 @@ ceph_docker_registry_auth: true
 # We only need this for SSL (https) connections
 #dashboard_crt: ''
 #dashboard_key: ''
+#dashboard_certificate_cn: ceph-dashboard
 #dashboard_tls_external: false
 #dashboard_grafana_api_no_ssl_verify: "{{ true if dashboard_protocol == 'https' and not grafana_crt and not grafana_key else false }}"
 #dashboard_rgw_api_user_id: ceph-dashboard
 #dashboard_rgw_api_admin_resource: ''
 #dashboard_rgw_api_no_ssl_verify: False
 #dashboard_frontend_vip: ''
+#prometheus_frontend_vip: ''
+#alertmanager_frontend_vip: ''
 node_exporter_container_image: registry.redhat.io/openshift4/ose-prometheus-node-exporter:v4.6
 #node_exporter_port: 9100
 #grafana_admin_user: admin
@@ -723,6 +729,9 @@ prometheus_container_image: registry.redhat.io/openshift4/ose-prometheus:v4.6
 #prometheus_user_id: '65534'  # This is the UID used by the prom/prometheus container image
 #prometheus_port: 9092
 #prometheus_conf_overrides: {}
+# Uncomment out this variable if you need to customize the retention period for prometheus storage.
+# set it to '30d' if you want to retain 30 days of data.
+#prometheus_storage_tsdb_retention_time: 15d
 alertmanager_container_image: registry.redhat.io/openshift4/ose-prometheus-alertmanager:v4.6
 #alertmanager_container_cpu_period: 100000
 #alertmanager_container_cpu_cores: 2
@@ -733,6 +742,16 @@ alertmanager_container_image: registry.redhat.io/openshift4/ose-prometheus-alert
 #alertmanager_port: 9093
 #alertmanager_cluster_port: 9094
 #alertmanager_conf_overrides: {}
+# igw
+#
+# `igw_network` variable is intended for allowing dashboard deployment with iSCSI node not residing in the same subnet than what is defined in `public_network`.
+# For example:
+# If the ceph public network is 2a00:8a60:1:c301::/64 and the iSCSI Gateway resides
+# at a dedicated gateway network (2a00:8a60:1:c300::/64) (With routing between those networks).
+# It means "{{ hostvars[item]['ansible_facts']['all_ipv4_addresses'] | ips_in_ranges(public_network.split(',')) | last | ipwrap }}" will be empty.
+# As a consequence, this prevent from deploying dashboard with iSCSI node when it reside in a subnet different than `public_network`.
+# Using `igw_network` make it possible, set it with the subnet used by your iSCSI node.
+#igw_network: "{{ public_network }}"
 
 
 ##################################
@@ -809,3 +828,4 @@ alertmanager_container_image: registry.redhat.io/openshift4/ose-prometheus-alert
 #container_exec_cmd:
 #docker: false
 #ceph_volume_debug: "{{ enable_ceph_volume_debug | ternary(1, 0)  }}"
+

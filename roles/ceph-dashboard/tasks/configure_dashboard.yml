@@ -1,12 +1,22 @@
 ---
 - name: set_fact container_exec_cmd
   set_fact:
-    container_exec_cmd: "{{ container_binary }} exec ceph-mon-{{ hostvars[groups[mon_group_name][0]]['ansible_hostname'] }}"
+    container_exec_cmd: "{{ container_binary }} exec ceph-mon-{{ hostvars[groups[mon_group_name][0]]['ansible_facts']['hostname'] }}"
   when: containerized_deployment | bool
 
 - name: set_fact container_run_cmd
   set_fact:
     ceph_cmd: "{{ hostvars[groups[mon_group_name][0]]['container_binary'] + ' run --interactive --net=host --rm -v /etc/ceph:/etc/ceph:z --entrypoint=ceph ' + ceph_docker_registry + '/' + ceph_docker_image + ':' + ceph_docker_image_tag if containerized_deployment | bool else 'ceph' }}"
+
+- name: get current mgr backend - ipv4
+  set_fact:
+    dashboard_server_addr: "{{ ansible_facts['all_ipv4_addresses'] | ips_in_ranges(dashboard_network.split(',')) | first }}"
+  when: ip_version == 'ipv4'
+
+- name: get current mgr backend - ipv6
+  set_fact:
+    dashboard_server_addr: "{{ ansible_facts['all_ipv6_addresses'] | ips_in_ranges(dashboard_network.split(',')) | last }}"
+  when: ip_version == 'ipv6'
 
 - name: disable SSL for dashboard
   when: dashboard_protocol == "http"
@@ -55,10 +65,19 @@
     - name: generate and copy self-signed certificate
       when: dashboard_key | length == 0 or dashboard_crt | length == 0
       block:
+        - name: set_fact subj_alt_names
+          set_fact:
+            subj_alt_names: >
+              {% for host in groups[mgr_group_name] | default(groups[mon_group_name]) -%}
+              subjectAltName={{ hostvars[host]['ansible_facts']['hostname'] }}/subjectAltName={{ hostvars[host]['dashboard_server_addr'] }}/subjectAltName={{ hostvars[host]['ansible_facts']['fqdn'] }}
+              {%- if loop.last %}/{% endif %}
+              {%- endfor -%}
+          run_once: true
+
         - name: generate a Self Signed OpenSSL certificate for dashboard
           shell: |
             test -f /etc/ceph/ceph-dashboard.key -a -f /etc/ceph/ceph-dashboard.crt || \
-            openssl req -new -nodes -x509 -subj '/O=IT/CN=ceph-dashboard' -days 3650 -keyout /etc/ceph/ceph-dashboard.key -out /etc/ceph/ceph-dashboard.crt -extensions v3_ca
+            openssl req -new -nodes -x509 -subj '/O=IT/CN={{ dashboard_certificate_cn }}/{{ subj_alt_names | trim }}' -days 3650 -keyout /etc/ceph/ceph-dashboard.key -out /etc/ceph/ceph-dashboard.crt -extensions v3_ca
           run_once: True
 
         - name: slurp self-signed generated certificate for dashboard
@@ -108,10 +127,12 @@
   changed_when: false
   failed_when: false # Do not fail if the option does not exist, it only exists post-14.2.0
 
-- include_tasks: configure_dashboard_backends.yml
+- name: config the current dashboard backend
+  command: "{{ container_exec_cmd }} ceph --cluster {{ cluster }} config set mgr mgr/dashboard/{{ hostvars[item]['ansible_facts']['hostname'] }}/server_addr {{ hostvars[item]['dashboard_server_addr'] }}"
+  delegate_to: "{{ groups[mon_group_name][0] }}"
+  changed_when: false
+  run_once: true
   with_items: '{{ groups[mgr_group_name] | default(groups[mon_group_name]) }}'
-  vars:
-    dashboard_backend: '{{ item }}'
 
 - name: disable mgr dashboard module (restart)
   command: "{{ container_exec_cmd }} ceph --cluster {{ cluster }} mgr module disable dashboard"
@@ -200,12 +221,26 @@
   vars:
     grafana_server_addr: '{{ item }}'
 
-- name: config grafana api url vip
-  command: "{{ container_exec_cmd }} ceph --cluster {{ cluster }} dashboard set-grafana-api-url {{ dashboard_protocol }}://{{ dashboard_frontend_vip }}:{{ grafana_port }}"
-  delegate_to: "{{ groups[mon_group_name][0] }}"
+- name: config monitoring api url vip
   run_once: true
-  changed_when: false
-  when: dashboard_frontend_vip is defined and dashboard_frontend_vip |length > 0
+  block:
+    - name: config grafana api url vip
+      command: "{{ container_exec_cmd }} ceph --cluster {{ cluster }} dashboard set-grafana-api-url {{ dashboard_protocol }}://{{ dashboard_frontend_vip }}:{{ grafana_port }}"
+      delegate_to: "{{ groups[mon_group_name][0] }}"
+      changed_when: false
+      when: dashboard_frontend_vip is defined and dashboard_frontend_vip | length > 0
+
+    - name: config alertmanager api url
+      command: "{{ container_exec_cmd }} ceph --cluster {{ cluster }} dashboard set-alertmanager-api-host {{ dashboard_protocol }}://{{ alertmanager_frontend_vip }}:{{ alertmanager_port }}"
+      delegate_to: "{{ groups[mon_group_name][0] }}"
+      changed_when: false
+      when: alertmanager_frontend_vip is defined and alertmanager_frontend_vip | length > 0
+
+    - name: config prometheus api url
+      command: "{{ container_exec_cmd }} ceph --cluster {{ cluster }} dashboard set-prometheus-api-host {{ dashboard_protocol }}://{{ prometheus_frontend_vip }}:{{ prometheus_port }}"
+      delegate_to: "{{ groups[mon_group_name][0] }}"
+      changed_when: false
+      when: prometheus_frontend_vip is defined and prometheus_frontend_vip | length > 0
 
 - name: dashboard nfs gateway management frontend
   run_once: true
@@ -317,7 +352,7 @@
     - name: add iscsi gateways - ipv4
       command: "{{ ceph_cmd }} --cluster {{ cluster }} dashboard iscsi-gateway-add -i -"
       args:
-        stdin: "{{ 'https' if hostvars[item]['api_secure'] | default(false) | bool else 'http' }}://{{ hostvars[item]['api_user'] | default('admin') }}:{{ hostvars[item]['api_password'] | default('admin') }}@{{ hostvars[item]['ansible_all_ipv4_addresses'] | ips_in_ranges(public_network.split(',')) | first }}:{{ hostvars[item]['api_port'] | default(5000) }}"
+        stdin: "{{ 'https' if hostvars[item]['api_secure'] | default(false) | bool else 'http' }}://{{ hostvars[item]['api_user'] | default('admin') }}:{{ hostvars[item]['api_password'] | default('admin') }}@{{ hostvars[item]['ansible_facts']['all_ipv4_addresses'] | ips_in_ranges(igw_network.split(',')) | first }}:{{ hostvars[item]['api_port'] | default(5000) }}"
         stdin_add_newline: no
       changed_when: false
       delegate_to: "{{ groups[mon_group_name][0] }}"
@@ -327,7 +362,7 @@
         - dashboard_password_from_stdin | bool
 
     - name: add iscsi gateways - ipv4 (legacy)
-      command: "{{ container_exec_cmd }} ceph --cluster {{ cluster }} dashboard iscsi-gateway-add {{ 'https' if hostvars[item]['api_secure'] | default(false) | bool else 'http' }}://{{ hostvars[item]['api_user'] | default('admin') }}:{{ hostvars[item]['api_password'] | default('admin') }}@{{ hostvars[item]['ansible_all_ipv4_addresses'] | ips_in_ranges(public_network.split(',')) | first }}:{{ hostvars[item]['api_port'] | default(5000) }}"
+      command: "{{ container_exec_cmd }} ceph --cluster {{ cluster }} dashboard iscsi-gateway-add {{ 'https' if hostvars[item]['api_secure'] | default(false) | bool else 'http' }}://{{ hostvars[item]['api_user'] | default('admin') }}:{{ hostvars[item]['api_password'] | default('admin') }}@{{ hostvars[item]['ansible_facts']['all_ipv4_addresses'] | ips_in_ranges(public_network.split(',')) | first }}:{{ hostvars[item]['api_port'] | default(5000) }}"
       changed_when: false
       delegate_to: "{{ groups[mon_group_name][0] }}"
       with_items: "{{ groups[iscsi_gw_group_name] }}"
@@ -338,7 +373,7 @@
     - name: add iscsi gateways - ipv6
       command: "{{ ceph_cmd }} --cluster {{ cluster }} dashboard iscsi-gateway-add -i -"
       args:
-        stdin: "{{ 'https' if hostvars[item]['api_secure'] | default(false) | bool else 'http' }}://{{ hostvars[item]['api_user'] | default('admin') }}:{{ hostvars[item]['api_password'] | default('admin') }}@{{ hostvars[item]['ansible_all_ipv6_addresses'] | ips_in_ranges(public_network.split(',')) | last | ipwrap }}:{{ hostvars[item]['api_port'] | default(5000) }}"
+        stdin: "{{ 'https' if hostvars[item]['api_secure'] | default(false) | bool else 'http' }}://{{ hostvars[item]['api_user'] | default('admin') }}:{{ hostvars[item]['api_password'] | default('admin') }}@{{ hostvars[item]['ansible_facts']['all_ipv6_addresses'] | ips_in_ranges(igw_network.split(',')) | last | ipwrap }}:{{ hostvars[item]['api_port'] | default(5000) }}"
         stdin_add_newline: no
       changed_when: false
       delegate_to: "{{ groups[mon_group_name][0] }}"
@@ -348,7 +383,7 @@
         - dashboard_password_from_stdin | bool
 
     - name: add iscsi gateways - ipv6 (legacy)
-      command: "{{ container_exec_cmd }} ceph --cluster {{ cluster }} dashboard iscsi-gateway-add {{ 'https' if hostvars[item]['api_secure'] | default(false) | bool else 'http' }}://{{ hostvars[item]['api_user'] | default('admin') }}:{{ hostvars[item]['api_password'] | default('admin') }}@{{ hostvars[item]['ansible_all_ipv6_addresses'] | ips_in_ranges(public_network.split(',')) | last | ipwrap }}:{{ hostvars[item]['api_port'] | default(5000) }}"
+      command: "{{ container_exec_cmd }} ceph --cluster {{ cluster }} dashboard iscsi-gateway-add {{ 'https' if hostvars[item]['api_secure'] | default(false) | bool else 'http' }}://{{ hostvars[item]['api_user'] | default('admin') }}:{{ hostvars[item]['api_password'] | default('admin') }}@{{ hostvars[item]['ansible_facts']['all_ipv6_addresses'] | ips_in_ranges(public_network.split(',')) | last | ipwrap }}:{{ hostvars[item]['api_port'] | default(5000) }}"
       changed_when: false
       delegate_to: "{{ groups[mon_group_name][0] }}"
       with_items: "{{ groups[iscsi_gw_group_name] }}"

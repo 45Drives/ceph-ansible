@@ -53,6 +53,10 @@ options:
         description:
             - The OSD FSID
         required: false
+    osd_id:
+        description:
+            - The OSD ID
+        required: false
     journal:
         description:
             - The logical volume name or partition to use as a filestore journal.
@@ -477,11 +481,12 @@ def is_lv(module, vg, lv, container_image):
 
     rc, cmd, out, err = exec_command(module, cmd)
 
-    result = json.loads(out)['report'][0]['lv']
-    if rc == 0 and len(result) > 0:
-        return True
-    else:
-        return False
+    if rc == 0:
+        result = json.loads(out)['report'][0]['lv']
+        if len(result) > 0:
+            return True
+
+    return False
 
 
 def zap_devices(module, container_image):
@@ -502,6 +507,7 @@ def zap_devices(module, container_image):
     wal = module.params.get('wal', None)
     wal_vg = module.params.get('wal_vg', None)
     osd_fsid = module.params.get('osd_fsid', None)
+    osd_id = module.params.get('osd_id', None)
     destroy = module.params.get('destroy', True)
 
     # build the CLI
@@ -512,6 +518,9 @@ def zap_devices(module, container_image):
 
     if osd_fsid:
         cmd.extend(['--osd-fsid', osd_fsid])
+
+    if osd_id:
+        cmd.extend(['--osd-id', osd_id])
 
     if data:
         data = get_data(data, data_vg)
@@ -559,12 +568,19 @@ def run_module():
         wal_devices=dict(type='list', required=False, default=[]),
         report=dict(type='bool', required=False, default=False),
         osd_fsid=dict(type='str', required=False),
+        osd_id=dict(type='str', required=False),
         destroy=dict(type='bool', required=False, default=True),
     )
 
     module = AnsibleModule(
         argument_spec=module_args,
-        supports_check_mode=True
+        supports_check_mode=True,
+        mutually_exclusive=[
+            ('data', 'osd_fsid', 'osd_id'),
+        ],
+        required_if=[
+            ('action', 'zap', ('data', 'osd_fsid', 'osd_id'), True)
+        ]
     )
 
     result = dict(
@@ -647,7 +663,8 @@ def run_module():
 
         cmd = zap_devices(module, container_image)
 
-        if any(skip) or module.params.get('osd_fsid', None):
+        if any(skip) or module.params.get('osd_fsid', None) \
+                or module.params.get('osd_id', None):
             rc, cmd, out, err = exec_command(
                 module, cmd)
             for scan_cmd in ['vgscan', 'lvscan']:

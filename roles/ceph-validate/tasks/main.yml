@@ -90,7 +90,7 @@
       with_items: '{{ lvm_volumes }}'
 
 - name: debian based systems tasks
-  when: ansible_os_family == 'Debian'
+  when: ansible_facts['os_family'] == 'Debian'
   block:
     - name: fail if local scenario is enabled on debian
       fail:
@@ -108,7 +108,7 @@
 # - ceph_origin == 'distro'
 # - ceph_origin == 'repository' and ceph_repository == 'obs'
 - name: SUSE/openSUSE Leap based system tasks
-  when: ansible_os_family == 'Suse'
+  when: ansible_facts['os_family'] == 'Suse'
   block:
     - name: Check ceph_origin definition on SUSE/openSUSE Leap
       fail:
@@ -136,7 +136,7 @@
     msg: installation can't happen on Atomic and ntpd needs to be installed
   when:
     - is_atomic | default(False) | bool
-    - ansible_os_family in ['RedHat', 'Rocky']
+    - ansible_facts['os_family'] == 'RedHat'
     - ntp_daemon_type == 'ntpd'
 
 - name: make sure journal_size configured
@@ -152,7 +152,6 @@
   when:
     - osd_group_name in group_names
     - not osd_auto_discovery | default(False) | bool
-    - devices|default([])|length > 0
 
 - name: include check_eth_mon.yml
   include_tasks: check_eth_mon.yml
@@ -279,3 +278,18 @@
     - keys is defined
     - keys | length > 0
     - item.caps is not defined
+
+- name: check virtual_ips is defined
+  fail:
+    msg: "virtual_ips is not defined."
+  when:
+    - rgwloadbalancer_group_name in group_names
+    - groups[rgwloadbalancer_group_name] | length > 0
+    - virtual_ips is not defined
+
+- name: validate virtual_ips length
+  fail:
+    msg: "There are more virual_ips defined than rgwloadbalancer nodes"
+  when:
+    - rgwloadbalancer_group_name in group_names
+    - (virtual_ips | length) > (groups[rgwloadbalancer_group_name] | length)
