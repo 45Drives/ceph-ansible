@@ -1,3 +1,9 @@
+ceph-ansible-45d (5.2.1-3focal) focal; urgency=medium
+
+  * added an infractructure playbook to purge rgw and rgwloadbalancers
+
+ -- Mark Hooper <mhooper@45drives.com>  Mon, 26 Jul 2021 12:55:45 -0300
+
 ceph-ansible-45d (5.2.1-2focal) focal; urgency=medium
 
   * modified generate-osd-vars.yml to ignore ceph-deploy host_vars files

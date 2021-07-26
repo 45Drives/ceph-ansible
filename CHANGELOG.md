@@ -1,3 +1,3 @@
-## Ceph Ansible 5.2.1-2
+## Ceph Ansible 5.2.1-3
 
-* modified generate-osd-vars.yml to ignore ceph-deploy host_vars files
+* added an infractructure playbook to purge rgw and rgwloadbalancers

@@ -1,0 +1,86 @@
+---
+- name: confirm whether user really meant to purge the cluster
+  hosts: localhost
+  gather_facts: false
+
+  vars_prompt:
+    - name: ireallymeanit
+      prompt: Are you sure you want to purge rgw and rgwloadbalancers?
+      default: 'no'
+      private: no
+
+  tasks:
+  - name: exit playbook, if user did not mean to purge cluster
+    fail:
+      msg: >
+        "Exiting purge-cluster playbook, cluster was NOT purged.
+         To purge the cluster, either say 'yes' on the prompt or
+         or use `-e ireallymeanit=yes` on the command line when
+         invoking the playbook"
+    when: ireallymeanit != 'yes'
+
+- name: gather facts on all hosts
+
+  hosts:
+    - "{{ mon_group_name|default('mons') }}"
+    - "{{ osd_group_name|default('osds') }}"
+    - "{{ mds_group_name|default('mdss') }}"
+    - "{{ rgw_group_name|default('rgws') }}"
+    - "{{ rbdmirror_group_name|default('rbdmirrors') }}"
+    - "{{ nfs_group_name|default('nfss') }}"
+    - "{{ client_group_name|default('clients') }}"
+    - "{{ mgr_group_name|default('mgrs') }}"
+    - grafana-server
+
+  become: true
+
+  tasks:
+    - debug: msg="gather facts on all Ceph hosts for following reference"
+
+- name: purge rgwloadbalancer cluster
+
+  vars:
+    rgwloadbalancer_group_name: rgwloadbalancers
+
+  hosts:
+    - "{{ rgwloadbalancer_group_name|default('rgwloadbalancers') }}"
+
+  gather_facts: false # Already gathered previously
+
+  become: true
+
+  tasks:
+
+  - name: stop rgwloadbalancer services
+    service:
+      name: ['keepalived', 'haproxy']
+      state: stopped
+      enabled: no
+    failed_when: false
+
+- name: purge ceph rgw cluster
+
+  vars:
+    rgw_group_name: rgws
+
+  hosts: "{{ rgw_group_name|default('rgws') }}"
+
+  gather_facts: false # Already gathered previously
+
+  become: true
+
+  tasks:
+    - import_role:
+        name: ceph-defaults
+
+    - import_role:
+        name: ceph-facts
+        tasks_from: set_radosgw_address
+
+    - name: stop ceph rgws with systemd
+      service:
+        name: "ceph-radosgw@rgw.{{ ansible_hostname }}.{{ item.instance_name }}"
+        state: stopped
+        enabled: no
+      failed_when: false
+      with_items: "{{ rgw_instances }}"

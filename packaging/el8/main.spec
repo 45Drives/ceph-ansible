@@ -28,6 +28,8 @@ make DESTDIR=%{buildroot} install
 /usr/share/ceph-ansible/*
 
 %changelog
+* Mon Jul 26 2021 Mark Hooper <mhooper@45drives.com> 5.2.1-3
+- added an infractructure playbook to purge rgw and rgwloadbalancers
 * Thu Jul 22 2021 Mark Hooper <mhooper@45drives.com> 5.2.1-2
 - modified generate-osd-vars.yml to ignore ceph-deploy host_vars files
 * Thu Jul 22 2021 Brett Kelly <bkelly@45drives.com> 5.2.1-1
