@@ -2,10 +2,10 @@
 # Install packages
 - include: install/redhat_samba.yml
   when:
-    - ansible_facts['ansible_os_family'] == 'RedHat'
+    - ansible_facts['os_family'] == 'RedHat'
 
 - include: install/ubuntu_samba.yml
-  when: ansible_facts['ansible_distribution'] == 'Ubuntu'
+  when: ansible_facts['distribution'] == 'Ubuntu'
 
 - include: configure/cephfs_backend.yml
   when: 
