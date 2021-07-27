@@ -1,3 +1,3 @@
-## Ceph Ansible 5.2.1-3
+## Ceph Ansible 5.2.1-4
 
-* added an infractructure playbook to purge rgw and rgwloadbalancers
+* updated purge-rgw.yml to use apt purge to fix issue with haproxy and keepalived

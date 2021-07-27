@@ -84,3 +84,49 @@
         enabled: no
       failed_when: false
       with_items: "{{ rgw_instances }}"
+
+- name: uninstall haproxy and keepalived
+  vars:
+    purge_extra_packages: true
+    extra_packages:
+      - keepalived
+      - haproxy
+  hosts:
+    - "{{ rgwloadbalancer_group_name|default('rgwloadbalancers') }}"
+  tasks:
+    - name: purge extra packages with yum
+      yum:
+        name: "{{ extra_packages }}"
+        state: absent
+      when:
+        - ansible_facts['pkg_mgr'] == 'yum'
+        - purge_extra_packages | bool
+
+    - name: purge extra packages with dnf
+      dnf:
+        name: "{{ extra_packages }}"
+        state: absent
+      when:
+        - ansible_facts['pkg_mgr'] == 'dnf'
+        - purge_extra_packages | bool
+
+    - name: purge extra packages with apt
+      apt:
+        name: "{{ extra_packages }}"
+        state: absent
+        purge: yes
+      when:
+        - ansible_facts['pkg_mgr'] == 'apt'
+        - purge_extra_packages | bool
+
+    - name: remove config for haproxy and keepalived
+      file:
+        path: "{{ item }}"
+        state: absent
+      with_items:
+        - /etc/keepalived
+        - /etc/haproxy
+        - /etc/default/haproxy
+        - /etc/default/keepalived
+
+      

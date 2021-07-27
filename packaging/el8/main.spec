@@ -28,6 +28,8 @@ make DESTDIR=%{buildroot} install
 /usr/share/ceph-ansible/*
 
 %changelog
+* Tue Jul 27 2021 Mark Hooper <mhooper@45drives.com> 5.2.1-4
+- updated purge-rgw.yml to use apt purge to fix issue with haproxy and keepalived
 * Mon Jul 26 2021 Mark Hooper <mhooper@45drives.com> 5.2.1-3
 - added an infractructure playbook to purge rgw and rgwloadbalancers
 * Thu Jul 22 2021 Mark Hooper <mhooper@45drives.com> 5.2.1-2
