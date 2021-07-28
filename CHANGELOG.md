@@ -1,3 +1,3 @@
-## Ceph Ansible 5.2.1-4
+## Ceph Ansible 5.2.1-5
 
-* updated purge-rgw.yml to use apt purge to fix issue with haproxy and keepalived
+* added python3-netaddr dependency for rocky
