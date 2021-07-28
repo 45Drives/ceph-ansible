@@ -29,7 +29,9 @@
         "el": [
             "ansible",
             "python3",
-            "python3-netaddr"
+            "python3-netaddr",
+            "python3-pyyaml",
+            "python3-six"
         ]
     },
     "releases": [
