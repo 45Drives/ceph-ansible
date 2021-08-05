@@ -1,3 +1,3 @@
-## Ceph Ansible 5.2.1-3
+## Ceph Ansible 5.2.1-5
 
-* added an infractructure playbook to purge rgw and rgwloadbalancers
+* added python3-netaddr dependency for rocky
