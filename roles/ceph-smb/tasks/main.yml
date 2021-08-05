@@ -30,7 +30,13 @@
   when:
     - not domain_member | bool
 
-# Turn on WSD service
+# TODO Turn on WSD service
+
+# Mount Cephfs on SMB gw's
+# For use with houston file-sharing 
+- include: mount_cephfs.yml
+  when:
+    - not configure_shares | bool
 
 # Configure shares
 - include: loop_shares.yml

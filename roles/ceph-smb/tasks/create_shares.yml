@@ -6,7 +6,7 @@
 
 - name: create_shares | create local directory for share mount
   file:
-    path: "{{ shared_storage_mountpoint }}{{ item.path }}"
+    path: "{{ shared_storage_mountpoint }}"
     owner: "root"
     group: "root"
     mode: '0775'
@@ -15,8 +15,8 @@
 
 - name: create_shares | mount share
   mount:
-    name: "{{ shared_storage_mountpoint }}{{ item.path }}"
-    src: ":{{ item.path }}"
+    name: "{{ shared_storage_mountpoint }}"
+    src: ":{{ smb_gw_path }}"
     fstype: "ceph"
     opts: "name=samba,secretfile=/etc/ceph/samba.secret,_netdev,relatime"
     state: mounted

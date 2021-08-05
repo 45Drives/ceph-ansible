@@ -7,13 +7,6 @@
 # file as a good configuration file when no variable in it.
 dummy:
 
-# samba_repo can either be '45drives' or 'community'.
-# Community will install Samba,CTDB & Winbind packages from the standard CentOS repo.
-# 45drives will install the same packages and version of Samba,CTDB & Winbind as communuty but rebuilt with support for storing CTDB locks in RADOS objects.
-# Default is to install with RADOS support. If not using samba with CephFS then "community" is fine.
-samba_repo: 45drives
-ceph_45drives_repo_url: http://images.45drives.com/ceph/rpm/el7/
-
 # Update samba packages if already installed
 upgrade_samba_packages: true
 
@@ -26,9 +19,13 @@ domain_member: false
 backend_fs: cephfs
 
 ## Cephfs Options
+# local mountpoint for cephfs
+shared_storage_mountpoint: /mnt/cephfs
+# cephfs directory for samba shares
+smb_gw_path: /fsgw
 samba_keyring:
   - { name: client.samba, caps: { mds: "allow r path=/, allow rwps path=/fsgw", mon: "allow r", osd: "allow *" }, mode: "0600" }
-shared_storage_mountpoint: /mnt/cephfs
+
 
 ## Samba Server (SMB) Settings
 # Global options
@@ -60,7 +57,7 @@ active_directory_info:
 
 # Samba Share (SMB) Definitions
 # Path is relative to cephfs root
-#configure_shares: true
+configure_shares: false
 #enable_windows_acl: true
 #samba_shares:
 #  - name: 'public'
