@@ -28,6 +28,9 @@ make DESTDIR=%{buildroot} install
 /usr/share/ceph-ansible/*
 
 %changelog
+* Tue Aug 24 2021 Mark Hooper <mhooper@45drives.com> 5.2.2-1
+- updated version for cockpit-ceph-deploy requirements
+- releasing 5.2.2-1 on 45drives-stable repo
 * Wed Jul 28 2021 Mark Hooper <mhooper@45drives.com> 5.2.1-5
 - added python3-netaddr dependency for rocky
 * Tue Jul 27 2021 Mark Hooper <mhooper@45drives.com> 5.2.1-4

@@ -1,3 +1,4 @@
-## Ceph Ansible 5.2.1-5
+## Ceph Ansible 5.2.2-1
 
-* added python3-netaddr dependency for rocky
+* updated version for cockpit-ceph-deploy requirements
+* releasing 5.2.2-1 on 45drives-stable repo
