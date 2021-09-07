@@ -1,8 +1,8 @@
 ---
 - name: fail on unsupported distribution for iscsi gateways
   fail:
-    msg: "iSCSI gateways can only be deployed on Red Hat Enterprise Linux, CentOS or Fedora"
-  when: ansible_distribution not in ['RedHat', 'CentOS', 'Fedora', 'Ubuntu']
+    msg: "iSCSI gateways can only be deployed on Red Hat Enterprise Linux, CentOS, Ubuntu or Rocky Linux"
+  when: ansible_distribution not in ['RedHat', 'CentOS', 'Fedora', 'Ubuntu', 'Rocky']
 
 - name: make sure gateway_ip_list is configured
   fail:

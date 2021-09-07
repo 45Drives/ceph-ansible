@@ -28,6 +28,8 @@ make DESTDIR=%{buildroot} install
 /usr/share/ceph-ansible/*
 
 %changelog
+* Tue Sep 07 2021 Mark Hooper <mhooper@45drives.com> 5.2.2-2
+- added Rocky to list of distros in iscsi.yml
 * Tue Aug 24 2021 Mark Hooper <mhooper@45drives.com> 5.2.2-1
 - updated version for cockpit-ceph-deploy requirements
 - releasing 5.2.2-1 on 45drives-stable repo

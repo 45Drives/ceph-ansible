@@ -1,4 +1,3 @@
-## Ceph Ansible 5.2.2-1
+## Ceph Ansible 5.2.2-2
 
-* updated version for cockpit-ceph-deploy requirements
-* releasing 5.2.2-1 on 45drives-stable repo
+* added Rocky to list of distros in iscsi.yml
