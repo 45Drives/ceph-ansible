@@ -1,3 +1,3 @@
-## Ceph Ansible 5.2.2-3
+## Ceph Ansible 5.2.2-4
 
-* added rocky nfs support
+* fixed syntax error ganesha.conf.j2

@@ -1,3 +1,9 @@
+ceph-ansible-45d (5.2.2-4focal) focal; urgency=medium
+
+  * fixed syntax error ganesha.conf.j2
+
+ -- Brett Kelly <bkelly@45drives.com>  Wed, 08 Sep 2021 13:57:34 -0300
+
 ceph-ansible-45d (5.2.2-3focal) focal; urgency=medium
 
   * added rocky nfs support
