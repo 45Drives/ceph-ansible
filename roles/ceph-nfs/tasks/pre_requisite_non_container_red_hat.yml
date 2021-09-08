@@ -58,6 +58,14 @@
 
 - name: red hat based systems - install pacemaker/corosync/pcs
   block:
+    - name: Enable HighAvailablity Repo on RHEL8/Rocky
+      dnf:
+        enablerepo: ha
+        state: present
+      when:
+        - ansible_os_family == 'RedHat'
+        - ansible_distribution_major_version == '8'
+
     - name: install pacemaker
       package:
         name: ['pacemaker', 'corosync', 'pcs']
