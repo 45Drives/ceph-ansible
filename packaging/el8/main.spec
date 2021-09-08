@@ -28,6 +28,8 @@ make DESTDIR=%{buildroot} install
 /usr/share/ceph-ansible/*
 
 %changelog
+* Wed Sep 08 2021 Brett Kelly <bkelly@45drives.com> 5.2.2-3
+- added rocky nfs support
 * Tue Sep 07 2021 Mark Hooper <mhooper@45drives.com> 5.2.2-2
 - added Rocky to list of distros in iscsi.yml
 * Tue Aug 24 2021 Mark Hooper <mhooper@45drives.com> 5.2.2-1

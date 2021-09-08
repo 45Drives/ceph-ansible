@@ -1,3 +1,3 @@
-## Ceph Ansible 5.2.2-2
+## Ceph Ansible 5.2.2-3
 
-* added Rocky to list of distros in iscsi.yml
+* added rocky nfs support

@@ -1,3 +1,9 @@
+ceph-ansible-45d (5.2.2-3focal) focal; urgency=medium
+
+  * added rocky nfs support
+
+ -- Brett Kelly <bkelly@45drives.com>  Wed, 08 Sep 2021 09:11:08 -0300
+
 ceph-ansible-45d (5.2.2-2focal) focal; urgency=medium
 
   * added Rocky to list of distros in iscsi.yml
