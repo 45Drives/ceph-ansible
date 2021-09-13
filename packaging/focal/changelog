@@ -1,3 +1,9 @@
+ceph-ansible-45d (5.2.2-5focal) focal; urgency=medium
+
+  * ceph-iscsi: el8 install from ceph-iscsi repo
+
+ -- Brett Kelly <bkelly@45drives.com>  Mon, 13 Sep 2021 08:01:35 -0300
+
 ceph-ansible-45d (5.2.2-4focal) focal; urgency=medium
 
   * fixed syntax error ganesha.conf.j2

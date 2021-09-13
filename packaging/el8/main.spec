@@ -28,6 +28,8 @@ make DESTDIR=%{buildroot} install
 /usr/share/ceph-ansible/*
 
 %changelog
+* Mon Sep 13 2021 Brett Kelly <bkelly@45drives.com> 5.2.2-5
+- ceph-iscsi: el8 install from ceph-iscsi repo
 * Wed Sep 08 2021 Brett Kelly <bkelly@45drives.com> 5.2.2-4
 - fixed syntax error ganesha.conf.j2
 * Wed Sep 08 2021 Brett Kelly <bkelly@45drives.com> 5.2.2-3

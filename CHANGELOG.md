@@ -1,3 +1,3 @@
-## Ceph Ansible 5.2.2-4
+## Ceph Ansible 5.2.2-5
 
-* fixed syntax error ganesha.conf.j2
+* ceph-iscsi: el8 install from ceph-iscsi repo
