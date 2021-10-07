@@ -28,6 +28,9 @@ make DESTDIR=%{buildroot} install
 /usr/share/ceph-ansible/*
 
 %changelog
+* Thu Oct 07 2021 Mark Hooper <mhooper@45drives.com> 5.2.2-6
+- updated device-alias.yml to skip running dmap when /etc/vdev_id.conf exists and
+  isn't created using dmap
 * Mon Sep 13 2021 Brett Kelly <bkelly@45drives.com> 5.2.2-5
 - ceph-iscsi: el8 install from ceph-iscsi repo
 * Wed Sep 08 2021 Brett Kelly <bkelly@45drives.com> 5.2.2-4

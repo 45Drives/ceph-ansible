@@ -1,3 +1,3 @@
-## Ceph Ansible 5.2.2-5
+## Ceph Ansible 5.2.2-6
 
-* ceph-iscsi: el8 install from ceph-iscsi repo
+* updated device-alias.yml to skip running dmap when /etc/vdev_id.conf exists and isn't created using dmap

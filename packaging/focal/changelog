@@ -1,3 +1,10 @@
+ceph-ansible-45d (5.2.2-6focal) focal; urgency=medium
+
+  * updated device-alias.yml to skip running dmap when /etc/vdev_id.conf exists and
+    isn't created using dmap
+
+ -- Mark Hooper <mhooper@45drives.com>  Thu, 07 Oct 2021 10:54:47 -0300
+
 ceph-ansible-45d (5.2.2-5focal) focal; urgency=medium
 
   * ceph-iscsi: el8 install from ceph-iscsi repo

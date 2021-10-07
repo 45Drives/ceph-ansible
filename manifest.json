@@ -2,10 +2,10 @@
     "__version": "45D-R1",
     "name": "ceph-ansible-45d",
     "title": "Ceph Ansible",
-    "prerelease": false,
+    "prerelease": true,
     "version": "5.2.2",
-    "buildVersion": "5",
-    "author": "Brett Kelly <bkelly@45drives.com>",
+    "buildVersion": "6",
+    "author": "Mark Hooper <mhooper@45drives.com>",
     "url": "https://github.com/45Drives/ceph-ansible",
     "category": "utils",
     "priority": "optional",
@@ -49,10 +49,10 @@
     "changelog": {
         "urgency": "medium",
         "version": "5.2.2",
-        "buildVersion": "5",
+        "buildVersion": "6",
         "ignore": [],
         "date": null,
-        "packager": "Brett Kelly <bkelly@45drives.com>",
+        "packager": "Mark Hooper <mhooper@45drives.com>",
         "changes": []
     }
 }
