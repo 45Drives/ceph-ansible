@@ -28,6 +28,8 @@ make DESTDIR=%{buildroot} install
 /usr/share/ceph-ansible/*
 
 %changelog
+* Thu Oct 07 2021 Mark Hooper <mhooper@45drives.com> 5.2.3-1
+- first build for pre-release package ceph-ansible-45d
 * Thu Oct 07 2021 Mark Hooper <mhooper@45drives.com> 5.2.2-6
 - updated device-alias.yml to skip running dmap when /etc/vdev_id.conf exists and
   isn't created using dmap
