@@ -28,6 +28,10 @@ make DESTDIR=%{buildroot} install
 /usr/share/ceph-ansible/*
 
 %changelog
+* Thu Oct 07 2021 Mark Hooper <mhooper@45drives.com> 5.2.3-2
+- first stable build of ceph-ansible-45d v5.2.3
+- modified device-alias.yml playbook to be hardware agnostic if /etc/vdev_id.conf
+  was not created using dmap
 * Thu Oct 07 2021 Mark Hooper <mhooper@45drives.com> 5.2.3-1
 - first build for pre-release package ceph-ansible-45d
 * Thu Oct 07 2021 Mark Hooper <mhooper@45drives.com> 5.2.2-6
