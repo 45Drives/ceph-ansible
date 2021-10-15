@@ -115,9 +115,12 @@ upgrade_ceph_packages: False
 ###########
 # INSTALL #
 ###########
+
 ceph_repository_type: community
 ceph_origin: repository
 ceph_repository: community
+
+offline_install: false
 
 # REPOSITORY: COMMUNITY VERSION
 #

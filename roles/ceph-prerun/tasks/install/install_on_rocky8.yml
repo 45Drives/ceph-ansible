@@ -5,6 +5,7 @@
     state: latest
   register: result
   until: result is succeeded
+  when: not offline_install
 
 - name: Install Extra Dependencies in Rocky 8
   dnf:
