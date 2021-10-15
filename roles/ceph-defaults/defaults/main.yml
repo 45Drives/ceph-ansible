@@ -103,6 +103,9 @@ ceph_directories_mode: "0755"
 ###########
 # INSTALL #
 ###########
+
+offline_install: false
+
 ceph_repository_type: dummy
 
 # ORIGIN SOURCE

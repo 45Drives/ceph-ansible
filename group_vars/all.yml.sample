@@ -111,6 +111,9 @@ dummy:
 ###########
 # INSTALL #
 ###########
+
+#offline_install: false
+
 #ceph_repository_type: dummy
 
 # ORIGIN SOURCE

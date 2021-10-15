@@ -1,7 +1,9 @@
 ---
 - name: include configure_redhat_repository_installation.yml
   include_tasks: configure_redhat_repository_installation.yml
-  when: ceph_origin == 'repository'
+  when:
+    - ceph_origin == 'repository'
+    - not offline_install
 
 - name: include configure_redhat_local_installation.yml
   include_tasks: configure_redhat_local_installation.yml
