@@ -28,6 +28,8 @@ make DESTDIR=%{buildroot} install
 /usr/share/ceph-ansible/*
 
 %changelog
+* Fri Oct 15 2021 Brett Kelly <bkelly@45drives.com> 5.2.4-1
+- Added offline install mode for rhel/rocky clusters
 * Thu Oct 07 2021 Mark Hooper <mhooper@45drives.com> 5.2.3-2
 - first stable build of ceph-ansible-45d v5.2.3
 - modified device-alias.yml playbook to be hardware agnostic if /etc/vdev_id.conf
