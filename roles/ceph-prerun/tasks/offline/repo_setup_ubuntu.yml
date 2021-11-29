@@ -3,15 +3,24 @@
   copy: remote_src=True src=/etc/apt/sources.list dest=/etc/apt/sources.list.bak
 
 - name: disable 45drives repos
-  copy: remote_src=True src=/etc/apt/sources.list.d/45drives.list dest=/etc/apt//etc/apt/sources.list.d/45drives.list.bak
+  copy: remote_src=True src=/etc/apt/sources.list.d/45drives.sources dest=/etc/apt/sources.list.d/45drives.sources.bak
 
 - name: place offline repo file on each node
   template:
     src: "ubuntu-offline.list.j2"
-    dest: "/etc/apt/sources.list.d/"
+    dest: "/etc/apt/sources.list.d/ubuntu-offline.list"
     owner: root
     group: root
     mode: 0644
+
+- name: import apt keys
+  apt_key:
+    url: http://{{ offline_repo_server_ip }}/{{ item }}.asc
+    state: present
+  loop:
+    - 45drives
+    - ceph
+    - nfs-ganesha
 
 - name: update apt cache
   apt:
