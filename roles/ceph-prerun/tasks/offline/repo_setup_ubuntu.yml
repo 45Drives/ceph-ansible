@@ -50,23 +50,19 @@
   apt:
     update_cache: yes
 
-- name: set_fact is_atomic
-  set_fact:
-    is_atomic: '{{ stat_ostree.stat.exists }}'
-  tags: always
-
 - name: install container packages on each node
   block:
     - name: check if it is Atomic host
       stat: path=/run/ostree-booted
       register: stat_ostree
       check_mode: no
+
     - name: set_fact is_atomic
       set_fact:
         is_atomic: '{{ stat_ostree.stat.exists }}'
       tags: always
     - import_role:
-      name: ceph-container-engine
+        name: ceph-container-engine
 
 - name: Inspect node_exporter local image
   docker_image_info:
