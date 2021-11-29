@@ -18,7 +18,7 @@
 - name: check if 45drives.sources exists
   stat:
     path: /etc/apt/sources.list.d/45drives.sources
-  register: 45drives_repo_result
+  register: ffd_repo_result
 
 - name: disable 45drives repo
   block:
@@ -27,7 +27,7 @@
 
     - name: remove 45drives.sources
       file: path=/etc/apt/sources.list.d/45drives.sources state=absent
-  when: 45drives_repo_result.stat.exists == True
+  when: ffd_repo_result.stat.exists == True
 
 - name: place offline repo file on each node
   template:
