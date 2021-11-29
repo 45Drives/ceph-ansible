@@ -1,9 +1,32 @@
 ---
-- name: disable ubuntu main repos
-  copy: remote_src=True src=/etc/apt/sources.list dest=/etc/apt/sources.list.bak
 
-- name: disable 45drives repos
-  copy: remote_src=True src=/etc/apt/sources.list.d/45drives.sources dest=/etc/apt/sources.list.d/45drives.sources.bak
+- name: check if sources.list exists
+  stat:
+    path: /etc/apt/sources.list
+  register: ubuntu_repo_result
+
+- name: disable ubuntu main repos
+  block:
+    - name: create backup of sources.list
+      copy: remote_src=True src=/etc/apt/sources.list dest=/etc/apt/sources.list.bak
+
+    - name: remove sources.list
+      file: /etc/apt/sources.list
+  when: ubuntu_repo_result.stat.exists == True
+
+- name: check if 45drives.sources exists
+  stat:
+    path: /etc/apt/sources.list.d/45drives.sources
+  register: 45drives_repo_result
+
+- name: disable 45drives repo
+  block:
+    - name: create backup of 45drives.sources
+      copy: remote_src=True src=/etc/apt/sources.list.d/45drives.sources dest=/etc/apt/sources.list.d/45drives.sources.bak
+
+    - name: remove 45drives.sources
+      file: /etc/apt/sources.list.d/45drives.sources
+  when: 45drives_repo_result.stat.exists == True
 
 - name: place offline repo file on each node
   template:
@@ -13,7 +36,7 @@
     group: root
     mode: 0644
 
-- name: import apt keys
+- name: import apt keys for ceph, nfs-ganeha and 45drives
   apt_key:
     url: http://{{ offline_repo_server_ip }}/{{ item }}.asc
     state: present
