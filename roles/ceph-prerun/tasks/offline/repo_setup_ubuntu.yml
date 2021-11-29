@@ -11,7 +11,8 @@
       copy: remote_src=True src=/etc/apt/sources.list dest=/etc/apt/sources.list.bak
 
     - name: remove sources.list
-      file: /etc/apt/sources.list
+      file: path=/etc/apt/sources.list state=absent
+
   when: ubuntu_repo_result.stat.exists == True
 
 - name: check if 45drives.sources exists
@@ -25,7 +26,7 @@
       copy: remote_src=True src=/etc/apt/sources.list.d/45drives.sources dest=/etc/apt/sources.list.d/45drives.sources.bak
 
     - name: remove 45drives.sources
-      file: /etc/apt/sources.list.d/45drives.sources
+      file: path=/etc/apt/sources.list.d/45drives.sources state=absent
   when: 45drives_repo_result.stat.exists == True
 
 - name: place offline repo file on each node
