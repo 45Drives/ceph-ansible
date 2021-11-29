@@ -1,0 +1,10 @@
+---
+- name: disable active repos
+
+- name: place offline repo file on each node
+
+- name: install container packages on each node
+
+- name: import node_exporter on each node
+
+- name: import metric container images on metrics node

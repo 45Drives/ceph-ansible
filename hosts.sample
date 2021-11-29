@@ -22,3 +22,6 @@
 #[rgws]
 #[rgwloadbalancers]
 
+# OFFLINE REPO SERVER
+#[reposerver]
+

@@ -1,0 +1,8 @@
+---
+- name: setup offline repos on redhat
+  include_tasks: offline/repo_setup_redhat.yml
+  when: ansible_os_family == "RedHat"
+
+- name: setup offline repos on ubuntu
+  include_tasks: offline_install/repo_setup_ubuntu.yml
+  when: ansible_distribution == 'Ubuntu'

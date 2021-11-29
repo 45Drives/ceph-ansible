@@ -1,0 +1,19 @@
+deb http://{{ groups[reposerver][0]['ansible_default_ipv4']['address'] }}/45drives focal main
+deb http://{{ groups[reposerver][0]['ansible_default_ipv4']['address'] }}/ceph focal main
+deb http://{{ groups[reposerver][0]['ansible_default_ipv4']['address'] }}/nfs-ganesha focal main
+deb http://{{ groups[reposerver][0]['ansible_default_ipv4']['address'] }}/libntirpc focal main 
+
+deb http://{{ groups[reposerver][0]['ansible_default_ipv4']['address'] }}/ubuntu-main focal main
+deb http://{{ groups[reposerver][0]['ansible_default_ipv4']['address'] }}/ubuntu-updates-main focal-updates main
+deb http://{{ groups[reposerver][0]['ansible_default_ipv4']['address'] }}/ubuntu-backports-main focal-backports main
+deb http://{{ groups[reposerver][0]['ansible_default_ipv4']['address'] }}/ubuntu-security-main focal-security main
+
+deb http://{{ groups[reposerver][0]['ansible_default_ipv4']['address'] }}/ubuntu-universe focal universe
+deb http://{{ groups[reposerver][0]['ansible_default_ipv4']['address'] }}/ubuntu-updates-universe focal-updates universe
+deb http://{{ groups[reposerver][0]['ansible_default_ipv4']['address'] }}/ubuntu-backports-universe focal-backports universe
+deb http://{{ groups[reposerver][0]['ansible_default_ipv4']['address'] }}/ubuntu-security-universe focal-security universe
+
+#deb http://{{ groups[reposerver][0]['ansible_default_ipv4']['address'] }}/ubuntu-multiverse focal multiverse
+#deb http://{{ groups[reposerver][0]['ansible_default_ipv4']['address'] }}/ubuntu-updates-multiverse focal-updates multiverse
+#deb http://{{ groups[reposerver][0]['ansible_default_ipv4']['address'] }}/ubuntu-backports-multiverse focal-backports multiverse
+#deb http://{{ groups[reposerver][0]['ansible_default_ipv4']['address'] }}/ubuntu-security-multiverse focal-security multiverse
