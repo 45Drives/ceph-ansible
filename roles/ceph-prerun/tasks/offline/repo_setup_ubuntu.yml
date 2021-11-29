@@ -39,7 +39,7 @@
 
 - name: import apt keys for ceph, nfs-ganeha and 45drives
   apt_key:
-    url: http://{{ offline_repo_server_ip }}/{{ item }}.asc
+    url: http://{{ offline_repo_server_ip }}/keys/{{ item }}.asc
     state: present
   loop:
     - 45drives
