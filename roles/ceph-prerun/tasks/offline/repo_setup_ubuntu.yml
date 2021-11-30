@@ -45,6 +45,7 @@
     - 45drives
     - ceph
     - nfs-ganesha
+    - docker-ce
 
 - name: update apt cache
   apt:
