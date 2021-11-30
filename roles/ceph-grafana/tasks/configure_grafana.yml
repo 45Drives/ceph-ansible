@@ -42,6 +42,17 @@
   when:
     - not containerized_deployment | bool
     - not ansible_facts['os_family'] in ['RedHat', 'Suse']
+    - not offline_install
+
+- name: copy ceph grafana dashboards
+  copy:
+    src: files/{{ item }}
+    dest: "/etc/grafana/dashboards/ceph-dashboard/{{ item }}"
+  with_items: "{{ grafana_dashboard_files }}"
+  when:
+    - not containerized_deployment | bool
+    - not ansible_facts['os_family'] in ['RedHat', 'Suse']
+    - offline_install  
 
 - name: write grafana.ini
   config_template:
