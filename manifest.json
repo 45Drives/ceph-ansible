@@ -49,9 +49,9 @@
     "changelog": {
         "urgency": "medium",
         "version": "5.2.5",
-        "buildVersion": "2",
+        "buildVersion": "1",
         "ignore": [],
-        "date": "2021-11-30T10:06:59.975058",
+        "date": null,
         "packager": "Brett Kelly <bkelly@45drives.com>",
         "changes": []
     }
