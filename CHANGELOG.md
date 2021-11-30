@@ -1,1 +1,1 @@
-## Ceph Ansible 5.2.5-1
+## Ceph Ansible 5.2.5-2
