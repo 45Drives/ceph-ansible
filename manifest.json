@@ -48,10 +48,10 @@
     ],
     "changelog": {
         "urgency": "medium",
-        "version": "5.2.4",
+        "version": "5.2.5",
         "buildVersion": "1",
         "ignore": [],
-        "date": null,
+        "date": "2021-11-30T09:52:38.936640",
         "packager": "Brett Kelly <bkelly@45drives.com>",
         "changes": []
     }
