@@ -5,7 +5,7 @@
     state: absent
   when: container_package_name == 'docker-ce'
 
-- name: configure dockerpodman repo
+- name: configure docker-ce repo when not offline_install
   block:
   - name: allow apt to use a repository over https (debian)
     package:
