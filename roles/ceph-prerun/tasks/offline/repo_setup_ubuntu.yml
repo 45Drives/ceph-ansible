@@ -1,5 +1,4 @@
 ---
-
 - name: check if sources.list exists
   stat:
     path: /etc/apt/sources.list
