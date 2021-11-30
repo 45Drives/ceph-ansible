@@ -16,6 +16,10 @@
   when:
     - not offline_install
 
+- name: setup offline repositories
+  include_tasks: offline/repo_setup.yml
+  when: offline_install 
+
 - name: include_tasks cleanup/cleanup_on_ubuntu.yml
   include_tasks: cleanup/cleanup_on_ubuntu.yml
   when: ansible_distribution == 'Ubuntu'

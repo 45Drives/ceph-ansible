@@ -1,6 +1,7 @@
 ---
 ubuntu_install_pkgs:
   - "45drives-tools"
+  - "python3-docker"
 
 centos_install_pkgs:
   - "45drives-tools"
@@ -27,5 +28,10 @@ rocky_cleanup_pkgs:
   - "zfs"
   - "cockpit-zfs-manager"
   - "cockpit-machines"
+
+metric_docker_images:
+  - "alertmanager-v0.16.2.tar"
+  - "grafana-v5.4.2.tar"
+  - "prometheus-v2.7.2.tar"
 
 

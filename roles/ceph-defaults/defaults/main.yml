@@ -105,6 +105,7 @@ ceph_directories_mode: "0755"
 ###########
 
 offline_install: false
+offline_repo_server_ip: ""
 
 ceph_repository_type: dummy
 

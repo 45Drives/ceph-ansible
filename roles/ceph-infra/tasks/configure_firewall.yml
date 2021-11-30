@@ -322,6 +322,16 @@
         - rgwloadbalancer_group_name is defined
         - rgwloadbalancer_group_name in group_names
 
+    - name: open http port for offline reposerver
+      firewalld:
+        port: "80/tcp"
+        zone: "{{ ceph_mon_firewall_zone }}"
+        permanent: true
+        immediate: true
+        state: enabled
+      when:
+        - offline_install | bool
+
     - name: add rich rule for keepalived vrrp
       firewalld:
         rich_rule: 'rule protocol value="vrrp" accept'
