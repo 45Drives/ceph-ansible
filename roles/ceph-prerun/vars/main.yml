@@ -1,4 +1,6 @@
 ---
+import_container_images: true
+
 ubuntu_install_pkgs:
   - "45drives-tools"
   - "python3-docker"
