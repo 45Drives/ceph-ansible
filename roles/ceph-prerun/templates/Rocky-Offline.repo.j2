@@ -1,0 +1,95 @@
+### 45DRIVES
+[45drives-stable-local]
+enabled = 1
+priority = 1
+gpgcheck = 1
+repo_gpgcheck = 1
+baseurl = http://{{ offline_repo_server_ip }}/packages/45drives_stable
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-45drives
+name = 45Drives EL8 Stable
+
+### CEPH
+[ceph-iscsi-local]
+name=ceph-iscsi noarch packages
+baseurl=http://{{ offline_repo_server_ip }}/packages/ceph-iscsi
+enabled=1
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ceph
+type=rpm-md
+
+[ceph-stable-local]
+baseurl = http://{{ offline_repo_server_ip }}/packages/ceph_stable
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ceph
+name = Ceph Stable $basearch repo
+priority = 2
+
+[ceph-stable-noarch-local]
+baseurl = http://{{ offline_repo_server_ip }}/packages/ceph_stable_noarch
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ceph
+name = Ceph Stable noarch repo
+priority = 2
+
+### EPEL
+[epel-local]
+name=Extra Packages for Enterprise Linux $releasever - $basearch
+baseurl=http://{{ offline_repo_server_ip }}/packages/epel
+enabled=1
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-8
+exclude=epel-release*
+
+[epel-modular-local]
+name=Extra Packages for Enterprise Linux Modular $releasever - $basearch
+baseurl=http://{{ offline_repo_server_ip }}/packages/epel-modular
+enabled=1
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-8
+
+### ROCKY OFFICIAL
+[appstream-local]
+name=Rocky Linux $releasever - AppStream
+baseurl=http://{{ offline_repo_server_ip }}/packages/appstream
+gpgcheck=1
+enabled=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-rockyofficial
+
+[baseos-local]
+name=Rocky Linux $releasever - BaseOS
+baseurl=http://{{ offline_repo_server_ip }}/packages/baseos
+gpgcheck=1
+enabled=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-rockyofficial
+
+[extras-local]
+name=Rocky Linux $releasever - Extras
+baseurl=http://{{ offline_repo_server_ip }}/packages/extras
+gpgcheck=1
+enabled=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-rockyofficial
+exclude=epel-release*
+
+### HIGH AVAILABILITY
+[ha-local]
+name=Rocky Linux $releasever - HighAvailability
+baseurl=http://{{ offline_repo_server_ip }}/packages/ha
+gpgcheck=1
+enabled=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-rockyofficial
+
+### POWER TOOLS
+[powertools-local]
+name=Rocky Linux $releasever - PowerTools
+baseurl=http://{{ offline_repo_server_ip }}/packages/powertools
+gpgcheck=1
+enabled=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-rockyofficial
+
+### ZFS
+[zfs-local]
+name=ZFS on Linux for EL8 - dkms
+baseurl=http://{{ offline_repo_server_ip }}/packages/zfs
+enabled=1
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-zfsonlinux
