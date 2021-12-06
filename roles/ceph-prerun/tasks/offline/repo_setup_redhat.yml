@@ -2,12 +2,12 @@
 - name: disable active repos
   block:
     - name: get active repos
-      command: "/usr/bin/dnf repolist"
+      shell: "dnf repolist --enabled | awk 'NR>1{print $1}'"
       register: active_repos
     
-    - name: show em to me
-      debug:
-        msg: "{{ active_repos }}"
+    - name: disable active repos
+      command: "dnf config-manager --set-disabled {{ item }}"
+      loop: "{{ active_repos.stdout_lines }}"
 
 - name: place offline repo file on each node
   template:
