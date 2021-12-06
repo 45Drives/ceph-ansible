@@ -31,7 +31,7 @@ rocky_cleanup_pkgs:
   - "cockpit-zfs-manager"
   - "cockpit-machines"
 
-metric_docker_images:
+metric_container_images:
   - "alertmanager-v0.16.2.tar"
   - "grafana-v5.4.2.tar"
   - "prometheus-v2.7.2.tar"

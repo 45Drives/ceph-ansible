@@ -1,0 +1,52 @@
+---
+- name: Inspect node_exporter local image
+  docker_image_info:
+    name:
+      - prom/node-exporter:v0.17.0
+  register: node_exporter_result
+
+- name: Pull down and import node_exporter image if not present already
+  block:
+    - name: Pull down node_exporter image
+      get_url:
+        url: http://{{ offline_repo_server_ip }}/images/node-exporter-v0.17.0.tar
+        dest: /tmp/node-exporter-v0.17.0.tar
+
+    - name: Import node_exporter if not present already
+      docker_image_load:
+        path: /tmp/node-exporter-v0.17.0.tar
+
+    - name: remove node-exporter image tar
+      file:
+        path: /tmp/node-exporter-v0.17.0.tar
+        state: absent
+  when: node_exporter_result.images | length == 0
+
+- name: Inspect metrics node for local docker images
+  docker_image_info:
+    name:
+      - localhost/grafana-offline:5.4.2
+      - prom/alertmanager:v0.16.2
+      - prom/prometheus:v2.7.2
+  register: metric_images_result
+
+- name: Pull down and import metric stack images if not present already
+  block:
+    - name: Pull down node_exporter image
+      get_url:
+        url: http://{{ offline_repo_server_ip }}/images/{{ item }}
+        dest: /tmp/{{ item }}
+      loop: "{{ metric_container_images|flatten(levels=1) }}"
+
+    - name: Import node_exporter if not present already
+      docker_image_load:
+        path: /tmp/{{ item }}
+      loop: "{{ metric_container_images|flatten(levels=1) }}"
+
+    - name: remove node-exporter image tar
+      file:
+        path: /tmp/{{ item }}
+        state: absent
+      loop: "{{ metric_container_images|flatten(levels=1) }}"
+  delegate_to: "{{ groups[grafana_server_group_name][0] }}"
+  when: metric_images_result.images | length != 3
