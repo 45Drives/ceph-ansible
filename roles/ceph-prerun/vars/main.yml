@@ -1,5 +1,9 @@
 ---
 import_container_images: true
+metric_container_images:
+  - "alertmanager-v0.16.2.tar"
+  - "grafana-v5.4.2.tar"
+  - "prometheus-v2.7.2.tar"
 
 ubuntu_install_pkgs:
   - "45drives-tools"
@@ -31,9 +35,5 @@ rocky_cleanup_pkgs:
   - "cockpit-zfs-manager"
   - "cockpit-machines"
 
-metric_container_images:
-  - "alertmanager-v0.16.2.tar"
-  - "grafana-v5.4.2.tar"
-  - "prometheus-v2.7.2.tar"
 
 
