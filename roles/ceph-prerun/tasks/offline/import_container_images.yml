@@ -14,7 +14,7 @@
         name: ceph-container-engine
 
 - name: include specific variables
-  include_vars: "../../ceph-container-engine/vars/{{ item }}"
+  include_vars: "../../../ceph-container-engine/vars/{{ item }}"
   with_first_found:
     - "{{ ansible_facts['distribution'] }}-{{ ansible_facts['distribution_major_version'] }}.yml"
     - "{{ ansible_facts['os_family'] }}.yml"
