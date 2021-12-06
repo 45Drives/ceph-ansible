@@ -14,12 +14,7 @@
         name: ceph-container-engine
 
 - name: include specific variables
-  include_vars: "../../../ceph-container-engine/vars/{{ item }}"
-  with_first_found:
-    - "{{ ansible_facts['distribution'] }}-{{ ansible_facts['distribution_major_version'] }}.yml"
-    - "{{ ansible_facts['os_family'] }}.yml"
+  include_vars: "../../../ceph-container-engine/vars/{{ ansible_facts['distribution'] }}-{{ ansible_facts['distribution_major_version'] }}.yml"
 
 - name: import container images
   include_tasks: offline/import_container_images_{{ container_service_name }}.yml
-
-
