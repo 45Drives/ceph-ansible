@@ -12,7 +12,7 @@
 - name: place offline repo file on each node
   template:
     src: "Rocky-Offline.repo.j2"
-    dest: "/etc/yum.repos.d/Rocky-Offline.repo.j2"
+    dest: "/etc/yum.repos.d/Rocky-Offline.repo"
     owner: root
     group: root
     mode: 0644
