@@ -34,6 +34,7 @@
           delay: 2
           until: update_libntirpc_apt_cache is success
           when: add_libntirpc_apt_repo is changed
+  when: not offline_install 
 
 
 - name: ubuntu systems - install nfs packages

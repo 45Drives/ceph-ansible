@@ -37,6 +37,7 @@
       when:
         - nfs_ganesha_dev | bool
         - ceph_repository == 'dev'
+  when: not offline_install   
 
 - name: red hat based systems - install nfs packages
   block:
