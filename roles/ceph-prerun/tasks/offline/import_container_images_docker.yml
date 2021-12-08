@@ -31,17 +31,17 @@
 
 - name: Pull down and import metric stack images if not present already
   block:
-    - name: Pull down {{ item }} image
+    - name: Pull down metric stack images
       get_url:
         url: http://{{ offline_repo_server_ip }}/images/{{ item }}
         dest: /tmp/{{ item }}
       loop: "{{ metric_container_images|flatten(levels=1) }}"
 
-    - name: Import {{ item }} if not present already
-      shell: "/usr/bin/docker load -i /tmp/node-exporter-v0.17.0.tar"
+    - name: Import images if not present already
+      shell: "/usr/bin/docker load -i /tmp/{{ item }}"
       loop: "{{ metric_container_images|flatten(levels=1) }}"
 
-    - name: remove {{ item }} image tar
+    - name: remove container image tar
       file:
         path: /tmp/{{ item }}
         state: absent
