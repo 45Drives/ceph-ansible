@@ -13,8 +13,7 @@
         dest: /tmp/node-exporter-v0.17.0.tar
 
     - name: Import node_exporter if not present already
-      docker_image_load:
-        path: /tmp/node-exporter-v0.17.0.tar
+      shell: "/usr/bin/docker load -i /tmp/node-exporter-v0.17.0.tar"
 
     - name: remove node-exporter image tar
       file:
@@ -32,18 +31,17 @@
 
 - name: Pull down and import metric stack images if not present already
   block:
-    - name: Pull down node_exporter image
+    - name: Pull down {{ item }} image
       get_url:
         url: http://{{ offline_repo_server_ip }}/images/{{ item }}
         dest: /tmp/{{ item }}
       loop: "{{ metric_container_images|flatten(levels=1) }}"
 
-    - name: Import node_exporter if not present already
-      docker_image_load:
-        path: /tmp/{{ item }}
+    - name: Import {{ item }} if not present already
+      shell: "/usr/bin/docker load -i /tmp/node-exporter-v0.17.0.tar"
       loop: "{{ metric_container_images|flatten(levels=1) }}"
 
-    - name: remove node-exporter image tar
+    - name: remove {{ item }} image tar
       file:
         path: /tmp/{{ item }}
         state: absent
