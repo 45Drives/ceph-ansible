@@ -19,4 +19,3 @@
   loop: "{{ metric_container_images_archive|flatten(levels=1) }}"
   delegate_to: "{{ groups[grafana_server_group_name][0] }}"
   when: metric_images_result.images | length != 3
-
