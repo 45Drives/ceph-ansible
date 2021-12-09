@@ -1,5 +1,6 @@
 ---
 - name: ubuntu systems - repo handling
+  when: not offline_install
   block:
     - name: stable repos specific tasks
       block:
@@ -34,7 +35,6 @@
           delay: 2
           until: update_libntirpc_apt_cache is success
           when: add_libntirpc_apt_repo is changed
-  when: not offline_install 
 
 
 - name: ubuntu systems - install nfs packages
