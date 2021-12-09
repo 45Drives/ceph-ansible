@@ -1,0 +1,14 @@
+- name: Pull down and import {{ item }} image
+  block:
+    - name: Pull down node_exporter image
+      get_url:
+        url: http://{{ offline_repo_server_ip }}/images/{{ item }}
+        dest: /tmp/{{ item }}
+
+    - name: Import {{ item }}
+      shell: "/usr/bin/{{ container_service_name }} load -i /tmp/{{ item }}"
+
+    - name: remove {{ item }} image tar
+      file:
+        path: /tmp/{{ item }}
+        state: absent
