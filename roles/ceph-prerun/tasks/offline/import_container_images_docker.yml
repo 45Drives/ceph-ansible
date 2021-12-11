@@ -9,7 +9,7 @@
     - name: Pull down node_exporter image
       get_url:
         url: http://{{ offline_repo_server_ip }}/images/{{ node_exporter_container_image_archive }}
-        dest: /tmp/"{{ node_exporter_container_image_archive }}"
+        dest: /tmp/{{ node_exporter_container_image_archive }}
 
     - name: Import node_exporter if not present already
       shell: "/usr/bin/docker load -i /tmp/{{ node_exporter_container_image_archive }}"

@@ -9,7 +9,7 @@
     - name: Pull down node_exporter image
       get_url:
         url: http://{{ offline_repo_server_ip }}/images/{{ node_exporter_container_image_archive }}
-        dest: /tmp/"{{ node_exporter_container_image_archive }}"
+        dest: /tmp/{{ node_exporter_container_image_archive }}
 
     - name: Import node_exporter if not present already
       shell: "/usr/bin/podman load -i /tmp/{{ node_exporter_container_image_archive }}"
@@ -27,17 +27,17 @@
 
 - name: Pull down and import metric stack images if not present already
   block:
-    - name: Pull down node_exporter image
+    - name: Pull down metrics images
       get_url:
         url: http://{{ offline_repo_server_ip }}/images/{{ item }}
         dest: /tmp/{{ item }}
       loop: "{{ metric_container_images_archive|flatten(levels=1) }}"
 
-    - name: Import node_exporter if not present already
+    - name: Import metric images if not present already
       shell: "/usr/bin/podman load -i /tmp/{{ item }}"
       loop: "{{ metric_container_images_archive|flatten(levels=1) }}"
 
-    - name: remove node-exporter image tar
+    - name: remove metric images image tar
       file:
         path: /tmp/{{ item }}
         state: absent
