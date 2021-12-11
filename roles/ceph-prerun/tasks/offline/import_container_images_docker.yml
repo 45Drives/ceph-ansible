@@ -5,17 +5,42 @@
   register: node_exporter_result
 
 - name: Pull down and import node_exporter image if not present already
-  include_tasks: image_import.yml
-  loop: "{{ node_exporter_container_image_archive }}"
+  block:
+    - name: Pull down node_exporter image
+      get_url:
+        url: http://{{ offline_repo_server_ip }}/images/{{ node_exporter_container_image_archive }}
+        dest: /tmp/"{{ node_exporter_container_image_archive }}"
+
+    - name: Import node_exporter if not present already
+      shell: "/usr/bin/docker load -i /tmp/{{ node_exporter_container_image_archive }}"
+
+    - name: remove node-exporter image tar
+      file:
+        path: /tmp/{{ node_exporter_container_image_archive }}
+        state: absent
   when: node_exporter_result.images | length == 0
 
-- name: Inspect metrics node for local docker images
+- name: Inspect metrics node for local container images
   docker_image_info:
     name: "{{ metric_container_images }}"
   register: metric_images_result
 
-- name: Pull down and import node_exporter image if not present already
-  include_tasks: image_import.yml
-  loop: "{{ metric_container_images_archive|flatten(levels=1) }}"
+- name: Pull down and import metric stack images if not present already
+  block:
+    - name: Pull down metrics images
+      get_url:
+        url: http://{{ offline_repo_server_ip }}/images/{{ item }}
+        dest: /tmp/{{ item }}
+      loop: "{{ metric_container_images_archive|flatten(levels=1) }}"
+
+    - name: Import metric images if not present already
+      shell: "/usr/bin/docker load -i /tmp/{{ item }}"
+      loop: "{{ metric_container_images_archive|flatten(levels=1) }}"
+
+    - name: remove metric images image tar
+      file:
+        path: /tmp/{{ item }}
+        state: absent
+      loop: "{{ metric_container_images_archive|flatten(levels=1) }}"
   delegate_to: "{{ groups[grafana_server_group_name][0] }}"
   when: metric_images_result.images | length != 3
