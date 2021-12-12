@@ -28,6 +28,8 @@ make DESTDIR=%{buildroot} install
 /usr/share/ceph-ansible/*
 
 %changelog
+* Sun Dec 12 2021 Brett Kelly <bkelly@45drives.com> 5.2.6-1
+- offline support for rocky(el8) and ubuntu20.04
 * Tue Nov 30 2021 Brett Kelly <bkelly@45drives.com> 5.2.5-1
 - ubuntu offline support
 * Fri Oct 15 2021 Brett Kelly <bkelly@45drives.com> 5.2.4-1

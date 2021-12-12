@@ -1,3 +1,3 @@
-## Ceph Ansible 5.2.5-1
+## Ceph Ansible 5.2.6-1
 
-* ubuntu offline support
+* offline support for rocky(el8) and ubuntu20.04
