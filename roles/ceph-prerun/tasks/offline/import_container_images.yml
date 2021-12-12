@@ -1,0 +1,20 @@
+---
+- name: install container packages on each node
+  block:
+    - name: check if it is Atomic host
+      stat: path=/run/ostree-booted
+      register: stat_ostree
+      check_mode: no
+
+    - name: set_fact is_atomic
+      set_fact:
+        is_atomic: '{{ stat_ostree.stat.exists }}'
+      tags: always
+    - import_role:
+        name: ceph-container-engine
+
+- name: include specific variables
+  include_vars: "../../../ceph-container-engine/vars/{{ ansible_facts['distribution'] }}-{{ ansible_facts['distribution_major_version'] }}.yml"
+
+- name: import container images
+  include_tasks: offline/import_container_images_{{ container_service_name }}.yml

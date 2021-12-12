@@ -18,7 +18,11 @@
 
 - name: setup offline repositories
   include_tasks: offline/repo_setup.yml
-  when: offline_install 
+  when: offline_install
+
+- name: set grafana image fact when offline_install
+  set_fact: grafana_container_image="localhost/grafana-offline:5.4.2"
+  when: offline_install
 
 - name: include_tasks cleanup/cleanup_on_ubuntu.yml
   include_tasks: cleanup/cleanup_on_ubuntu.yml
