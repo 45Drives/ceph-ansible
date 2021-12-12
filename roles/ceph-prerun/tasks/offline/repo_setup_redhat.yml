@@ -1,10 +1,29 @@
 ---
 - name: disable active repos
+  block:
+    - name: get active repos
+      shell: "dnf repolist --enabled | awk 'NR>1{print $1}'"
+      register: active_repos
+    
+    - name: disable active repos
+      command: "dnf config-manager --set-disabled {{ item }}"
+      loop: "{{ active_repos.stdout_lines }}"
 
 - name: place offline repo file on each node
+  template:
+    src: "Rocky-Offline.repo.j2"
+    dest: "/etc/yum.repos.d/Rocky-Offline.repo"
+    owner: root
+    group: root
+    mode: 0644
 
-- name: install container packages on each node
+- name: place GPG keys on each node
+  get_url:
+    url: http://{{ offline_repo_server_ip }}/keys/RPM-GPG-KEY-{{ item }}
+    dest: /etc/pki/rpm-gpg/RPM-GPG-KEY-{{ item }}
+  loop:
+    - 45drives
+    - ceph
+    - EPEL-8
+    - zfsonlinux
 
-- name: import node_exporter on each node
-
-- name: import metric container images on metrics node

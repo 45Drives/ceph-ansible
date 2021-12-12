@@ -2,7 +2,7 @@
 ## Fail if repo-server IP is not set in group_vars
 - name: fail if offline_repo_server_ip fact is not set
   fail:
-    msg: "offline_repo_server_ip varible must be set in group_vars/all.yml when using offline repos"
+    msg: "offline_repo_server_ip varible must be set in group_vars/all.yml when offline_install is true"
   when: offline_repo_server_ip == ""
 
 - name: setup offline repos on redhat
@@ -12,3 +12,7 @@
 - name: setup offline repos on ubuntu
   include_tasks: offline/repo_setup_ubuntu.yml
   when: ansible_distribution == 'Ubuntu'
+
+- name: import container images
+  include_tasks: offline/import_container_images.yml
+  when: import_container_images | bool

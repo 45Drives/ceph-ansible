@@ -1,5 +1,6 @@
 ---
 - name: ubuntu systems - repo handling
+  when: not offline_install
   block:
     - name: stable repos specific tasks
       block:

@@ -41,6 +41,7 @@
             owner: root
             group: root
             backup: yes
+  when: not offline_install 
 
 - name: debain based systems - install required packages
   block:
