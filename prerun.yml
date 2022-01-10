@@ -3,3 +3,5 @@
   tasks:
     - import_role:
         name: ceph-prerun
+      when:
+        - not skip_prerun | bool

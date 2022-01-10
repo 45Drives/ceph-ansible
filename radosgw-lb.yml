@@ -43,6 +43,8 @@
   tasks:
     - import_role:
         name: ceph-prerun
+      when:
+        - not skip_prerun | bool
     - import_role:
         name: ceph-defaults
     - import_role:

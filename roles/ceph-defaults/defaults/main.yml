@@ -107,6 +107,10 @@ ceph_directories_mode: "0755"
 offline_install: false
 offline_repo_server_ip: ""
 
+# Setting this to true will skip the import of ceph-prerun role
+# Set this to false for non-45drives hardware/installs  
+skip_prerun: false
+
 ceph_repository_type: dummy
 
 # ORIGIN SOURCE
