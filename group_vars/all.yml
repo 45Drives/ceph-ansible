@@ -439,11 +439,13 @@ nfs_file_gw: true
 # ceph_conf_overrides:
 #   global:
 #     foo: 1234
-#     bar: 5678
+#     bar: 5678  
 #   "client.rgw.{{ hostvars[groups.get(rgw_group_name)[0]]['ansible_hostname'] }}":
 #     rgw_zone: zone1
 #
-#ceph_conf_overrides: {}
+ceph_conf_overrides:
+  global:
+    osd_pool_default_pg_autoscale_mode: off
 
 
 #############

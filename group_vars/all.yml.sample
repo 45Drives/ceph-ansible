@@ -550,7 +550,9 @@ dummy:
 #   "client.rgw.{{ hostvars[groups.get(rgw_group_name)[0]]['ansible_facts']['hostname'] }}":
 #     rgw_zone: zone1
 #
-#ceph_conf_overrides: {}
+#ceph_conf_overrides:
+#  global:
+#    osd_pool_default_pg_autoscale_mode: off
 
 
 #############
