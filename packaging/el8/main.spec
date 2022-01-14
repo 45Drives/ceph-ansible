@@ -28,6 +28,9 @@ make DESTDIR=%{buildroot} install
 /usr/share/ceph-ansible/*
 
 %changelog
+* Fri Jan 14 2022 Brett Kelly <bkelly@45drives.com> 5.2.7-1
+- option to skip ceph-prerun
+- disable pg_autoscaling by defualt
 * Thu Oct 07 2021 Mark Hooper <mhooper@45drives.com> 5.2.3-2
 - first stable build of ceph-ansible-45d v5.2.3
 - modified device-alias.yml playbook to be hardware agnostic if /etc/vdev_id.conf

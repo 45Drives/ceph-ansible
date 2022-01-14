@@ -1,4 +1,4 @@
-## Ceph Ansible 5.2.3-2
+## Ceph Ansible 5.2.7-1
 
-* first stable build of ceph-ansible-45d v5.2.3
-* modified device-alias.yml playbook to be hardware agnostic if /etc/vdev_id.conf was not created using dmap
+* option to skip ceph-prerun
+* disable pg_autoscaling by defualt
