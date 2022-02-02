@@ -28,6 +28,8 @@ make DESTDIR=%{buildroot} install
 /usr/share/ceph-ansible/*
 
 %changelog
+* Wed Feb 02 2022 Brett Kelly <bkelly@45drives.com> 5.2.8-1
+- ceph-smb: Remove hold on samba package version
 * Sun Dec 12 2021 Brett Kelly <bkelly@45drives.com> 5.2.6-1
 - offline support for rocky(el8) and ubuntu20.04
 * Tue Nov 30 2021 Brett Kelly <bkelly@45drives.com> 5.2.5-1

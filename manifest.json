@@ -3,7 +3,7 @@
     "name": "ceph-ansible-45d",
     "title": "Ceph Ansible",
     "prerelease": false,
-    "version": "5.2.6",
+    "version": "5.2.8",
     "buildVersion": "1",
     "author": "Brett Kelly <bkelly@45drives.com>",
     "url": "https://github.com/45Drives/ceph-ansible",
@@ -48,7 +48,7 @@
     ],
     "changelog": {
         "urgency": "medium",
-        "version": "5.2.6",
+        "version": "5.2.8",
         "buildVersion": "1",
         "ignore": [],
         "date": null,

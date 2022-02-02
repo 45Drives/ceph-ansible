@@ -1,3 +1,3 @@
-## Ceph Ansible 5.2.6-1
+## Ceph Ansible 5.2.8-1
 
-* offline support for rocky(el8) and ubuntu20.04
+* ceph-smb: Remove hold on samba package version
