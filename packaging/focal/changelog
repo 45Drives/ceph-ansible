@@ -1,3 +1,9 @@
+ceph-ansible-45d (5.2.9-1focal) focal; urgency=medium
+
+  * ceph-grafana: Copy dashboard files locally rather than git
+
+ -- Brett Kelly <bkelly@45drives.com>  Wed, 09 Feb 2022 11:42:55 -0400
+
 ceph-ansible-45d (5.2.8-1focal) focal; urgency=medium
 
   * ceph-smb: Remove hold on samba package version

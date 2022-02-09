@@ -1,3 +1,3 @@
-## Ceph Ansible 5.2.8-1
+## Ceph Ansible 5.2.9-1
 
-* ceph-smb: Remove hold on samba package version
+* ceph-grafana: Copy dashboard files locally rather than git
