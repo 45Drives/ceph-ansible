@@ -1,3 +1,3 @@
-## Ceph Ansible 5.2.10-2
+## Ceph Ansible 5.2.10-3
 
-* update cephfs-nfs to use correct crush rule
+* added support for all flash clusters
