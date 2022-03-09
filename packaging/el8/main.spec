@@ -28,6 +28,8 @@ make DESTDIR=%{buildroot} install
 /usr/share/ceph-ansible/*
 
 %changelog
+* Wed Mar 09 2022 Brett Kelly <bkelly@45drives.com> 5.2.10-2
+- update cephfs-nfs to use correct crush rule
 * Wed Mar 09 2022 Brett Kelly <bkelly@45drives.com> 5.2.10-1
 - Added support for all flash clusters
 * Fri Jan 14 2022 Brett Kelly <bkelly@45drives.com> 5.2.7-1

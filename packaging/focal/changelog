@@ -1,3 +1,9 @@
+ceph-ansible-45d (5.2.10-2focal) focal; urgency=medium
+
+  * update cephfs-nfs to use correct crush rule
+
+ -- Brett Kelly <bkelly@45drives.com>  Wed, 09 Mar 2022 14:28:47 -0400
+
 ceph-ansible-45d (5.2.10-1focal) focal; urgency=medium
 
   * Added support for all flash clusters
