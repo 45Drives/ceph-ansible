@@ -1,4 +1,3 @@
-## Ceph Ansible 5.2.7-1
+## Ceph Ansible 5.2.10-1
 
-* option to skip ceph-prerun
-* disable pg_autoscaling by defualt
+* Added support for all flash clusters
