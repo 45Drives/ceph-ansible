@@ -344,13 +344,12 @@ ceph_iscsi_config_dev: false
 #cephfs: cephfs # name of the ceph filesystem
 #cephfs_data_pool:
 #  name: "{{ cephfs_data if cephfs_data is defined else 'cephfs_data' }}"
-#  rule_name: "replicated_hdd"
 #cephfs_metadata_pool:
 #  name: "{{ cephfs_metadata if cephfs_metadata is defined else 'cephfs_metadata' }}"
-#  rule_name: "{% if hybrid_cluster %}replicated_ssd{% else %}replicated_hdd{% endif %}"
 #cephfs_pools:
 #  - "{{ cephfs_data_pool }}"
 #  - "{{ cephfs_metadata_pool }}"
+
 
 ##########
 # NFS    #
@@ -376,6 +375,7 @@ ceph_iscsi_config_dev: false
 #osd_mkfs_options_xfs: -f -i size=2048
 #osd_mount_options_xfs: noatime,largeio,inode64,swalloc
 #osd_objectstore: bluestore
+# Legacy option, no longer neccesary to set
 #hybrid_cluster: false 
 
 # Any device containing these patterns in their path will be excluded.
