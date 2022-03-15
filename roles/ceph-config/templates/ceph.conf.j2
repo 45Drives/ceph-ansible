@@ -90,6 +90,7 @@ filestore xattr use omap = true
 [osd]
 osd memory target = {{ osd_memory_target | default(2147483648) }}
 {% endif %}
+{% endif %}
 
 {% if inventory_hostname in groups.get(rgw_group_name, []) %}
 {% set _rgw_hostname = hostvars[inventory_hostname]['rgw_hostname'] | default(hostvars[inventory_hostname]['ansible_facts']['hostname']) %}
