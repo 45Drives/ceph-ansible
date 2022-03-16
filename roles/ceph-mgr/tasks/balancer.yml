@@ -1,0 +1,35 @@
+---
+## Get current state of the balancer
+# the stdout of ceph_balancer_state looks like this
+# {
+#     "active": true,
+#     "last_optimize_duration": "0:00:00.000285",
+#     "last_optimize_started": "Tue Mar 15 16:57:37 2022",
+#     "mode": "none",
+#     "optimize_result": "Please do \"ceph balancer mode\" to choose a valid mode first",
+#     "plans": []
+# }
+- name: get balancer state
+  command: /usr/bin/ceph balancer status
+  register: ceph_balancer_state
+
+- name: get min client compatiblity state
+  command: /usr/bin/ceph osd get-require-min-compat-client
+  register: min_compat_client
+
+# You can use balancer state fact to set conditionals
+# the below task takes ceph_balancer_status stdout converts to json and gets the value of "active"
+- name: ensure balancer is active
+  command: /usr/bin/ceph balancer on
+  when: not (ceph_balancer_state.stdout | from_json).active
+
+- name: set minimum client to luminous
+  command: /usr/bin/ceph osd set-require-min-compat-client luminous
+  when: min_compat_client != "luminous"
+  register: set_min_client_result
+
+# Need to make sure we dont clobber any custom plans that may of been set
+# so only set to upmap if the "mode" is currently crush-compat or none
+- name: set mode to upmap id mode if mode is none, or crush-compat, otherwise ignore
+  command: /usr/bin/ceph balancer mode upmap
+  when: ((ceph_balancer_state.stdout | from_json).mode == "none") or ((ceph_balancer_state.stdout | from_json).mode == "crush-compat")
