@@ -544,7 +544,7 @@ rgw_zone: default
 #
 ceph_conf_overrides:
   global:
-    osd_pool_default_pg_autoscale_mode: off
+    osd pool default pg autoscale mode: "off"
 
 
 #############
