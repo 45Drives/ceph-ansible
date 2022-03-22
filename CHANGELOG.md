@@ -1,3 +1,3 @@
-## Ceph Ansible 5.2.10-3
+## Ceph Ansible 5.2.11-1
 
-* added support for all flash clusters
+* added osd_memory_target changes and ceph balancer enabled by default

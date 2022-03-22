@@ -28,6 +28,8 @@ make DESTDIR=%{buildroot} install
 /usr/share/ceph-ansible/*
 
 %changelog
+* Tue Mar 22 2022 Brett Kelly <bkelly@45drives.com> 5.2.11-1
+- added osd_memory_target changes and ceph balancer enabled by default
 * Wed Mar 09 2022 Brett Kelly <bkelly@45drives.com> 5.2.10-3
 - added support for all flash clusters
 * Wed Mar 09 2022 Brett Kelly <bkelly@45drives.com> 5.2.10-2

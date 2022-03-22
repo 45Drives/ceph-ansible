@@ -1,3 +1,9 @@
+ceph-ansible-45d (5.2.11-1focal) focal; urgency=medium
+
+  * added osd_memory_target changes and ceph balancer enabled by default
+
+ -- Brett Kelly <bkelly@45drives.com>  Tue, 22 Mar 2022 07:25:23 -0300
+
 ceph-ansible-45d (5.2.10-3focal) focal; urgency=medium
 
   * added support for all flash clusters
