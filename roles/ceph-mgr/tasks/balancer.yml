@@ -28,8 +28,12 @@
   when: min_compat_client != "luminous"
   register: set_min_client_result
 
+- name: set mode to crush-compat if luminous min client is unsupported
+  command: /usr/bin/ceph balancer mode crush-compat
+  when: ((ceph_balancer_state.stdout | from_json).mode == "none") and (set_min_client_result.rc != 0)
+
 # Need to make sure we dont clobber any custom plans that may of been set
 # so only set to upmap if the "mode" is currently crush-compat or none
 - name: set mode to upmap id mode if mode is none, or crush-compat, otherwise ignore
   command: /usr/bin/ceph balancer mode upmap
-  when: ((ceph_balancer_state.stdout | from_json).mode == "none") or ((ceph_balancer_state.stdout | from_json).mode == "crush-compat")
+  when: (((ceph_balancer_state.stdout | from_json).mode == "none") or ((ceph_balancer_state.stdout | from_json).mode == "crush-compat")) and (set_min_client_result.rc == 0)
