@@ -1,0 +1,153 @@
+---
+- name: confirm whether user really meant to purge the cluster
+  hosts: localhost
+  gather_facts: false
+
+  vars_prompt:
+    - name: ireallymeanit
+      prompt: Are you sure you want to purge the cluster?
+      default: 'no'
+      private: no
+
+  tasks:
+  - name: exit playbook, if user did not mean to purge cluster
+    fail:
+      msg: >
+        "Exiting purge-samba playbook, cluster was NOT purged.
+         To purge the cluster, either say 'yes' on the prompt or
+         or use `-e ireallymeanit=yes` on the command line when
+         invoking the playbook"
+    when: ireallymeanit != 'yes'
+
+- name: stop services, purge samba packages and purge config
+  hosts:
+  - smbs
+
+  vars:
+    redhat_samba_packages:
+      - samba*
+      - ctdb*
+      - pam_krb5
+      - libsmbclient
+      - libwbclient
+      - attr
+      - samba-common-tools
+      - oddjob*
+    ubuntu_samba_packages:
+      - samba-common
+      - samba-common-bin
+      - samba-libs
+      - libsmbclient
+      - smbclient
+      - samba
+      - samba-libs
+      - python3-samba
+      - winbind
+      - libwbclient0
+      - ctdb
+      - samba-vfs-modules
+      - samba-dsdb-modules
+      - libldb2
+      - libnss-winbind
+      - libpam-winbind
+      - python3-ldb
+      - oddjob
+      - oddjob-mkhomedir
+      - ceph*
+
+  gather_facts: true
+  become: true
+
+  tasks:
+  # Is in domain (realm list) ?
+  # then leave
+  - name: check if already joined
+    command: /bin/bash -c "/usr/sbin/realm list"
+    register: domain_check
+
+  - name: leave domain
+    command: /bin/bash -c "/usr/sbin/realm leave"
+    when: domain_check.stdout != ""
+
+  - name: check for ctdb
+    stat:
+      path: /usr/lib/systemd/system/ctdb.service
+    register: ctdb_present
+
+  - name: stop ctdb service
+    systemd:
+      name: ctdb
+      state: stopped
+      enabled: no
+    when: ctdb_present.stat.exists
+
+  - name: check for samba
+    stat:
+      path: /usr/lib/systemd/system/smb.service
+    register: smb_present
+
+  - name: stop smb service
+    systemd:
+      name: smb
+      state: stopped
+      enabled: no
+    when: smb_present.stat.exists
+
+  - name: check for winbind
+    stat:
+      path: /usr/lib/systemd/system/winbind.service
+    register: winbind_present
+
+  - name: stop winbind service
+    systemd:
+      name: winbind
+      state: stopped
+      enabled: no
+    when: winbind_present.stat.exists
+
+  - name: purge samba redhat
+    block:
+      - name: redhat | purge samba packages
+        package:
+          name: "{{ redhat_samba_packages }}"
+          state: absent
+
+      - name: redhat | remove config
+        file:
+          path: "{{ item }}"
+          state: absent
+        with_items:
+          - /etc/samba
+          - /etc/ctdb
+          - /etc/krb5.conf
+          - /etc/krb5.keytab
+          - /var/lib/ctdb
+          - /var/lib/samba
+          - /etc/sssd/sssd.conf
+          - /etc/realmd.conf
+    when: ansible_os_family in ['RedHat']
+
+  - name: purge samba ubuntu
+    block:
+      - name: ubuntu | purge samba packages
+        apt:
+          name: "{{ ubuntu_samba_packages }}"
+          state: absent
+          purge: yes
+          autoremove: yes
+          force: yes
+
+      - name: ubuntu | remove config
+        file:
+          path: "{{ item }}"
+          state: absent
+        with_items:
+          - /etc/samba
+          - /etc/ctdb
+          - /etc/krb5.conf
+          - /etc/krb5.keytab
+          - /var/lib/ctdb
+          - /var/lib/samba
+          - /etc/sssd/sssd.conf
+          - /etc/realmd.conf
+    when: ansible_os_family == 'Debian'
