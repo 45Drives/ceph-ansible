@@ -5,6 +5,7 @@
 
 - name: gather osd device classes
   shell: ceph osd df --format json | jq -r '.nodes | .[].device_class'
+  delegate_to: "{{ groups[mon_group_name][0] }}"
   register: osd_device_class_list
 
 - name: create filesystem pools non hybrid cluster only
