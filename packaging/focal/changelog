@@ -1,3 +1,9 @@
+ceph-ansible-45d (5.2.12-1focal) focal; urgency=medium
+
+  * fixed deploy issue when mds is not colocated
+
+ -- Brett Kelly <bkelly@45drives.com>  Tue, 05 Apr 2022 05:46:32 -0300
+
 ceph-ansible-45d (5.2.11-1focal) focal; urgency=medium
 
   * added osd_memory_target changes and ceph balancer enabled by default
