@@ -1,3 +1,3 @@
-## Ceph Ansible 5.2.12-1
+## Ceph Ansible 5.2.13-1
 
-* fixed deploy issue when mds is not colocated
+* fixed issue when mon and mgr are not colocated

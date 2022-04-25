@@ -1,3 +1,9 @@
+ceph-ansible-45d (5.2.13-1focal) focal; urgency=medium
+
+  * fixed issue when mon and mgr are not colocated
+
+ -- Brett Kelly <bkelly@45drives.com>  Mon, 25 Apr 2022 06:32:52 -0300
+
 ceph-ansible-45d (5.2.12-1focal) focal; urgency=medium
 
   * fixed deploy issue when mds is not colocated

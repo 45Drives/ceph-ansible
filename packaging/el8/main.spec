@@ -28,6 +28,8 @@ make DESTDIR=%{buildroot} install
 /usr/share/ceph-ansible/*
 
 %changelog
+* Mon Apr 25 2022 Brett Kelly <bkelly@45drives.com> 5.2.13-1
+- fixed issue when mon and mgr are not colocated
 * Tue Apr 05 2022 Brett Kelly <bkelly@45drives.com> 5.2.12-1
 - fixed deploy issue when mds is not colocated
 * Tue Mar 22 2022 Brett Kelly <bkelly@45drives.com> 5.2.11-1
