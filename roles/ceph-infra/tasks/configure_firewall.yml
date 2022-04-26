@@ -322,6 +322,29 @@
         - rgwloadbalancer_group_name is defined
         - rgwloadbalancer_group_name in group_names
 
+    - name: open haproxy ports
+      firewalld:
+        port: "{{ haproxy_frontend_port | default(80) }}/tcp"
+        zone: "{{ ceph_rgwloadbalancer_firewall_zone }}"
+        permanent: true
+        immediate: true
+        state: enabled
+      when:
+        - rgwloadbalancer_group_name is defined
+        - rgwloadbalancer_group_name in group_names
+
+    - name: open haproxy SSL ports
+      firewalld:
+        port: "{{ haproxy_frontend_ssl_port | default(443) }}/tcp"
+        zone: "{{ ceph_rgwloadbalancer_firewall_zone }}"
+        permanent: true
+        immediate: true
+        state: enabled
+      when:
+        - haproxy_frontend_ssl_certificate is defined
+        - rgwloadbalancer_group_name is defined
+        - rgwloadbalancer_group_name in group_names
+
     - name: add rich rule for keepalived vrrp
       firewalld:
         rich_rule: 'rule protocol value="vrrp" accept'
