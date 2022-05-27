@@ -128,25 +128,27 @@ dummy:
 ###############
 # CRUSH RULES #
 ###############
-#crush_rule_config: false
+#crush_rule_config: true
 
-#crush_rule_hdd:
-#  name: HDD
-#  root: default
-#  type: host
-#  class: hdd
-#  default: false
-
+## DONT CHANGE THE ORDER OF THESE RULES, HDD MUST BE THE LAST DEFINED RULE
 #crush_rule_ssd:
-#  name: SSD
+#  name: replicated_ssd
 #  root: default
 #  type: host
 #  class: ssd
-#  default: false
+#  default: true
 
-#crush_rules:
-#  - "{{ crush_rule_hdd }}"
-#  - "{{ crush_rule_ssd }}"
+#crush_rule_hdd:
+#  name: replicated_hdd
+#  root: default
+#  type: host
+#  class: hdd
+#  default: true
+## 
+
+# crush_rules:
+#   - "{{ crush_rule_hdd }}"
+#   - "{{ crush_rule_ssd }}"
 
 # Caution: this will create crush roots and racks according to hostvars {{ osd_crush_location }}
 # and will move hosts into them which might lead to significant data movement in the cluster!

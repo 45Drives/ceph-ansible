@@ -10,19 +10,47 @@
     - hostvars[groups[mon_group_name][0]]['create_crush_tree'] | default(create_crush_tree) | bool
     - osd_crush_location is defined
 
-- name: create configured crush rules
-  ceph_crush_rule:
-    name: "{{ item.name }}"
-    cluster: "{{ cluster }}"
-    rule_type: replicated
-    bucket_root: "{{ item.root }}"
-    bucket_type: "{{ item.type }}"
-    device_class: "{{ item.class | default(omit) }}"
-  environment:
-    CEPH_CONTAINER_IMAGE: "{{ ceph_docker_registry + '/' + ceph_docker_image + ':' + ceph_docker_image_tag if containerized_deployment | bool else None }}"
-    CEPH_CONTAINER_BINARY: "{{ container_binary }}"
-  with_items: "{{ hostvars[groups[mon_group_name][0]]['crush_rules'] | default(crush_rules) | unique }}"
-  delegate_to: '{{ groups[mon_group_name][0] }}'
+- name: gather osd device classes
+  shell: ceph osd df --format json | jq -r '.nodes | .[].device_class'
+  register: osd_device_class_list
+
+- name: create SSD crush rule
+  block:
+    - name: create SSD crush rule
+      command: "{{ hostvars[groups[mon_group_name][0]]['container_exec_cmd'] | default('') }} ceph --cluster {{ cluster }} osd crush rule create-replicated {{ crush_rule_ssd.name }} {{ crush_rule_ssd.root }} {{ crush_rule_ssd.type }} {{ crush_rule_ssd.class }}"
+      changed_when: false
+      delegate_to: '{{ groups[mon_group_name][0] }}'
+      run_once: true
+
+    - name: add crush ssd rule to crush_rules_temp
+      set_fact:
+        crush_rules_temp: "{{ crush_rules_temp|default([]) + [ crush_rule_ssd ] }}"
+      run_once: true
+  when:
+    - '"ssd" in osd_device_class_list.stdout_lines'
+    - crush_rule_ssd is defined
+
+- name: create HDD crush rule
+  block:
+    - name: create HDD crush rule
+      command: "{{ hostvars[groups[mon_group_name][0]]['container_exec_cmd'] | default('') }} ceph --cluster {{ cluster }} osd crush rule create-replicated {{ crush_rule_hdd.name }} {{ crush_rule_hdd.root }} {{ crush_rule_hdd.type }} {{ crush_rule_hdd.class }}"
+      changed_when: false
+      delegate_to: '{{ groups[mon_group_name][0] }}'
+      run_once: true
+
+    - name: add crush hdd rule to crush_rules_temp
+      set_fact:
+        crush_rules_temp: "{{ crush_rules_temp|default([]) + [ crush_rule_hdd ] }}"
+      run_once: true
+  when:
+    - '"hdd" in osd_device_class_list.stdout_lines'
+    - crush_rule_hdd is defined
+
+## If crush_rules is defined skip, otherwise auto populate crush_rules based on OSD device class present in cluster
+- name: set crush_rules fact if not defined
+  set_fact:
+    crush_rules: "{{ crush_rules_temp }}"
+  when: crush_rules is undefined
   run_once: true
 
 - name: get id for new default crush rule
@@ -42,6 +70,13 @@
 # If multiple rules are set as default (should not be) then the last one is taken as actual default.
 # the with_items statement overrides each iteration with the new one.
 # NOTE(leseb): we should actually fail if multiple rules are set as default
+#
+# NOTE(45Drives): we use this behavior to handle all HDD, all SSD or hybrid clusters. 
+# In the defaults of the ceph-osd role both a ssd and hdd crush rule are defined as "default: true"
+# In the case of all HDD OSDs the ssd crush rule is ignored and the default crush rule is HDD
+# In the case of all SSD OSDs the hdd crush rule is ignored and the default crush rule is SSD
+# In the case of hybrid, SSD and HDD OSDS the hdd crush rule is taken as the default crush rule
+
 - name: set_fact info_ceph_default_crush_rule_yaml, ceph_osd_pool_default_crush_rule_name
   set_fact:
     info_ceph_default_crush_rule_yaml: "{{ item.stdout | default('{}', True) | from_json() }}"
