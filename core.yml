@@ -44,6 +44,8 @@
 
   tasks:
     - import_role:
+        name: ceph-prerun
+    - import_role:
         name: ceph-defaults
     - import_role:
         name: ceph-facts
