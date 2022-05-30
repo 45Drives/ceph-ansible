@@ -1,0 +1,108 @@
+---
+- name: configure nfs directory on cephfs
+  delegate_to: "{{ groups[mon_group_name][0] }}"
+  run_once: true
+  block:
+    - name: config_cephfs | Get admin secret
+      command: "{{ container_exec_cmd }} ceph auth get-key client.admin"
+      register: command_output_admin
+      delegate_to: "{{ groups[mon_group_name][0] }}"
+      changed_when: false
+
+    - name: config_cephfs | Set admin secret fact
+      set_fact:
+        cephfs_admin_secret: "{{ command_output_admin.stdout }}"
+
+    - name: config_cephfs | Ensure cephfs root dir exists
+      file:
+        path: "/mnt/cephfs/root"
+        state: directory
+        mode: 0755
+
+    - name: config_cephfs | Mount cephfs as admin user 
+      mount:
+        name: "/mnt/cephfs/root"
+        src: ":/"
+        fstype: "ceph"
+        opts: "name=admin,secret={{ cephfs_admin_secret }},_netdev,noatime"
+        state: mounted
+
+    - name: config_cephfs | Create directory for nfsroot
+      file:
+        path: "/mnt/cephfs/root/{{ ceph_nfs_fs_root }}"
+        state: directory
+        owner: root
+        group: ceph
+        mode: 0775
+
+    - name: config_cephfs | Unmount cephfs as admin user 
+      mount:
+        name: "/mnt/cephfs/root"
+        state: absent 
+
+- name: config_cephfs | Create NFS cephx user
+  ceph_key:
+    name: "{{ item.name }}"
+    state: present
+    caps: "{{ item.caps }}"
+    cluster: "{{ cluster }}"
+    secret: "{{ item.key | default('') }}"
+  with_items: "{{ nfs_keyring }}"
+  delegate_to: "{{ groups[mon_group_name][0] }}"
+
+- import_role:
+    name: ceph-facts
+    tasks_from: get_def_crush_rule_name.yml
+
+- name: gather osd device classes
+  shell: ceph osd df --format json | jq -r '.nodes | .[].device_class'
+  register: osd_device_class_list
+
+- name: create pool for nfs ganesha data non hybrid cluster only
+  when:
+    - '("hdd" in osd_device_class_list.stdout_lines and "ssd" not in osd_device_class_list.stdout_lines) or ("ssd" in osd_device_class_list.stdout_lines and "hdd" not in osd_device_class_list.stdout_lines)'
+  block:
+    - name: create pool for nfs ganesha data non hybrid cluster
+      ceph_pool:
+        name: "{{ ceph_nfs_ganesha_pool }}"
+        cluster: "{{ cluster }}"
+        pg_num: 1
+        pgp_num: 1
+        application: "nfs_ganesha_conf"
+        size: "{{ ceph_nfs_ganesha_pool.size | default(omit) }}"
+        min_size: "{{ ceph_nfs_ganesha_pool.min_size | default(omit) }}"
+        pool_type: "{{ ceph_nfs_ganesha_pool.type | default('replicated') }}"
+        rule_name: "{{ ceph_osd_pool_default_crush_rule_name | default(omit) }}"
+        erasure_profile: "{{ ceph_nfs_ganesha_pool.erasure_profile | default(omit) }}"
+        pg_autoscale_mode: "{{ ceph_nfs_ganesha_pool.pg_autoscale_mode | default(omit) }}"
+        target_size_ratio: "{{ ceph_nfs_ganesha_pool.target_size_ratio | default(omit) }}"
+      delegate_to: "{{ groups[mon_group_name][0] }}"
+      environment:
+        CEPH_CONTAINER_IMAGE: "{{ ceph_docker_registry + '/' + ceph_docker_image + ':' + ceph_docker_image_tag if containerized_deployment else None }}"
+        CEPH_CONTAINER_BINARY: "{{ container_binary }}"
+      run_once: true
+
+- name: create filesystem pools hybrid cluster only
+  when:
+    - '"hdd" in osd_device_class_list.stdout_lines'
+    - '"ssd" in osd_device_class_list.stdout_lines'
+  block:
+    - name: create pool for nfs ganesha data hybrid cluster
+      ceph_pool:
+        name: "{{ ceph_nfs_ganesha_pool }}"
+        cluster: "{{ cluster }}"
+        pg_num: 1
+        pgp_num: 1
+        application: "nfs_ganesha_conf"
+        size: "{{ ceph_nfs_ganesha_pool.size | default(omit) }}"
+        min_size: "{{ ceph_nfs_ganesha_pool.min_size | default(omit) }}"
+        pool_type: "{{ ceph_nfs_ganesha_pool.type | default('replicated') }}"
+        rule_name: "replicated_ssd"
+        erasure_profile: "{{ ceph_nfs_ganesha_pool.erasure_profile | default(omit) }}"
+        pg_autoscale_mode: "{{ ceph_nfs_ganesha_pool.pg_autoscale_mode | default(omit) }}"
+        target_size_ratio: "{{ ceph_nfs_ganesha_pool.target_size_ratio | default(omit) }}"
+      delegate_to: "{{ groups[mon_group_name][0] }}"
+      environment:
+        CEPH_CONTAINER_IMAGE: "{{ ceph_docker_registry + '/' + ceph_docker_image + ':' + ceph_docker_image_tag if containerized_deployment else None }}"
+        CEPH_CONTAINER_BINARY: "{{ container_binary }}"
+      run_once: true

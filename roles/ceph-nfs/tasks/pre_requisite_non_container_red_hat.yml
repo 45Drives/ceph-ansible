@@ -1,6 +1,8 @@
 ---
 - name: red hat based systems - repo handling
-  when: ceph_origin == 'repository'
+  when: 
+    - ceph_origin == 'repository'
+    - not offline_install
   block:
     - name: red hat based systems - stable repo related tasks
       when:
@@ -55,3 +57,19 @@
       register: result
       until: result is succeeded
       when: nfs_obj_gw | bool
+
+- name: red hat based systems - install pacemaker/corosync/pcs
+  block:
+    - name: Enable HighAvailablity Repo on RHEL8/Rocky
+      shell: dnf config-manager --set-enabled ha
+      when: not offline_install
+
+    - name: install pacemaker
+      package:
+        name: ['pacemaker', 'corosync', 'pcs']
+        state: "{{ (upgrade_ceph_packages|bool) | ternary('latest','present') }}"
+      register: result
+      until: result is succeeded
+      when:
+        - ceph_nfs_rados_backend_driver == "rados_ng"
+        - groups['nfss'] | length > 1

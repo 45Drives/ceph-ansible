@@ -1,6 +1,8 @@
 ---
 - name: debian based systems - repo handling
-  when: ceph_origin == 'repository'
+  when: 
+    - ceph_origin == 'repository'
+    - not offline_install
   block:
     - name: stable repos specific tasks
       when:
