@@ -1,0 +1,54 @@
+- hosts: osds
+  vars:
+      tools_install_dir: "/opt/45drives/tools" 
+      vdev_file_content: None
+  tasks:
+    - import_role:
+        name: ceph-prerun
+    
+    - name: Check for presence of /etc/vdev_id.conf
+      stat:
+        path: /etc/vdev_id.conf
+      register: vdev_id_result
+    
+    - name: get vdev_id.conf content
+      shell: cat /etc/vdev_id.conf
+      register: vdev_file_content
+      when: vdev_id_result.stat.exists
+
+    - name: Perform drive aliasing using dmap on 45Drives standard hardware
+      block:
+
+        - name: Create drive alias' for standard chassis
+          command: /usr/bin/python3 "{{ tools_install_dir }}"/dmap 
+          register: dmap_output
+
+        - name: Show dmap output
+          debug:
+            msg: "{{ dmap_output.stdout_lines }}"
+          when:
+          - dmap_output.failed
+
+        - name: Get drive layout
+          command: /usr/bin/python3 "{{ tools_install_dir }}"/lsdev -n
+          register: drive_layout
+          changed_when: false
+
+        - name: Show drive layout
+          debug:
+            msg: "{{ drive_layout.stdout_lines }}"
+          when: 
+          - not drive_layout.failed
+
+      when: 'not vdev_id_result.stat.exists or "dmap" in vdev_file_content.stdout'
+
+    - name: Get vdev_id.conf file content
+      shell: 'cat /etc/vdev_id.conf'
+      register: vdev_id_content
+
+    - name: output vdev_id.conf content
+      debug:
+        msg: "{{ vdev_id_content.stdout_lines }}"
+
+- name: Import generate-osd-vars playbook
+  import_playbook: generate-osd-vars.yml
