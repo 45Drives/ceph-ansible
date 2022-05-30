@@ -1,0 +1,34 @@
+---
+## OFFLINE MODE ONLY
+import_container_images: true
+metric_container_images:
+  - "localhost/grafana-offline:5.4.2"
+  - "prom/alertmanager:v0.16.2"
+  - "prom/prometheus:v2.7.2"
+metric_container_images_archive:
+  - "alertmanager-v0.16.2.tar"
+  - "grafana-v5.4.2.tar"
+  - "prometheus-v2.7.2.tar"
+node_exporter_container_image: "prom/node-exporter:v0.17.0"
+node_exporter_container_image_archive: "node-exporter-v0.17.0.tar"
+###
+
+ubuntu_install_pkgs:
+  - "45drives-tools"
+  - "python3-docker"
+  
+rocky_install_pkgs:
+  - "45drives-tools"
+
+ubuntu_cleanup_pkgs:
+  - "zfs-dkms"
+  - "zfsutils-linux"
+  - "libzfs2linux"
+  - "libzfslinux-dev"
+  - "cockpit-zfs-manager"
+  - "cockpit-machines"
+
+rocky_cleanup_pkgs:
+  - "zfs"
+  - "cockpit-zfs-manager"
+  - "cockpit-machines"

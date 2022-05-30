@@ -1,0 +1,8 @@
+---
+- name: Install Extra Dependencies in Ubuntu 
+  apt:
+    name: "{{ ubuntu_install_pkgs | unique }}"
+    update_cache: no
+    state: "latest"
+  register: result
+  until: result is succeeded
