@@ -19,3 +19,14 @@ ceph-ansible.spec
 !.travis.yml
 !.mergify.yml
 !raw_install_python.yml
+!generate-osd-vars.yml
+!device-alias.yml
+!core.yml
+!cephfs.yml
+!clients.yml
+!iscsi.yml
+!nfs.yml
+!radosgw-lb.yml
+!radosgw.yml
+!smb.yml
+!update-servers.yml
