@@ -71,7 +71,7 @@
     - import_role:
         name: ceph-common
     - import_role:
-        name: ceph-smb
+        name: smb
 
   post_tasks:
     - name: set ceph samba install 'Complete'

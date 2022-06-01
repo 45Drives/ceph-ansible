@@ -3,8 +3,8 @@
     "name": "ceph-ansible-45d",
     "title": "Ceph Ansible",
     "prerelease": true,
-    "version": "5.2.2",
-    "buildVersion": "6",
+    "version": "5.3.1",
+    "buildVersion": "1",
     "author": "Mark Hooper <mhooper@45drives.com>",
     "url": "https://github.com/45Drives/ceph-ansible",
     "category": "utils",
@@ -24,14 +24,16 @@
     "dependencies": {
         "deb": [
             "ansible",
-            "python3"
+            "python3",
+            "samba-ansible"
         ],
         "el": [
             "ansible",
             "python3",
             "python3-netaddr",
             "python3-pyyaml",
-            "python3-six"
+            "python3-six",
+            "samba-ansible"
         ]
     },
     "releases": [
@@ -48,11 +50,11 @@
     ],
     "changelog": {
         "urgency": "medium",
-        "version": "5.2.2",
-        "buildVersion": "6",
+        "version": "5.3.1",
+        "buildVersion": "1",
         "ignore": [],
         "date": null,
-        "packager": "Mark Hooper <mhooper@45drives.com>",
+        "packager": "Brett Kelly <bkelly@45drives.com>",
         "changes": []
     }
 }

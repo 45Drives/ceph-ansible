@@ -1,3 +1,0 @@
-{% for host in groups['smbs'] %}
-{{ hostvars[host]['ansible_default_ipv4']['address']|default(hostvars[host]['ansible_all_ipv4_addresses'][0])}}
-{% endfor %}
