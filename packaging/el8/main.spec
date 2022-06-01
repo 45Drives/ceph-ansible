@@ -28,6 +28,8 @@ make DESTDIR=%{buildroot} install
 /usr/share/ceph-ansible/*
 
 %changelog
+* Wed Jun 01 2022 Brett Kelly <bkelly@45drives.com> 5.3.1-7
+- fixed version number
 * Wed Jun 01 2022 Brett Kelly <bkelly@45drives.com> 2.3.2-1
 - merged in external samba role
 - added missing delegate task when creating cephfs/nfs pools

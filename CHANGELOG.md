@@ -1,4 +1,3 @@
-## Ceph Ansible 2.3.2-1
+## Ceph Ansible 5.3.1-7
 
-* merged in external samba role
-* added missing delegate task when creating cephfs/nfs pools
+* fixed version number
