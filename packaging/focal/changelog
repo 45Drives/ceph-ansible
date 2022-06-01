@@ -1,3 +1,9 @@
+ceph-ansible-45d (5.3.1-8focal) focal; urgency=medium
+
+  * update ansible dependancy to 2.9.27
+
+ -- Brett Kelly <bkelly@45drives.com>  Wed, 01 Jun 2022 13:26:03 -0300
+
 ceph-ansible-45d (5.3.1-7focal) focal; urgency=medium
 
   * fixed version number

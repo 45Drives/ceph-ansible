@@ -1,3 +1,3 @@
-## Ceph Ansible 5.3.1-7
+## Ceph Ansible 5.3.1-8
 
-* fixed version number
+* update ansible dependancy to 2.9.27
