@@ -22,6 +22,9 @@ CORE
     * Defaults to 2GiB
 * Balancer is enabled by default. Mode is upmap
 
+ceph-facts
+* ansible version check ansible 2.10 
+
 PRERUN
 * included existing ceph-prerun role, removed centos 7 tasks
 * TODO - Update container images
