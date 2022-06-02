@@ -1,3 +1,3 @@
-## Ceph Ansible 5.3.1-8
+## Ceph Ansible 5.3.1-9
 
-* update ansible dependancy to 2.9.27
+* added task to remove any cephfs mounts on all hosts when purhing cluster

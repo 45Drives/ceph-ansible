@@ -28,6 +28,8 @@ make DESTDIR=%{buildroot} install
 /usr/share/ceph-ansible/*
 
 %changelog
+* Thu Jun 02 2022 Brett Kelly <bkelly@45drives.com> 5.3.1-9
+- added task to remove any cephfs mounts on all hosts when purhing cluster
 * Wed Jun 01 2022 Brett Kelly <bkelly@45drives.com> 5.3.1-8
 - update ansible dependancy to 2.9.27
 * Wed Jun 01 2022 Brett Kelly <bkelly@45drives.com> 5.3.1-7
