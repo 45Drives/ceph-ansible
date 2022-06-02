@@ -50,8 +50,6 @@
 - name: check there's no ceph kernel threads present
   hosts: 
     - clients
-    - smbs
-    - nfss
   become: true
   gather_facts: false
   any_errors_fatal: true
