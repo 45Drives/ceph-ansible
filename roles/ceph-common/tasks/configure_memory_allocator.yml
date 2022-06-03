@@ -9,13 +9,7 @@
   when:
     - ansible_facts['os_family'] == 'Debian'
     - etc_default_ceph.stat.exists
-  notify:
-    - restart ceph mons
-    - restart ceph mgrs
-    - restart ceph osds
-    - restart ceph mdss
-    - restart ceph rgws
-    - restart ceph rbdmirrors
+  register: config_updated_debian
 
 - name: configure TCMALLOC_MAX_TOTAL_THREAD_CACHE_BYTES for redhat
   lineinfile:
@@ -25,10 +19,34 @@
     regexp: "^TCMALLOC_MAX_TOTAL_THREAD_CACHE_BYTES="
     line: "TCMALLOC_MAX_TOTAL_THREAD_CACHE_BYTES={{ ceph_tcmalloc_max_total_thread_cache }}"
   when: ansible_facts['os_family'] == 'RedHat'
-  notify:
-    - restart ceph mons
-    - restart ceph mgrs
-    - restart ceph osds
-    - restart ceph mdss
-    - restart ceph rgws
-    - restart ceph rbdmirrors
+  register: config_updated_redhat
+
+- name: notify restart ceph mons
+  debug: msg="Notifying restart ceph mons"
+  when: (config_updated_redhat.changed or config_updated_debian.changed) and mon_group_name in group_names
+  notify: restart ceph mons
+
+- name: notify restart ceph mgrs
+  debug: msg="Notifying restart ceph mgrs"
+  when: (config_updated_redhat.changed or config_updated_debian.changed) and mgr_group_name in group_names
+  notify: restart ceph mgrs
+
+- name: notify restart ceph osds
+  debug: msg="Notifying restart ceph osds"
+  when: (config_updated_redhat.changed or config_updated_debian.changed) and osd_group_name in group_names
+  notify: restart ceph osds
+
+- name: notify restart ceph mdss
+  debug: msg="Notifying restart ceph mdss"
+  when: (config_updated_redhat.changed or config_updated_ubuntu.changed) and mds_group_name in group_names
+  notify: restart ceph mdss
+
+- name: notify restart ceph rgws
+  debug: msg="Notifying restart ceph rgws"
+  when: (config_updated_redhat.changed or config_updated_debian.changed) and rgw_group_name in group_names
+  notify: restart ceph rgws
+
+- name: notify restart ceph rbdmirrors
+  debug: msg="Notifying restart ceph rbdmirrors"
+  when: (config_updated_redhat.changed or config_updated_debian.changed) and rbdmirror_group_name in group_names
+  notify: restart ceph rbdmirrors

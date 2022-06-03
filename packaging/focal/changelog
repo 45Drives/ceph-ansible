@@ -1,3 +1,9 @@
+ceph-ansible-45d (5.3.1-10focal) focal; urgency=medium
+
+  * updated how listeners are notified in configure_memory_allocator.yml
+
+ -- Mark Hooper <mhooper@45drives.com>  Fri, 03 Jun 2022 10:38:41 -0300
+
 ceph-ansible-45d (5.3.1-9focal) focal; urgency=medium
 
   * added task to remove any cephfs mounts on all hosts when purhing cluster

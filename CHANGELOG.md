@@ -1,3 +1,3 @@
-## Ceph Ansible 5.3.1-9
+## Ceph Ansible 5.3.1-10
 
-* added task to remove any cephfs mounts on all hosts when purhing cluster
+* updated how listeners are notified in configure_memory_allocator.yml
