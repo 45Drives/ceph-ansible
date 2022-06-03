@@ -746,6 +746,7 @@
       - ceph-release
       - ceph-radosgw
       - ceph-grafana-dashboards
+      - ceph-mgr-modules-core
       - rbd-mirror
     ceph_remaining_packages:
       - libcephfs2
@@ -755,6 +756,7 @@
       - librgw2
       - python3-ceph-argparse
       - python3-cephfs
+      - python3-ceph-common
       - python3-rados
       - python3-rbd
       - python3-rgw
