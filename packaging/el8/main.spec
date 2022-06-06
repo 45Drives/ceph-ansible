@@ -28,6 +28,8 @@ make DESTDIR=%{buildroot} install
 /usr/share/ceph-ansible/*
 
 %changelog
+* Mon Jun 06 2022 Mark Hooper <mhooper@45drives.com> 5.3.1-11
+- fixed typo in configure_memory_allocator.yml
 * Fri Jun 03 2022 Mark Hooper <mhooper@45drives.com> 5.3.1-10
 - updated how listeners are notified in configure_memory_allocator.yml
 * Thu Jun 02 2022 Brett Kelly <bkelly@45drives.com> 5.3.1-9

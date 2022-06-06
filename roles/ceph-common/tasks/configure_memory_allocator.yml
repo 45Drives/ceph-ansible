@@ -38,7 +38,7 @@
 
 - name: notify restart ceph mdss
   debug: msg="Notifying restart ceph mdss"
-  when: (config_updated_redhat.changed or config_updated_ubuntu.changed) and mds_group_name in group_names
+  when: (config_updated_redhat.changed or config_updated_debian.changed) and mds_group_name in group_names
   notify: restart ceph mdss
 
 - name: notify restart ceph rgws

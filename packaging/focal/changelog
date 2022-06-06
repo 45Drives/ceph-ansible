@@ -1,3 +1,9 @@
+ceph-ansible-45d (5.3.1-11focal) focal; urgency=medium
+
+  * fixed typo in configure_memory_allocator.yml
+
+ -- Mark Hooper <mhooper@45drives.com>  Mon, 06 Jun 2022 06:16:47 -0300
+
 ceph-ansible-45d (5.3.1-10focal) focal; urgency=medium
 
   * updated how listeners are notified in configure_memory_allocator.yml

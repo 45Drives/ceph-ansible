@@ -1,3 +1,3 @@
-## Ceph Ansible 5.3.1-10
+## Ceph Ansible 5.3.1-11
 
-* updated how listeners are notified in configure_memory_allocator.yml
+* fixed typo in configure_memory_allocator.yml
