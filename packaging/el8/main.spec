@@ -28,6 +28,8 @@ make DESTDIR=%{buildroot} install
 /usr/share/ceph-ansible/*
 
 %changelog
+* Tue Jun 07 2022 Mark Hooper <mhooper@45drives.com> 5.3.1-12
+- removed ceph* wildcard in list of ubuntu packages for samba
 * Mon Jun 06 2022 Mark Hooper <mhooper@45drives.com> 5.3.1-11
 - fixed typo in configure_memory_allocator.yml
 * Fri Jun 03 2022 Mark Hooper <mhooper@45drives.com> 5.3.1-10

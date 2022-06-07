@@ -53,7 +53,6 @@
       - python3-ldb
       - oddjob
       - oddjob-mkhomedir
-      - ceph*
 
   gather_facts: true
   become: true

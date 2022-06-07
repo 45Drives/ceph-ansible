@@ -1,3 +1,3 @@
-## Ceph Ansible 5.3.1-11
+## Ceph Ansible 5.3.1-12
 
-* fixed typo in configure_memory_allocator.yml
+* removed ceph* wildcard in list of ubuntu packages for samba

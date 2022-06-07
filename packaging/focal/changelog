@@ -1,3 +1,9 @@
+ceph-ansible-45d (5.3.1-12focal) focal; urgency=medium
+
+  * removed ceph* wildcard in list of ubuntu packages for samba
+
+ -- Mark Hooper <mhooper@45drives.com>  Tue, 07 Jun 2022 12:02:41 -0300
+
 ceph-ansible-45d (5.3.1-11focal) focal; urgency=medium
 
   * fixed typo in configure_memory_allocator.yml
