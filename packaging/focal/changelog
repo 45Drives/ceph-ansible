@@ -1,3 +1,9 @@
+ceph-ansible-45d (5.3.1-14focal) focal; urgency=medium
+
+  * added kerberos_init.yml playbook
+
+ -- Mark Hooper <mhooper@45drives.com>  Thu, 09 Jun 2022 13:50:05 -0300
+
 ceph-ansible-45d (5.3.1-13focal) focal; urgency=medium
 
   * updated list of redhat_samba_packages to be removed when purging samba

@@ -1,3 +1,3 @@
-## Ceph Ansible 5.3.1-13
+## Ceph Ansible 5.3.1-14
 
-* updated list of redhat_samba_packages to be removed when purging samba
+* added kerberos_init.yml playbook

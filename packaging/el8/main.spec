@@ -28,6 +28,8 @@ make DESTDIR=%{buildroot} install
 /usr/share/ceph-ansible/*
 
 %changelog
+* Thu Jun 09 2022 Mark Hooper <mhooper@45drives.com> 5.3.1-14
+- added kerberos_init.yml playbook
 * Thu Jun 09 2022 Mark Hooper <mhooper@45drives.com> 5.3.1-13
 - updated list of redhat_samba_packages to be removed when purging samba
 * Tue Jun 07 2022 Mark Hooper <mhooper@45drives.com> 5.3.1-12
