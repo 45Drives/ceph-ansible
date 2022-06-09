@@ -28,6 +28,8 @@ make DESTDIR=%{buildroot} install
 /usr/share/ceph-ansible/*
 
 %changelog
+* Thu Jun 09 2022 Mark Hooper <mhooper@45drives.com> 5.3.1-13
+- updated list of redhat_samba_packages to be removed when purging samba
 * Tue Jun 07 2022 Mark Hooper <mhooper@45drives.com> 5.3.1-12
 - removed ceph* wildcard in list of ubuntu packages for samba
 * Mon Jun 06 2022 Mark Hooper <mhooper@45drives.com> 5.3.1-11

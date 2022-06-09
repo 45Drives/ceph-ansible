@@ -1,3 +1,9 @@
+ceph-ansible-45d (5.3.1-13focal) focal; urgency=medium
+
+  * updated list of redhat_samba_packages to be removed when purging samba
+
+ -- Mark Hooper <mhooper@45drives.com>  Thu, 09 Jun 2022 06:58:19 -0300
+
 ceph-ansible-45d (5.3.1-12focal) focal; urgency=medium
 
   * removed ceph* wildcard in list of ubuntu packages for samba

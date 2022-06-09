@@ -25,14 +25,14 @@
 
   vars:
     redhat_samba_packages:
-      - samba*
-      - ctdb*
-      - pam_krb5
+      - attr
+      - ctdb
       - libsmbclient
       - libwbclient
-      - attr
-      - samba-common-tools
-      - oddjob*
+      - oddjob
+      - oddjob-mkhomedir
+      - samba
+
     ubuntu_samba_packages:
       - samba-common
       - samba-common-bin
