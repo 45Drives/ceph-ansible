@@ -28,6 +28,8 @@ make DESTDIR=%{buildroot} install
 /usr/share/ceph-ansible/*
 
 %changelog
+* Fri Jun 10 2022 Mark Hooper <mhooper@45drives.com> 5.3.1-15
+- updated kerberos_init.yml playbook
 * Thu Jun 09 2022 Mark Hooper <mhooper@45drives.com> 5.3.1-14
 - added kerberos_init.yml playbook
 * Thu Jun 09 2022 Mark Hooper <mhooper@45drives.com> 5.3.1-13

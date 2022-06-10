@@ -1,3 +1,3 @@
-## Ceph Ansible 5.3.1-14
+## Ceph Ansible 5.3.1-15
 
-* added kerberos_init.yml playbook
+* updated kerberos_init.yml playbook

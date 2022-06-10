@@ -1,3 +1,9 @@
+ceph-ansible-45d (5.3.1-15focal) focal; urgency=medium
+
+  * updated kerberos_init.yml playbook
+
+ -- Mark Hooper <mhooper@45drives.com>  Fri, 10 Jun 2022 09:55:20 -0300
+
 ceph-ansible-45d (5.3.1-14focal) focal; urgency=medium
 
   * added kerberos_init.yml playbook
