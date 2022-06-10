@@ -3,18 +3,34 @@
   vars_prompt:
 
     - name: kerberos_username
-      prompt: 'Enter kerberos username for {{ realm | upper }}'
+      prompt: 'Enter kerberos username'
       private: no
 
     - name: kerberos_password
-      prompt: 'Enter kerberos password for {{ realm | upper }}'
+      prompt: 'password'
       private: yes
       confirm: yes
 
   tasks:
-    - name: include dependency tasks
-      include: install/dependencies.yml
-      tags: always
+    - name: redhat family | install dependency
+      package:
+        name: "{{ item }}"
+        state: "{{ (upgrade_samba_packages|bool) | ternary('latest','present') }}"
+      register: result
+      until: result is succeeded
+      with_items: 
+        - krb5-workstation
+      when: ansible_facts['os_family'] == 'RedHat'
+
+    - name: debian family | install dependency
+      package:
+        name: "{{ item }}"
+        state: "{{ (upgrade_samba_packages|bool) | ternary('latest','present') }}"
+      register: result
+      until: result is succeeded
+      with_items: 
+        - krb5-user
+      when: ansible_facts['os_family'] == 'Debian'
       
     - name: run klist
       command: klist
