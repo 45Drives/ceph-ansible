@@ -1,3 +1,3 @@
-## Ceph Ansible 5.3.1-15
+## Ceph Ansible 5.3.1-16
 
-* updated kerberos_init.yml playbook
+* added samba-common package to redhat_samba_packages list in purge-smb.yml

@@ -1,3 +1,9 @@
+ceph-ansible-45d (5.3.1-16focal) focal; urgency=medium
+
+  * added samba-common package to redhat_samba_packages list in purge-smb.yml
+
+ -- Mark Hooper <mhooper@45drives.com>  Mon, 20 Jun 2022 10:17:44 -0300
+
 ceph-ansible-45d (5.3.1-15focal) focal; urgency=medium
 
   * updated kerberos_init.yml playbook

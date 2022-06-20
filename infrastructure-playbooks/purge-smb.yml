@@ -32,6 +32,7 @@
       - oddjob
       - oddjob-mkhomedir
       - samba
+      - samba-common
 
     ubuntu_samba_packages:
       - samba-common

@@ -28,6 +28,8 @@ make DESTDIR=%{buildroot} install
 /usr/share/ceph-ansible/*
 
 %changelog
+* Mon Jun 20 2022 Mark Hooper <mhooper@45drives.com> 5.3.1-16
+- added samba-common package to redhat_samba_packages list in purge-smb.yml
 * Fri Jun 10 2022 Mark Hooper <mhooper@45drives.com> 5.3.1-15
 - updated kerberos_init.yml playbook
 * Thu Jun 09 2022 Mark Hooper <mhooper@45drives.com> 5.3.1-14
