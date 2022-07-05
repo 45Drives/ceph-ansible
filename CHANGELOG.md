@@ -1,3 +1,1 @@
-## Ceph Ansible 5.3.1-16
-
-* added samba-common package to redhat_samba_packages list in purge-smb.yml
+## Ceph Ansible specify which phys iterface the VIP will reside-1
