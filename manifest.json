@@ -4,7 +4,7 @@
     "title": "Ceph Ansible",
     "prerelease": true,
     "version": "5.3.1",
-    "buildVersion": "16",
+    "buildVersion": "17",
     "author": "Mark Hooper <mhooper@45drives.com>",
     "url": "https://github.com/45Drives/ceph-ansible",
     "category": "utils",
@@ -50,11 +50,11 @@
     ],
     "changelog": {
         "urgency": "medium",
-        "version": "specify which phys iterface the VIP will reside",
-        "buildVersion": "1",
+        "version": "5.3.1",
+        "buildVersion": "17",
         "ignore": [],
-        "date": "2022-07-05T17:14:25.800340",
-        "packager": "Brett Kelly <bkelly@45drives.com>",
+        "date": null,
+        "packager": "Mark Hooper <mhooper@45drives.com>",
         "changes": []
     }
 }

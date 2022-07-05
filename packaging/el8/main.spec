@@ -28,6 +28,8 @@ make DESTDIR=%{buildroot} install
 /usr/share/ceph-ansible/*
 
 %changelog
+* Tue Jul 05 2022 Brett Kelly <bkelly@45drives.com> 5.3.1-17
+- specify which phys iterface the VIP will reside
 * Mon Jun 20 2022 Mark Hooper <mhooper@45drives.com> 5.3.1-16
 - added samba-common package to redhat_samba_packages list in purge-smb.yml
 * Fri Jun 10 2022 Mark Hooper <mhooper@45drives.com> 5.3.1-15

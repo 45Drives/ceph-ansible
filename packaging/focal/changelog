@@ -1,3 +1,9 @@
+ceph-ansible-45d (5.3.1-17focal) focal; urgency=medium
+
+  * specify which phys iterface the VIP will reside
+
+ -- Brett Kelly <bkelly@45drives.com>  Tue, 05 Jul 2022 14:18:13 -0300
+
 ceph-ansible-45d (5.3.1-16focal) focal; urgency=medium
 
   * added samba-common package to redhat_samba_packages list in purge-smb.yml
