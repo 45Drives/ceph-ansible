@@ -72,7 +72,7 @@
   register: ip_resource_check
 
 - name: Create Floating IP for NFS service
-  command: pcs resource create nfs_ip ocf:heartbeat:IPaddr2 ip={{ ceph_nfs_floating_ip_address }} cidr_netmask={{ ceph_nfs_floating_ip_cidr }} op monitor interval=10s
+  command: pcs resource create nfs_ip ocf:heartbeat:IPaddr2 ip={{ ceph_nfs_floating_ip_address }} cidr_netmask={{ ceph_nfs_floating_ip_cidr }} nic={{ ceph_nfs_floating_ip_interface }} op monitor interval=10s
   run_once: true
   when: ip_resource_check.rc == 1
 
