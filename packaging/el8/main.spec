@@ -28,27 +28,39 @@ make DESTDIR=%{buildroot} install
 /usr/share/ceph-ansible/*
 
 %changelog
-* Mon Apr 25 2022 Brett Kelly <bkelly@45drives.com> 5.2.13-1
-- fixed issue when mon and mgr are not colocated
-* Tue Apr 05 2022 Brett Kelly <bkelly@45drives.com> 5.2.12-1
-- fixed deploy issue when mds is not colocated
-* Tue Mar 22 2022 Brett Kelly <bkelly@45drives.com> 5.2.11-1
-- added osd_memory_target changes and ceph balancer enabled by default
-* Wed Mar 09 2022 Brett Kelly <bkelly@45drives.com> 5.2.10-3
-- added support for all flash clusters
-* Wed Mar 09 2022 Brett Kelly <bkelly@45drives.com> 5.2.10-2
-- update cephfs-nfs to use correct crush rule
-* Wed Mar 09 2022 Brett Kelly <bkelly@45drives.com> 5.2.10-1
-- Added support for all flash clusters
-* Fri Jan 14 2022 Brett Kelly <bkelly@45drives.com> 5.2.7-1
-- option to skip ceph-prerun
-- disable pg_autoscaling by defualt
-* Thu Oct 07 2021 Mark Hooper <mhooper@45drives.com> 5.2.3-2
-- first stable build of ceph-ansible-45d v5.2.3
-- modified device-alias.yml playbook to be hardware agnostic if /etc/vdev_id.conf
-  was not created using dmap
-* Thu Oct 07 2021 Mark Hooper <mhooper@45drives.com> 5.2.3-1
-- first build for pre-release package ceph-ansible-45d
+* Wed Jul 06 2022 Mark Hooper <mhooper@45drives.com> 5.3.2-1
+- updated samba-ansible dependency to >= 1.1.3
+- updated manifest to release to 45drives stable repo
+- modified samba deployment to use either winbind, or sssd to join domains.
+- joining domain can now use a kerberos ticket, or username/password
+- updated nfs playbooks to specify vip interface
+* Tue Jul 05 2022 Brett Kelly <bkelly@45drives.com> 5.3.1-17
+- specify which phys iterface the VIP will reside
+* Mon Jun 20 2022 Mark Hooper <mhooper@45drives.com> 5.3.1-16
+- added samba-common package to redhat_samba_packages list in purge-smb.yml
+* Fri Jun 10 2022 Mark Hooper <mhooper@45drives.com> 5.3.1-15
+- updated kerberos_init.yml playbook
+* Thu Jun 09 2022 Mark Hooper <mhooper@45drives.com> 5.3.1-14
+- added kerberos_init.yml playbook
+* Thu Jun 09 2022 Mark Hooper <mhooper@45drives.com> 5.3.1-13
+- updated list of redhat_samba_packages to be removed when purging samba
+* Tue Jun 07 2022 Mark Hooper <mhooper@45drives.com> 5.3.1-12
+- removed ceph* wildcard in list of ubuntu packages for samba
+* Mon Jun 06 2022 Mark Hooper <mhooper@45drives.com> 5.3.1-11
+- fixed typo in configure_memory_allocator.yml
+* Fri Jun 03 2022 Mark Hooper <mhooper@45drives.com> 5.3.1-10
+- updated how listeners are notified in configure_memory_allocator.yml
+* Thu Jun 02 2022 Brett Kelly <bkelly@45drives.com> 5.3.1-9
+- added task to remove any cephfs mounts on all hosts when purhing cluster
+* Wed Jun 01 2022 Brett Kelly <bkelly@45drives.com> 5.3.1-8
+- update ansible dependancy to 2.9.27
+* Wed Jun 01 2022 Brett Kelly <bkelly@45drives.com> 5.3.1-7
+- fixed version number
+* Wed Jun 01 2022 Brett Kelly <bkelly@45drives.com> 2.3.2-1
+- merged in external samba role
+- added missing delegate task when creating cephfs/nfs pools
+* Wed Mar 30 2022 Brett Kelly <bkelly@45drives.com> 5.3.1-6
+- smb rework pre-release
 * Thu Oct 07 2021 Mark Hooper <mhooper@45drives.com> 5.2.2-6
 - updated device-alias.yml to skip running dmap when /etc/vdev_id.conf exists and
   isn't created using dmap

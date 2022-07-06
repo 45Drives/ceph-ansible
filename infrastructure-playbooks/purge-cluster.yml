@@ -48,7 +48,8 @@
 
 
 - name: check there's no ceph kernel threads present
-  hosts: clients
+  hosts: 
+    - clients
   become: true
   gather_facts: false
   any_errors_fatal: true
@@ -107,6 +108,17 @@
         - ceph
         - libceph
 
+- name: remove any cephfs mounts on any of nodes
+  hosts: all
+  gather_facts: false # Already gathered previously
+  become: true
+  tasks:
+    - import_role:
+        name: ceph-defaults
+
+    - name: ensure cephfs mountpoint(s) are unmounted
+      command: umount -a -t ceph
+      changed_when: false
 
 - name: purge ceph nfs cluster
   hosts: nfss
@@ -734,6 +746,7 @@
       - ceph-release
       - ceph-radosgw
       - ceph-grafana-dashboards
+      - ceph-mgr-modules-core
       - rbd-mirror
     ceph_remaining_packages:
       - libcephfs2
@@ -743,6 +756,7 @@
       - librgw2
       - python3-ceph-argparse
       - python3-cephfs
+      - python3-ceph-common
       - python3-rados
       - python3-rbd
       - python3-rgw

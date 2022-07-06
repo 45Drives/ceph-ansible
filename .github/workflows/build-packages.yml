@@ -2,7 +2,7 @@ name: Build Packages
 on:
   push:
     branches: 
-      - master-45d-octopus
+      - dev-45d-octopus
     tags:
       - 'v*.*.*'
 jobs:

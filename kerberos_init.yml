@@ -1,0 +1,67 @@
+---
+- hosts: smbs
+  vars_prompt:
+
+    - name: kerberos_username
+      prompt: 'Enter kerberos username'
+      private: no
+
+    - name: kerberos_password
+      prompt: 'password'
+      private: yes
+      confirm: yes
+
+  tasks:
+    - name: redhat family | install dependency
+      package:
+        name: "{{ item }}"
+        state: "{{ (upgrade_samba_packages|bool) | ternary('latest','present') }}"
+      register: result
+      until: result is succeeded
+      with_items: 
+        - krb5-workstation
+      when: ansible_facts['os_family'] == 'RedHat'
+
+    - name: debian family | install dependency
+      package:
+        name: "{{ item }}"
+        state: "{{ (upgrade_samba_packages|bool) | ternary('latest','present') }}"
+      register: result
+      until: result is succeeded
+      with_items: 
+        - krb5-user
+      when: ansible_facts['os_family'] == 'Debian'
+      
+    - name: run klist
+      command: klist
+      register: klist_result
+      failed_when: klist_result.rc != 0 or (realm | upper) not in klist_result.stdout
+      ignore_errors: yes
+
+    - name: Ensure ticket is valid
+      command: klist -s
+      register: ticket_valid
+      ignore_errors: yes
+      when: not klist_result.failed
+    
+    - name: perform kinit
+      expect:
+        command: kinit {{ kerberos_username }}@{{ realm | upper }}
+        responses:
+          Password for *: "{{ kerberos_password }}"
+      throttle: 1
+      no_log: True
+      when: klist_result.failed or ticket_valid.failed
+
+    - name: run klist after kinit
+      command: klist
+      register: klist_post_kinit
+      when: klist_result.failed or ticket_valid.failed
+
+    - name: Output klist result after running kinit
+      debug: var=klist_post_kinit.stdout
+      when: klist_result.failed or ticket_valid.failed
+
+    - name: Output klist result for existing ticket
+      debug: var=klist_result.stdout
+      when: not klist_result.failed
