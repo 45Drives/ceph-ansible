@@ -3,6 +3,7 @@ on:
   push:
     branches: 
       - dev-45d-octopus
+      - master-45d-octopus
     tags:
       - 'v*.*.*'
 jobs:
