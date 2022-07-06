@@ -28,6 +28,12 @@ make DESTDIR=%{buildroot} install
 /usr/share/ceph-ansible/*
 
 %changelog
+* Wed Jul 06 2022 Mark Hooper <mhooper@45drives.com> 5.3.2-1
+- updated samba-ansible dependency to >= 1.1.3
+- updated manifest to release to 45drives stable repo
+- modified samba deployment to use either winbind, or sssd to join domains.
+- joining domain can now use a kerberos ticket, or username/password
+- updated nfs playbooks to specify vip interface
 * Tue Jul 05 2022 Brett Kelly <bkelly@45drives.com> 5.3.1-17
 - specify which phys iterface the VIP will reside
 * Mon Jun 20 2022 Mark Hooper <mhooper@45drives.com> 5.3.1-16
