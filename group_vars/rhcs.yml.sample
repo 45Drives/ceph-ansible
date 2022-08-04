@@ -207,7 +207,7 @@ ceph_rhcs_version: 5
 #
 # Enabled when ceph_repository == 'dev'
 #
-#ceph_dev_branch: master # development branch you would like to use e.g: master, wip-hack
+#ceph_dev_branch: main # development branch you would like to use e.g: main, wip-hack
 #ceph_dev_sha1: latest # distinct sha1 to use, defaults to 'latest' (as in latest built)
 
 #nfs_ganesha_dev: false # use development repos for nfs-ganesha
@@ -465,6 +465,11 @@ ceph_iscsi_config_dev: false
 #health_osd_check_retries: 20
 #health_osd_check_delay: 10
 
+##############
+# RBD-MIRROR #
+##############
+
+#ceph_rbd_mirror_pool: "rbd"
 
 ###############
 # NFS-GANESHA #
@@ -752,7 +757,7 @@ alertmanager_container_image: registry.redhat.io/openshift4/ose-prometheus-alert
 # For example:
 # If the ceph public network is 2a00:8a60:1:c301::/64 and the iSCSI Gateway resides
 # at a dedicated gateway network (2a00:8a60:1:c300::/64) (With routing between those networks).
-# It means "{{ hostvars[item]['ansible_facts']['all_ipv4_addresses'] | ips_in_ranges(public_network.split(',')) | last | ipwrap }}" will be empty.
+# It means "{{ hostvars[item]['ansible_facts']['all_ipv4_addresses'] | ips_in_ranges(public_network.split(',')) | last | ansible.utils.ipwrap }}" will be empty.
 # As a consequence, this prevent from deploying dashboard with iSCSI node when it reside in a subnet different than `public_network`.
 # Using `igw_network` make it possible, set it with the subnet used by your iSCSI node.
 #igw_network: "{{ public_network }}"

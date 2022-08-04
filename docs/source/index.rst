@@ -63,6 +63,16 @@ You can acquire Ansible on Ubuntu by using the `Ansible PPA <https://launchpad.n
    $ sudo apt update
    $ sudo apt install ansible
 
+Ansible collections
+-------------------
+
+In order to install third-party collections that are required for ceph-ansible,
+please run:
+
+.. code-block:: console
+
+   $ ansible-galaxy install -r requirements.yml
+
 
 Releases
 ========
@@ -81,9 +91,9 @@ The ``master`` branch should be considered experimental and used with caution.
 
 - ``stable-5.0`` Supports Ceph version ``octopus``. This branch requires Ansible version ``2.9``.
 
-- ``stable-6.0`` Supports Ceph version ``pacific``. This branch requires Ansible version ``2.9``.
+- ``stable-6.0`` Supports Ceph version ``pacific``. This branch requires Ansible version ``2.10``.
 
-- ``master`` Supports the master branch of Ceph. This branch requires Ansible version ``2.9``.
+- ``master`` Supports the master branch of Ceph. This branch requires Ansible version ``2.10``.
 
 .. NOTE:: ``stable-3.0`` and ``stable-3.1`` branches of ceph-ansible are deprecated and no longer maintained.
 
@@ -287,6 +297,16 @@ ceph-ansible provides a set of playbook in ``infrastructure-playbooks`` director
    day-2/osds
    day-2/purge
    day-2/upgrade
+
+RBD Mirroring
+-------------
+
+Ceph-ansible provides the role ``ceph-rbd-mirror`` that can setup an RBD mirror replication.
+
+.. toctree::
+   :maxdepth: 1
+
+   rbdmirror/index
 
 Contribution
 ============
