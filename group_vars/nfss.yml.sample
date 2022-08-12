@@ -61,6 +61,16 @@ dummy:
 # when setting 'nfs_file_gw' option as true.
 #ceph_nfs_disable_caching: false
 
+####################
+#    PCS Config    #
+####################
+#pcmk_cluster_name: hacluster
+#pcmk_user: hacluster
+
+#ceph_nfs_floating_ip_address: '192.168.18.73'
+#ceph_nfs_floating_ip_cidr: '16'
+#ceph_nfs_floating_ip_interface : 'ens3'
+
 # This is the file ganesha will use to control NFSv4 ID mapping
 #ceph_nfs_idmap_conf: "/etc/ganesha/idmap.conf"
 

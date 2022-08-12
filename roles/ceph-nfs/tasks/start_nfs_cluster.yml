@@ -25,8 +25,13 @@
     name: "{{ pcmk_user }}"
     password: "{{ pcmk_password | password_hash('sha512') }}"
 
+- name: resolve hostnames
+  set_fact: nfs_host_ips="{{ nfs_host_ips|default([]) + [ lookup('ip', '{{ item }}') ] }}"
+  loop: "{{ ansible_play_batch }}"
+  run_once: true
+
 - name: Authenticate all nodes
-  command: pcs host auth {{ ansible_play_batch | join(' ') }} -u "{{ pcmk_user }}" -p "{{ pcmk_password | quote }}"
+  command: pcs host auth {{ nfs_host_ips | join(' ') }} -u "{{ pcmk_user }}" -p "{{ pcmk_password | quote }}"
   run_once: true
   args:
     creates: /var/lib/pcsd/tokens
@@ -67,7 +72,7 @@
   register: ip_resource_check
 
 - name: Create Floating IP for NFS service
-  command: pcs resource create nfs_ip ocf:heartbeat:IPaddr2 ip={{ ceph_nfs_floating_ip_address }} cidr_netmask={{ ceph_nfs_floating_ip_cidr }} op monitor interval=10s
+  command: pcs resource create nfs_ip ocf:heartbeat:IPaddr2 ip={{ ceph_nfs_floating_ip_address }} cidr_netmask={{ ceph_nfs_floating_ip_cidr }} nic={{ ceph_nfs_floating_ip_interface }} op monitor interval=10s
   run_once: true
   when: ip_resource_check.rc == 1
 
