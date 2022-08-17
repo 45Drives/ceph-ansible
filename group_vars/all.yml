@@ -19,6 +19,10 @@ upgrade_ceph_packages: False
 ###########
 # INSTALL #
 ###########
+
+offline_install: false
+offline_repo_server_ip: ""
+
 ceph_origin: repository
 ceph_repository: community
 ceph_mirror: https://download.ceph.com

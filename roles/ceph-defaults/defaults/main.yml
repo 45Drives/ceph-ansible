@@ -141,6 +141,8 @@ valid_ceph_repository:
   - custom
   - obs
 
+offline_install: false
+offline_repo_server_ip: ""
 
 # REPOSITORY: COMMUNITY VERSION
 #
