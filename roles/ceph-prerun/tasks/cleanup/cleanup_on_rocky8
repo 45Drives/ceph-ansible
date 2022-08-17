@@ -1,8 +1,0 @@
-- name: Remove unneeded pkgs in centos
-  block:
-    - name: Remove packages
-      yum:
-        name: "{{ rocky_cleanup_pkgs }}"
-        state: absent
-      register: result
-      until: result is succeeded

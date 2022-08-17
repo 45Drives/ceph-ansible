@@ -126,6 +126,10 @@ dummy:
 ###########
 # INSTALL #
 ###########
+
+offline_install: false
+offline_repo_server_ip: ""
+
 # ORIGIN SOURCE
 #
 # Choose between:
