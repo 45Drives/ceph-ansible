@@ -26,20 +26,20 @@
 
 - name: include_tasks cleanup/cleanup_on_ubuntu.yml
   include_tasks: cleanup/cleanup_on_ubuntu.yml
-  when: ansible_distribution == 'Ubuntu'
+  when: ansible_facts['distribution_version'] == 'Ubuntu'
 
 - name: include_tasks cleanup/cleanup_on_rocky8.yml
   include_tasks: cleanup/cleanup_on_rocky8.yml
   when:
-    - ansible_distribution == 'Rocky'
-    - ansible_distribution_major_version == '8'
+    - ansible_facts['distribution_version'] == 'Rocky'
+    - ansible_facts['ansible_distribution_major_version'] == '8'
 
 - name: include_tasks install/install_on_ubuntu.yml
   include_tasks: install/install_on_ubuntu.yml
-  when: ansible_distribution == 'Ubuntu'
+  when: ansible_facts['distribution_version'] == 'Ubuntu'
     
 - name: include_tasks install/install_on_rocky8.yml
   include_tasks: install/install_on_rocky8.yml
   when:
-    - ansible_distribution == 'Rocky'
-    - ansible_distribution_major_version == '8'
+    - ansible_facts['distribution_version'] == 'Rocky'
+    - ansible_facts['ansible_distribution_major_version'] == '8'
