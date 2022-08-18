@@ -7,7 +7,50 @@
 # file as a good configuration file when no variable in it.
 dummy:
 
+#########################
+# INVENTORY GROUP NAMES #
+#########################
+mon_group_name: mons
+osd_group_name: osds
+rgw_group_name: rgws
+mds_group_name: mdss
+nfs_group_name: nfss
+rbdmirror_group_name: rbdmirrors
+client_group_name: clients
+iscsi_gw_group_name: iscsigws
+mgr_group_name: mgrs
+rgwloadbalancer_group_name: rgwloadbalancers
+monitoring_group_name: monitoring
+adopt_label_group_names:
+ - "{{ mon_group_name }}"
+ - "{{ osd_group_name }}"
+ - "{{ rgw_group_name }}"
+ - "{{ mds_group_name }}"
+ - "{{ nfs_group_name }}"
+ - "{{ rbdmirror_group_name }}"
+ - "{{ client_group_name }}"
+ - "{{ iscsi_gw_group_name }}"
+ - "{{ mgr_group_name }}"
+ - "{{ rgwloadbalancer_group_name }}"
+ - "{{ monitoring_group_name }}"
+
+############
+# FIREWALL #
+############
+
 configure_firewall: True
+
+# Open ports on corresponding nodes if firewall is installed on it
+ceph_mon_firewall_zone: public
+ceph_mgr_firewall_zone: public
+ceph_osd_firewall_zone: public
+ceph_rgw_firewall_zone: public
+ceph_mds_firewall_zone: public
+ceph_nfs_firewall_zone: public
+ceph_rbdmirror_firewall_zone: public
+ceph_iscsi_firewall_zone: public
+ceph_dashboard_firewall_zone: public
+ceph_rgwloadbalancer_firewall_zone: public
 
 ############
 # PACKAGES #
