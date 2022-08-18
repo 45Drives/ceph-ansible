@@ -20,7 +20,7 @@ client_group_name: clients
 iscsi_gw_group_name: iscsigws
 mgr_group_name: mgrs
 rgwloadbalancer_group_name: rgwloadbalancers
-monitoring_group_name: monitoring
+monitoring_group_name: metrics
 adopt_label_group_names:
  - "{{ mon_group_name }}"
  - "{{ osd_group_name }}"
@@ -93,7 +93,7 @@ cephx: true
 # These variables must be defined at least in all.yml and overrided if needed (inventory host file or group_vars/*.yml).
 # Eg. If you want to specify for each monitor which address the monitor will bind to you can set it in your **inventory host file** by using 'monitor_address' variable.
 # Preference will go to monitor_address if both monitor_address and monitor_interface are defined.
-monitor_interface: ens7f0
+monitor_interface: ens18
 #monitor_address: x.x.x.x
 #monitor_address_block: subnet
 
