@@ -17,8 +17,8 @@
       when: vdev_id_result.stat.exists
 
     - name: Perform drive aliasing using dmap on 45Drives standard hardware
+      when: 'not vdev_id_result.stat.exists or "dmap" in vdev_file_content.stdout'
       block:
-
         - name: Create drive alias' for standard chassis
           command: /usr/bin/python3 "{{ tools_install_dir }}"/dmap 
           register: dmap_output
@@ -29,18 +29,6 @@
           when:
           - dmap_output.failed
 
-        - name: Get drive layout
-          command: /usr/bin/python3 "{{ tools_install_dir }}"/lsdev -n
-          register: drive_layout
-          changed_when: false
-
-        - name: Show drive layout
-          debug:
-            msg: "{{ drive_layout.stdout_lines }}"
-          when: 
-          - not drive_layout.failed
-
-      when: 'not vdev_id_result.stat.exists or "dmap" in vdev_file_content.stdout'
 
     - name: Get vdev_id.conf file content
       shell: 'cat /etc/vdev_id.conf'
