@@ -325,6 +325,8 @@ mon_host_v1:
 mon_host_v2:
   suffix: ':3300'
 
+allow_insecure_global_reclaim: false
+
 enable_ceph_volume_debug: False
 
 ##########

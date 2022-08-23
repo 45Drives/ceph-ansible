@@ -55,7 +55,7 @@ dummy:
 #iscsi_gw_group_name: iscsigws
 #mgr_group_name: mgrs
 #rgwloadbalancer_group_name: rgwloadbalancers
-#monitoring_group_name: monitoring
+#monitoring_group_name: metrics
 #adopt_label_group_names:
 #  - "{{ mon_group_name }}"
 #  - "{{ osd_group_name }}"
@@ -126,10 +126,6 @@ dummy:
 ###########
 # INSTALL #
 ###########
-
-offline_install: false
-offline_repo_server_ip: ""
-
 # ORIGIN SOURCE
 #
 # Choose between:
@@ -153,6 +149,8 @@ offline_repo_server_ip: ""
 #  - custom
 #  - obs
 
+#offline_install: false
+#offline_repo_server_ip: ""
 
 # REPOSITORY: COMMUNITY VERSION
 #
@@ -335,6 +333,8 @@ offline_repo_server_ip: ""
 #mon_host_v2:
 #  suffix: ':3300'
 
+#allow_insecure_global_reclaim: false
+
 #enable_ceph_volume_debug: False
 
 ##########
@@ -361,6 +361,7 @@ offline_repo_server_ip: ""
 #is_hci: false
 #hci_safety_factor: 0.2
 #non_hci_safety_factor: 0.7
+#safety_factor: "{{ hci_safety_factor if is_hci | bool else non_hci_safety_factor }}"
 #osd_memory_target: 2147483648
 #journal_size: 5120 # OSD journal size in MB
 #block_db_size: -1 # block db size in bytes for the ceph-volume lvm batch. -1 means use the default of 'as big as possible'.

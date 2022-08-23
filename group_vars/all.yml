@@ -100,6 +100,9 @@ monitor_interface: ens18
 # set to either ipv4 or ipv6, whichever your network is using
 ip_version: ipv4
 
+# set to true if using windows ceph client drivers
+allow_insecure_global_reclaim: false
+
 ##########
 # CEPHFS #
 ##########
