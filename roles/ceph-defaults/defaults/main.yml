@@ -219,8 +219,8 @@ ceph_iscsi_config_dev: false # special repo for deploying iSCSI gateways
 # ceph_custom_repo should be the URL to the repo base.
 #
 #ceph_custom_key: https://server.domain.com/ceph-custom-repo/key.asc
-ceph_custom_repo: https://server.domain.com/ceph-custom-repo
-
+ceph_custom_repo: "{% if ansible_facts['os_family'] == 'Debian' %}https://ceph.repo.45drives.com/octopus/debian{% elif ansible_facts['os_family'] == 'RedHat' %}https://ceph.repo.45drives.com/octopus/rhel/el8/ceph_45d.repo{% endif %}"
+ceph_custom_key: "https://repo.45drives.com/key/gpg.asc"
 
 # ORIGIN: LOCAL CEPH INSTALLATION
 #
