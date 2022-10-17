@@ -1,0 +1,111 @@
+---
+# This playbook purges nfs 
+# It removes: packages, configuration files and ALL THE DATA
+#
+# Use it like this:
+# ansible-playbook purge-nfs.yml
+#     Prompts for confirmation to purge, defaults to no and
+#     doesn't purge the cluster. yes purges the cluster.
+#
+# ansible-playbook -e ireallymeanit=yes|no purge-nfs.yml
+#     Overrides the prompt using -e option. Can be used in
+#     automation scripts to avoid interactive prompt.
+
+- name: confirm whether user really meant to purge the cluster
+  hosts: localhost
+  gather_facts: false
+
+  vars_prompt:
+    - name: ireallymeanit
+      prompt: Are you sure you want to purge the cluster?
+      default: 'no'
+      private: no
+
+  tasks:
+  - name: exit playbook, if user did not mean to purge cluster
+    fail:
+      msg: >
+        "Exiting purge-samba playbook, cluster was NOT purged.
+         To purge the cluster, either say 'yes' on the prompt or
+         or use `-e ireallymeanit=yes` on the command line when
+         invoking the playbook"
+    when: ireallymeanit != 'yes'
+
+
+- name: stop NFS services
+  hosts:
+    - nfss
+
+  tasks:
+  - name: check for nfs-ganesha
+    stat:
+      path: /usr/lib/systemd/system/nfs-ganesha.service
+    register: nfs_present
+
+  - name: stop nfs-ganesha service
+    systemd:
+      name: nfs-ganesha
+      state: stopped
+      enabled: no
+    when: nfs_present.stat.exists
+
+  - name: check for corosync
+    stat:
+      path: /usr/lib/systemd/system/corosync.service
+    register: corosync_present
+
+  - name: stop corosync service
+    systemd:
+      name: corosync
+      state: stopped
+      enabled: no
+    when: corosync_present.stat.exists
+
+  - name: check for pcsd
+    stat:
+      path: /usr/lib/systemd/system/pcsd.service
+    register: pcsd_present
+
+  - name: destroy pcs cluster
+    command: pcs cluster destroy
+    when: pcsd_present.stat.exists
+  
+  - name: stop pcsd service
+    systemd:
+      name: pcsd
+      state: stopped
+      enabled: no
+    when: pcsd_present.stat.exists
+
+- name: final cleanup - purge nfs packages and purge config
+  vars:
+    nfs_packages:
+      - nfs-ganesha*
+      - corosync*
+      - pcs
+
+  hosts:
+    - nfss
+
+  gather_facts: false # Already gathered previously
+  become: true
+  tasks:
+
+  - name: purge nfs packages
+    package:
+      name: "{{ nfs_packages }}"
+      state: absent
+
+  - name: remove config
+    file:
+      path: "{{ item }}"
+      state: absent
+    with_items:
+      - /etc/ganesha
+      - /etc/pacemaker
+      - /etc/corosync
+
+  - name: remove logs
+    file:
+     path: /var/log/ganesha
+     state: absent
