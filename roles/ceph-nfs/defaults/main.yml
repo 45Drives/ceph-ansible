@@ -88,7 +88,6 @@ ceph_nfs_ceph_export_id: 20133
 ceph_nfs_ceph_pseudo_path: "/cephfile"
 ceph_nfs_ceph_protocols: "3,4"
 ceph_nfs_ceph_access_type: "RW"
-ceph_nfs_ceph_user: "admin"
 ceph_nfs_ceph_squash: "Root_Squash"
 ceph_nfs_ceph_sectype: "sys,krb5,krb5i,krb5p"
 
