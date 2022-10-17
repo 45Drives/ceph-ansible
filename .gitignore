@@ -30,3 +30,4 @@ ceph-ansible.spec
 !radosgw.yml
 !smb.yml
 !update-servers.yml
+.vscode
