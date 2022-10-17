@@ -125,14 +125,13 @@ ceph_directories_mode: "0755"
 # - 'distro' means that no separate repo file will be added
 #  you will get whatever version of Ceph is included in your Linux distro.
 # 'local' means that the ceph binaries will be copied over from the local machine
-ceph_origin: dummy
+ceph_origin: repository
 valid_ceph_origins:
   - repository
   - distro
   - local
 
-
-ceph_repository: dummy
+ceph_repository: custom
 valid_ceph_repository:
   - community
   - rhcs
@@ -148,8 +147,6 @@ offline_repo_server_ip: ""
 #
 # Enabled when ceph_repository == 'community'
 #
-ceph_origin: repository
-ceph_repository: custom
 ceph_custom_repo: "{% if ansible_facts['os_family'] == 'Debian' %}https://ceph.repo.45drives.com/pacific/debian{% elif ansible_facts['os_family'] == 'RedHat' %}https://ceph.repo.45drives.com/pacific/rhel/el8/ceph_45d.repo{% endif %}"
 ceph_custom_key: "https://repo.45drives.com/key/gpg.asc"
 
