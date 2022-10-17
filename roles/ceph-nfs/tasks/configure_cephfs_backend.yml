@@ -57,10 +57,12 @@
 - name: gather osd device classes
   shell: ceph osd df --format json | jq -r '.nodes | .[].device_class'
   register: osd_device_class_list
+  delegate_to: "{{ groups[mon_group_name][0] }}"
 
 - name: create pool for nfs ganesha data non hybrid cluster only
   when:
     - '("hdd" in osd_device_class_list.stdout_lines and "ssd" not in osd_device_class_list.stdout_lines) or ("ssd" in osd_device_class_list.stdout_lines and "hdd" not in osd_device_class_list.stdout_lines)'
+  delegate_to: "{{ groups[mon_group_name][0] }}"
   block:
     - name: create pool for nfs ganesha data non hybrid cluster
       ceph_pool:
@@ -86,6 +88,7 @@
   when:
     - '"hdd" in osd_device_class_list.stdout_lines'
     - '"ssd" in osd_device_class_list.stdout_lines'
+  delegate_to: "{{ groups[mon_group_name][0] }}"
   block:
     - name: create pool for nfs ganesha data hybrid cluster
       ceph_pool:
