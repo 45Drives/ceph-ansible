@@ -67,11 +67,10 @@ offline_install: false
 offline_repo_server_ip: ""
 
 ceph_origin: repository
-ceph_repository: community
-ceph_mirror: https://download.ceph.com
-ceph_stable_key: https://download.ceph.com/keys/release.asc
-ceph_stable_release: pacific
-ceph_stable_repo: "{{ ceph_mirror }}/debian-{{ ceph_stable_release }}"
+ceph_repository: custom
+ceph_custom_repo: "{% if ansible_facts['os_family'] == 'Debian' %}https://ceph.repo.45drives.com/pacific/debian{% elif ansible_facts['os_family'] == 'RedHat' %}https://ceph.repo.45drives.com/pacific/rhel/el8/ceph_45d.repo{% endif %}"
+ceph_custom_key: "https://repo.45drives.com/key/gpg.asc"
+
 nfs_ganesha_stable: true # use stable repos for nfs-ganesha
 nfs_ganesha_stable_branch: V3.5-stable
 nfs_ganesha_stable_deb_repo: http://ppa.launchpad.net/nfs-ganesha/nfs-ganesha-3.0/ubuntu
