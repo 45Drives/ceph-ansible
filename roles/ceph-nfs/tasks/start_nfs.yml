@@ -42,7 +42,7 @@
   delegate_to: "{{ groups[mon_group_name][0] }}"
   
 - name: initialize ganesha rados grace database
-  command: "ganesha-rados-grace -p {{ ceph_nfs_ganesha_pool }} -n {{ ceph_nfs_grace_namespace }} add {{ ansible_facts['ansible_hostname'] }}"
+  command: "ganesha-rados-grace -p {{ ceph_nfs_ganesha_pool }} -n {{ ceph_nfs_grace_namespace }} add {{ ansible_facts['hostname'] }}"
   when:
     - ceph_nfs_rados_backend | bool
     - ceph_nfs_rados_backend_driver == 'rados_cluster'
@@ -82,7 +82,7 @@
 
 ##### CREATE EXPORT INDEX OBJECTS
 - name: check if rados export index object exists
-  shell: "rados -p {{ ceph_nfs_ganesha_pool  }} -N {{ ceph_nfs_export_namespace }} --cluster {{ cluster }} ls|grep conf-{{ ansible_facts['ansible_hostname'] }}/"
+  shell: "rados -p {{ ceph_nfs_ganesha_pool  }} -N {{ ceph_nfs_export_namespace }} --cluster {{ cluster }} ls|grep conf-{{ ansible_facts['hostname'] }}/"
   changed_when: false
   failed_when: false
   register: rados_index_exists
@@ -92,7 +92,7 @@
   delegate_to: "{{ groups[mon_group_name][0] }}"
 
 - name: create an empty rados export index object
-  command: "rados -p {{ ceph_nfs_ganesha_pool }} -N {{ ceph_nfs_export_namespace }} --cluster {{ cluster }} put conf-{{ ansible_facts['ansible_hostname'] }} /dev/null"
+  command: "rados -p {{ ceph_nfs_ganesha_pool }} -N {{ ceph_nfs_export_namespace }} --cluster {{ cluster }} put conf-{{ ansible_facts['hostname'] }} /dev/null"
   when:
     - ceph_nfs_rados_backend | bool 
     - rados_index_exists.rc != 0
