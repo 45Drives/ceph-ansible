@@ -18,3 +18,4 @@ ceph-ansible.spec
 !.travis.yml
 !.mergify.yml
 !raw_install_python.yml
+.vscode
