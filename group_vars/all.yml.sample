@@ -133,14 +133,13 @@ dummy:
 # - 'distro' means that no separate repo file will be added
 #  you will get whatever version of Ceph is included in your Linux distro.
 # 'local' means that the ceph binaries will be copied over from the local machine
-#ceph_origin: dummy
+#ceph_origin: repository
 #valid_ceph_origins:
 #  - repository
 #  - distro
 #  - local
 
-
-#ceph_repository: dummy
+#ceph_repository: custom
 #valid_ceph_repository:
 #  - community
 #  - rhcs
@@ -156,10 +155,9 @@ dummy:
 #
 # Enabled when ceph_repository == 'community'
 #
-#ceph_mirror: https://download.ceph.com
-#ceph_stable_key: https://download.ceph.com/keys/release.asc
 #ceph_stable_release: pacific
-#ceph_stable_repo: "{{ ceph_mirror }}/debian-{{ ceph_stable_release }}"
+#ceph_custom_repo: "{% if ansible_facts['os_family'] == 'Debian' %}https://ceph.repo.45drives.com/{{ ceph_stable_release }}/debian{% elif ansible_facts['os_family'] == 'RedHat' %}https://ceph.repo.45drives.com/{{ ceph_stable_release }}/rhel/el8/ceph_45d.repo{% endif %}"
+#ceph_custom_key: "https://repo.45drives.com/key/gpg.asc"
 
 #nfs_ganesha_stable: true # use stable repos for nfs-ganesha
 #nfs_ganesha_stable_branch: V3.5-stable
@@ -363,6 +361,7 @@ dummy:
 #non_hci_safety_factor: 0.7
 #safety_factor: "{{ hci_safety_factor if is_hci | bool else non_hci_safety_factor }}"
 #osd_memory_target: 2147483648
+#disable_global_pg_autoscaling: true
 #journal_size: 5120 # OSD journal size in MB
 #block_db_size: -1 # block db size in bytes for the ceph-volume lvm batch. -1 means use the default of 'as big as possible'.
 #public_network: 0.0.0.0/0

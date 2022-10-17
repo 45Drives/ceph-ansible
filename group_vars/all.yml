@@ -122,6 +122,7 @@ block_db_size: -1 # block db size in bytes for the ceph-volume lvm batch. -1 mea
 public_network: 192.168.0.0/16
 cluster_network: "{{ public_network | regex_replace(' ', '') }}"
 osd_objectstore: bluestore
+disable_global_pg_autoscaling: true
 
 # Any device containing these patterns in their path will be excluded.
 osd_auto_discovery_exclude: "dm-*|loop*|md*|rbd*"
