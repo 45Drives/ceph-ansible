@@ -16,7 +16,7 @@
 
 - name: Generate a password for the user {{ pcmk_user }}
   set_fact:
-    pcmk_password: "{{ ansible_machine_id | to_uuid }}"
+    pcmk_password: "{{ ansible_facts['machine_id'] | to_uuid }}"
   run_once: true
   when: pcmk_password is not defined
 
