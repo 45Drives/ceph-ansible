@@ -67,6 +67,7 @@
         owner: root
         group: root
         mode: "0600"
+      with_items: "{{ nfs_keyring }}"
 
 - import_role:
     name: ceph-facts
