@@ -53,7 +53,7 @@
 - name: config_cephfs | Write NFS cephx keyring to gateway
   block:
     - name: get nfs cephx keyring
-      command: "ceph auth get client.{{ item.name }}"
+      command: "ceph auth get {{ item.name }}"
       register: keyring_output
       changed_when: false
       with_items: "{{ nfs_keyring }}"
