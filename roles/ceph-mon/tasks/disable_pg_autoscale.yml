@@ -1,7 +1,7 @@
 ---
 #get current pg autoscaling state
 - name: get current pg autoscaling state
-  shell: ceph config dump --format=json | jq -r '.[] | select(.name=="osd_pool_default_pg_autoscale_mode") | .value'"
+  shell: ceph config dump --format=json | jq -r '.[] | select(.name=="osd_pool_default_pg_autoscale_mode") | .value'
   register: pg_autoscale_status
 
 - name: disable pg autoscaling globally
