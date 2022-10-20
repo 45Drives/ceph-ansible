@@ -50,6 +50,24 @@
   with_items: "{{ nfs_keyring }}"
   delegate_to: "{{ groups[mon_group_name][0] }}"
 
+- name: config_cephfs | Write NFS cephx keyring to gateway
+  block:
+    - name: get nfs cephx keyring
+      command: "ceph auth get client.{{ item.name }}"
+      register: keyring_output
+      changed_when: false
+      with_items: "{{ nfs_keyring }}"
+      delegate_to: "{{ groups[mon_group_name][0] }}"
+
+    - name: write nfs cephx keyring
+      copy:
+        content: "{{ keyring_output.stdout }}\n"
+        dest: "/etc/ceph/ceph.client.{{ item.name }}.keyring"
+        force: yes
+        owner: root
+        group: root
+        mode: "0600"
+
 - import_role:
     name: ceph-facts
     tasks_from: get_def_crush_rule_name.yml
