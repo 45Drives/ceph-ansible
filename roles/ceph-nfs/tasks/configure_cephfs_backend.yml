@@ -61,13 +61,13 @@
 
     - name: write nfs cephx keyring
       copy:
-        content: "{{ keyring_output.stdout }}\n"
-        dest: "/etc/ceph/ceph.client.{{ item.name }}.keyring"
+        content: "{{ item.stdout }}\n"
+        dest: "/etc/ceph/ceph.{{ item.item.name }}.keyring"
         force: yes
         owner: root
         group: root
         mode: "0600"
-      with_items: "{{ nfs_keyring }}"
+      with_items: "{{ keyring_output.results }}"
 
 - import_role:
     name: ceph-facts
