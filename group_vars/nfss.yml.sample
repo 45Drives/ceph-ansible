@@ -39,7 +39,7 @@ dummy:
 #ceph_nfs_fs_root: "nfs"
 
 #nfs_keyring:
-#  - { name: client.nfs, caps: { mds: "allow r path=/, allow rwps path=/{{ ceph_nfs_fs_root }}", mon: "allow r", osd: "allow *" }, mode: "0600" }
+#  - { name: client.nfs, caps: { mds: "allow r path=/, allow rwps path=/{{ ceph_nfs_fs_root }}", mon: "allow r", osd: "allow rw tag cephfs data={{ cephfs }}, allow rw pool={{ ceph_nfs_ganesha_pool }}" }, mode: "0600" }
 
 #ceph_nfs_dynamic_exports: true
 # If set to true then rados is used to store ganesha exports
