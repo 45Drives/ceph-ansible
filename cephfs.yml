@@ -100,6 +100,16 @@
   tasks:
     - import_role:
         name: ceph-defaults
+
+    - name: install cephfs-shell
+      package:
+        name: "{{ item }}"
+        state: "{{ (upgrade_ceph_packages|bool) | ternary('latest','present') }}"
+      register: result
+      until: result is succeeded
+      with_items:
+        - cephfs-shell
+
     - name: get ceph status from the first monitor
       command: ceph --cluster {{ cluster }} -s
       register: ceph_status
