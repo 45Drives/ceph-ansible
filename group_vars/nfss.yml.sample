@@ -35,7 +35,7 @@ dummy:
 # NFS Ganesha Config #
 ######################
 #ceph_nfs_log_file: "/var/log/ganesha/ganesha.log"
-#ceph_nfs_ceph_user: "admin"
+#ceph_nfs_ceph_user: "nfs"
 #ceph_nfs_fs_root: "nfs"
 
 #nfs_keyring:
