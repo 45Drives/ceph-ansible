@@ -41,7 +41,7 @@ ceph_nfs_dynamic_exports: true
 ceph_nfs_rados_backend: true
 # Name of the rados object used to store a list of the export rados
 # object URLS
-ceph_nfs_rados_export_index: "ganesha-export-index"
+ceph_nfs_export_namespace: "ganesha-export"
 # backend mode, either rados_ng, or rados_cluster
 # Default (rados_ng) is for single gateway/active-passive use.
 # rados_cluster is for active-active nfs cluster. Requires ganesha-grace-db to be initialized

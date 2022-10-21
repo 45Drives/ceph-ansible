@@ -1,7 +1,7 @@
 #jinja2: trim_blocks: "true", lstrip_blocks: "true"
 # {{ ansible_managed }}
 
-{% if ceph_nfs_dynamic_exports | bool and not ceph_nfs_rados_backend | bool %}
+{% if ceph_nfs_dynamic_exports and not ceph_nfs_rados_backend %}
 %include /etc/ganesha/export.d/INDEX.conf
 {% endif %}
 
@@ -10,38 +10,121 @@ NFS_Core_Param
 {% if ceph_nfs_bind_addr is defined %}
        Bind_Addr={{ ceph_nfs_bind_addr }};
 {% endif %}
-{{ ganesha_core_param_overrides | default(None) }}
+        Enable_NLM = false;
+        Enable_RQUOTA = false;
+        Protocols = 3,4;
 }
 
-{% if ceph_nfs_disable_caching | bool or nfs_file_gw | bool %}
+{% if ceph_nfs_disable_caching or nfs_file_gw %}
 EXPORT_DEFAULTS {
-	Attr_Expiration_Time = 0;
+        Attr_Expiration_Time = 0;
 }
 
 CACHEINODE {
-	Dir_Chunk = 0;
-
-	NParts = 1;
-	Cache_Size = 1;
+        Dir_Chunk = 0;
+        NParts = 1;
+        Cache_Size = 1;
 }
 {% endif %}
 
-{% if ceph_nfs_rados_backend | bool %}
+{% if ceph_nfs_rados_backend %}
 RADOS_URLS {
    ceph_conf = '/etc/ceph/{{ cluster }}.conf';
    userid = "{{ ceph_nfs_ceph_user }}";
+   {% if ceph_nfs_dynamic_exports %}
+   watch_url = "rados://{{ ceph_nfs_ganesha_pool }}/{{ ceph_nfs_export_namespace }}/conf-{{ ansible_hostname }}";
+   {% endif %}
 }
-%url rados://{{ ceph_nfs_ganesha_pool }}/{{ ceph_nfs_rados_export_index }}
-
+{% if ceph_nfs_rados_backend_driver is defined %}
 NFSv4 {
-	RecoveryBackend = 'rados_kv';
-	IdmapConf = "{{ ceph_nfs_idmap_conf }}";
+        RecoveryBackend = '{{ ceph_nfs_rados_backend_driver }}';
 }
+{% else %}
+NFSv4 {
+        RecoveryBackend = 'rados_ng';
+}
+{% endif %}
+
+
 RADOS_KV {
-	ceph_conf = '/etc/ceph/{{ cluster }}.conf';
-	userid = "{{ ceph_nfs_ceph_user }}";
-	pool = "{{ ceph_nfs_ganesha_pool }}";
+        ceph_conf = '/etc/ceph/{{ cluster }}.conf';
+        userid = "{{ ceph_nfs_ceph_user }}";
+        pool = "{{ ceph_nfs_ganesha_pool }}";
+        namespace = "{{ ceph_nfs_grace_namespace }}";
+        {% if 'rados_cluster' in ceph_nfs_rados_backend_driver %}
+        nodeid = "{{ ansible_hostname }}";
+        {% endif %}
 }
+{% endif %}
+
+{% if ceph_nfs_dynamic_exports %}
+%url rados://{{ ceph_nfs_ganesha_pool }}/{{ ceph_nfs_export_namespace }}/conf-{{ ansible_hostname }}
+{% else %}
+{% if nfs_file_gw %}
+EXPORT
+{
+        Export_id={{ ceph_nfs_ceph_export_id }};
+
+        Path = "/";
+
+        Pseudo = {{ ceph_nfs_ceph_pseudo_path }};
+
+        Access_Type = {{ ceph_nfs_ceph_access_type }};
+
+        Protocols = {{ ceph_nfs_ceph_protocols }};
+
+        Transports = TCP;
+
+        SecType = sys,krb5,krb5i,krb5p;
+
+        Squash = {{ ceph_nfs_ceph_squash }};
+
+        Attr_Expiration_Time = 0;
+
+        FSAL {
+                Name = CEPH;
+                User_Id = "{{ ceph_nfs_ceph_user }}";
+        }
+
+        {{ ganesha_ceph_export_overrides | default(None) }}
+}
+{% endif %}
+{% if nfs_obj_gw %}
+EXPORT
+{
+        Export_id={{ ceph_nfs_rgw_export_id }};
+
+        Path = "/";
+
+        Pseudo = {{ ceph_nfs_rgw_pseudo_path }};
+
+        Access_Type = {{ ceph_nfs_rgw_access_type }};
+
+        Protocols = {{ ceph_nfs_rgw_protocols }};
+
+        Transports = TCP;
+
+        SecType = sys,krb5,krb5i,krb5p;
+
+        Squash = {{ ceph_nfs_rgw_squash }};
+
+        FSAL {
+                Name = RGW;
+                User_Id = "{{ ceph_nfs_rgw_user }}";
+                Access_Key_Id ="{{ ceph_nfs_rgw_access_key }}";
+                Secret_Access_Key = "{{ ceph_nfs_rgw_secret_key }}";
+        }
+
+        {{ ganesha_rgw_export_overrides | default(None) }}
+
+}
+RGW {
+        ceph_conf = "/etc/ceph/{{ cluster }}.conf";
+        cluster = "{{ cluster }}";
+        name = "{{ rgw_client_name }}";
+        {{ ganesha_rgw_section_overrides | default(None) }}
+}
+{% endif %}
 {% endif %}
 
 LOG {
