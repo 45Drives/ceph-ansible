@@ -42,11 +42,12 @@
   delegate_to: "{{ groups[mon_group_name][0] }}"
   
 - name: initialize ganesha rados grace database
-  command: "ganesha-rados-grace -p {{ ceph_nfs_ganesha_pool }} -n {{ ceph_nfs_grace_namespace }} add {{ ansible_facts['hostname'] }}"
+  command: "ganesha-rados-grace -p {{ ceph_nfs_ganesha_pool }} -n {{ ceph_nfs_grace_namespace }} add {{ ansible_facts['hostname'] }} --userid {{ item.name.split('.')[1] }}"
   when:
     - ceph_nfs_rados_backend | bool
     - ceph_nfs_rados_backend_driver == 'rados_cluster'
     - rados_grace_exists.rc != 0
+  with_items: "{{ nfs_keyring }}"
 ######## 
 
 - name: generate ganesha idmap.conf file
