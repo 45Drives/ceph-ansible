@@ -6,7 +6,7 @@ upgrade_samba_packages: true
 manage_firewall: true
 
 # Roles
-domain_member: true
+domain_member: false
 cluster_member: true
 
 # Join Method
@@ -36,8 +36,11 @@ share_admins:
 
 # ctdb 
 ctdb_public_addresses:
-  - vip_address: '192.168.189.10'
-    vip_interface: 'enp59s0f0'
+  - vip_address: '192.168.63.66'
+    vip_interface: 'ens18'
+    subnet_mask: '16'
+  - vip_address: '192.168.63.67'
+    vip_interface: 'ens18'
     subnet_mask: '16'
 
 # backend_filesystem: cephfs|generic

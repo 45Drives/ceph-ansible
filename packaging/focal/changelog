@@ -1,3 +1,21 @@
+ceph-ansible-45d (5.3.3-1focal) focal; urgency=medium
+
+  * build 5.3.3
+
+ -- Brett Kelly <bkelly@45drives.com>  Mon, 26 Sep 2022 12:43:18 -0300
+
+ceph-ansible-45d (5.3.3-100focal) focal; urgency=medium
+
+  * bump build rev
+
+ -- Brett Kelly <bkelly@45drives.com>  Mon, 26 Sep 2022 10:32:03 -0300
+
+ceph-ansible-45d (5.3.3-99focal) focal; urgency=medium
+
+  * use 45drives ceph repos instead of community
+
+ -- Brett Kelly <bkelly@45drives.com>  Mon, 26 Sep 2022 09:45:40 -0300
+
 ceph-ansible-45d (5.3.2-1focal) focal; urgency=medium
 
   * updated samba-ansible dependency to >= 1.1.3

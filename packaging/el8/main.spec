@@ -28,6 +28,12 @@ make DESTDIR=%{buildroot} install
 /usr/share/ceph-ansible/*
 
 %changelog
+* Mon Sep 26 2022 Brett Kelly <bkelly@45drives.com> 5.3.3-1
+- build 5.3.3
+* Mon Sep 26 2022 Brett Kelly <bkelly@45drives.com> 5.3.3-100
+- bump build rev
+* Mon Sep 26 2022 Brett Kelly <bkelly@45drives.com> 5.3.3-99
+- use 45drives ceph repos instead of community
 * Wed Jul 06 2022 Mark Hooper <mhooper@45drives.com> 5.3.2-1
 - updated samba-ansible dependency to >= 1.1.3
 - updated manifest to release to 45drives stable repo
