@@ -18,8 +18,4 @@ ceph-ansible.spec
 !.travis.yml
 !.mergify.yml
 !raw_install_python.yml
-<<<<<<< HEAD
 .vscode
-=======
-.vscode
->>>>>>> master-45d-octopus
