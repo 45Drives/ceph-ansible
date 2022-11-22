@@ -1,6 +1,8 @@
 ---
 - name: ubuntu systems - repo handling
-  when: not offline_install
+  when:
+    - ceph_nfs_server == 'ganesha'
+    - not offline_install 
   block:
     - name: stable repos specific tasks
       block:
@@ -37,7 +39,8 @@
           when: add_libntirpc_apt_repo is changed
 
 
-- name: ubuntu systems - install nfs packages
+- name: ubuntu systems - install nfs-ganesha packages
+  when: ceph_nfs_server == 'ganesha'
   block:
     - name: install nfs cephfs gateway
       apt:
@@ -55,7 +58,19 @@
       until: result is succeeded
       when: nfs_obj_gw | bool
 
+- name: ubuntu systems - install nfs-kernel packages
+  when: ceph_nfs_server == 'kernel'
+  block:
+    - name: install nfs cephfs gateway
+      apt:
+        name: ['nfs-kernel-server', 'nfs-common']
+        state: "{{ (upgrade_ceph_packages|bool) | ternary('latest','present') }}"
+      register: result
+      until: result is succeeded
+      when: nfs_file_gw
+
 - name: ubuntu systems - install pacemaker/corosync/pcs
+  when: ceph_nfs_rados_backend_driver == "rados_ng"
   block:
     - name: install pacemaker
       apt:
@@ -64,5 +79,4 @@
       register: result
       until: result is succeeded
       when:
-        - ceph_nfs_rados_backend_driver == "rados_ng"
         - groups['nfss'] | length > 1

@@ -6,7 +6,7 @@
     state: stopped
     enabled: no
   failed_when: false
-
+  when: ceph_nfs_server == 'ganesha'
 # common used to be here
 
 - name: include pre_requisite_non_container.yml
@@ -43,6 +43,7 @@
     - not containerized_deployment | bool
     - ansible_facts['os_family'] == 'RedHat'
     - ansible_facts['selinux']['status'] == 'enabled'
+    - ceph_nfs_server: 'kernel'
 
 - name: nfs with external ceph cluster task related
   when:
@@ -84,6 +85,7 @@
 
 - name: include start_nfs.yml
   import_tasks: start_nfs.yml
+  when: ceph_nfs_server == 'ganesha'
 
 - name: include start_nfs_cluster.yml
   block:

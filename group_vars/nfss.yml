@@ -31,6 +31,10 @@ ceph_nfs_enable_service: true
 # can be set by 'ceph_nfs_service_suffix'
 # ceph_nfs_service_suffix: ansible_hostname
 
+# Choice between kernel or nfs-ganesha
+ceph_nfs_server: kernel
+shared_storage_mountpoint: /mnt/cephfs
+
 #######################
 # Access type options #
 #######################

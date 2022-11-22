@@ -1,6 +1,9 @@
 ---
 - name: red hat based systems - repo handling
-  when: ceph_origin == 'repository'
+  when:
+    - ceph_origin == 'repository'
+    - ceph_nfs_server == 'ganesha'
+    - not offline_install 
   block:
     - name: red hat based systems - stable repo related tasks
       when:
@@ -36,10 +39,10 @@
             force: true
       when:
         - nfs_ganesha_dev | bool
-        - ceph_repository == 'dev'
-  when: not offline_install   
+        - ceph_repository == 'dev'  
 
-- name: red hat based systems - install nfs packages
+- name: red hat based systems - install nfs-ganesha packages
+  when: ceph_nfs_server == 'ganesha'
   block:
     - name: install nfs cephfs gateway
       package:
@@ -57,7 +60,19 @@
       until: result is succeeded
       when: nfs_obj_gw | bool
 
+- name: red hat based systems - install nfs-utils
+  when: ceph_nfs_server == 'kernel'
+  block:
+    - name: install nfs cephfs gateway
+      package:
+        name: nfs-utils
+        state: "latest"
+      register: result
+      until: result is succeeded
+      when: nfs_file_gw
+
 - name: red hat based systems - install pacemaker/corosync/pcs
+  when: ceph_nfs_rados_backend_driver == "rados_ng"
   block:
     - name: Enable HighAvailablity Repo on RHEL8/Rocky
       shell: dnf config-manager --set-enabled ha
@@ -73,6 +88,5 @@
       register: result
       until: result is succeeded
       when:
-        - ceph_nfs_rados_backend_driver == "rados_ng"
         - groups['nfss'] | length > 1
 

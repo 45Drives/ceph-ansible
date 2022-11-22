@@ -62,6 +62,7 @@
 - name: create pool for nfs ganesha data non hybrid cluster only
   when:
     - '("hdd" in osd_device_class_list.stdout_lines and "ssd" not in osd_device_class_list.stdout_lines) or ("ssd" in osd_device_class_list.stdout_lines and "hdd" not in osd_device_class_list.stdout_lines)'
+    - ceph_nfs_server == 'ganesha'
   block:
     - name: create pool for nfs ganesha data non hybrid cluster
       ceph_pool:
@@ -87,6 +88,7 @@
   when:
     - '"hdd" in osd_device_class_list.stdout_lines'
     - '"ssd" in osd_device_class_list.stdout_lines'
+    - ceph_nfs_server == 'ganesha'
   block:
     - name: create pool for nfs ganesha data hybrid cluster
       ceph_pool:
@@ -107,3 +109,43 @@
         CEPH_CONTAINER_IMAGE: "{{ ceph_docker_registry + '/' + ceph_docker_image + ':' + ceph_docker_image_tag if containerized_deployment else None }}"
         CEPH_CONTAINER_BINARY: "{{ container_binary }}"
       run_once: true
+
+- name: mount cephfs nfs gateway
+  when:
+    - ceph_nfs_server == 'kernel'
+  block:
+    - name: config_cephfs | Get nfs secret for cephfs mount
+      command: "ceph auth get-key client.nfs"
+      register: command_output_nfs
+      changed_when: false
+      delegate_to: "{{ groups[mon_group_name][0] }}"
+
+    - name: config_cephfs | Set nfs secret fact
+      set_fact:
+        cephfs_nfs_secret: "{{ command_output_nfs.stdout }}"
+      run_once: true
+
+    - name: config_cephfs | write ceph nfs client secret
+      copy:
+        content: "{{ cephfs_nfs_secret }}"
+        dest: /etc/ceph/nfs.secret
+        force: yes
+        group: ceph
+        owner: ceph
+        mode: "0600"
+
+    - name: mount_cephfs | create local directory for share mount
+      file:
+        path: "{{ nfs_shared_storage_mountpoint }}"
+        owner: "root"
+        group: "root"
+        mode: '0775'
+        state: directory
+
+    - name: mount_cephfs | mount share
+      mount:
+        name: "{{ nfs_shared_storage_mountpoint }}"
+        src: ":/nfs"
+        fstype: "ceph"
+        opts: "name=samba,secretfile=/etc/ceph/nfs.secret,_netdev,relatime"
+        state: mounted
