@@ -33,7 +33,7 @@ ceph_nfs_enable_service: true
 
 # Choice between kernel or nfs-ganesha
 ceph_nfs_server: kernel
-shared_storage_mountpoint: /mnt/cephfs
+shared_storage_mountpoint: /mnt/nfsgw
 
 #######################
 # Access type options #
