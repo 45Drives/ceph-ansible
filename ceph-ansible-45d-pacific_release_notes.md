@@ -1,8 +1,9 @@
 ceph-ansible-45d-pacific Release notes
 
 ANSIBLE VERSION
-ansible == 5.4.0
 anisble-core == 2.12
+ansible-collection-ansible*
+ansible-collection-community-general
 python38-netaddr
 python38-six
 python38-pyyaml
