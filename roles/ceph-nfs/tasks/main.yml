@@ -1,4 +1,15 @@
 ---
+# knfs does not support active active scenarios
+# fail if cephfs_nfs_server is 'kernel' and ceph_nfs_rados_backend_driver is 'rados_cluster"
+- name: validate nfs playbook settings
+  fail: 
+    msg: |
+      Kernel nfs server does not support active active config
+      Change ceph_nfs_rados_backend_driver to 'rados_ng' when cephfs_nfs_server is 'kernel'
+  when: 
+    - cephfs_nfs_server == 'kernel'
+    - ceph_nfs_rados_backend_driver == 'rados_cluster'
+
 # global/common requirement
 - name: stop nfs server service
   systemd:
@@ -32,6 +43,7 @@
     - inventory_hostname in groups.get(nfs_group_name, [])
     - ansible_facts['os_family'] == 'RedHat'
     - ansible_facts['distribution_major_version'] == '8'
+    - ceph_nfs_server == 'ganesha'
 
 # NOTE (leseb): workaround for issues with ganesha and librgw
 - name: add ganesha_t to permissive domain
@@ -43,7 +55,7 @@
     - not containerized_deployment | bool
     - ansible_facts['os_family'] == 'RedHat'
     - ansible_facts['selinux']['status'] == 'enabled'
-    - ceph_nfs_server: 'kernel'
+    - ceph_nfs_server == 'ganesha'
 
 - name: nfs with external ceph cluster task related
   when:
