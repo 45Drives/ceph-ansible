@@ -147,5 +147,5 @@
         name: "{{ nfs_shared_storage_mountpoint }}"
         src: ":/nfs"
         fstype: "ceph"
-        opts: "name=samba,secretfile=/etc/ceph/nfs.secret,_netdev,relatime"
+        opts: "name=nfs,secretfile=/etc/ceph/nfs.secret,_netdev,relatime"
         state: mounted
