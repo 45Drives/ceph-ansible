@@ -245,12 +245,15 @@
 - name: dashboard nfs gateway management frontend
   run_once: true
   when: groups.get(nfs_group_name, []) | length > 0
-  block:  
+  block:
+    - name: include nfss.yml vars
+      include_vars: group_vars/nfss.yml
+
     - name: set the NFS ganesha pool namespace
       command: "{{ container_exec_cmd }} ceph --cluster {{ cluster }} dashboard set-ganesha-clusters-rados-pool-namespace {{ ceph_nfs_ganesha_pool }}/{{ ceph_nfs_export_namespace }}"
       changed_when: false
       delegate_to: "{{ groups[mon_group_name][0] }}"
-
+      when: ceph_nfs_server == 'ganesha'
 
 - name: dashboard object gateway management frontend
   when: groups.get(rgw_group_name, []) | length > 0
