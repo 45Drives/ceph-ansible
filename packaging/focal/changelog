@@ -1,3 +1,10 @@
+ceph-ansible-45d (5.3.4-99focal) focal; urgency=medium
+
+  * added knfs support
+  * build 5.3.4
+
+ -- Brett Kelly <bkelly@45drives.com>  Thu, 24 Nov 2022 09:17:30 -0400
+
 ceph-ansible-45d (5.3.3-1focal) focal; urgency=medium
 
   * build 5.3.3

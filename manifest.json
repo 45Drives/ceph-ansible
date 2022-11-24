@@ -50,8 +50,8 @@
     ],
     "changelog": {
         "urgency": "medium",
-        "version": "5.3.3",
-        "buildVersion": "1",
+        "version": "5.3.4",
+        "buildVersion": "99",
         "ignore": [],
         "date": null,
         "packager": "Brett Kelly <bkelly@45drives.com>",

@@ -28,6 +28,9 @@ make DESTDIR=%{buildroot} install
 /usr/share/ceph-ansible/*
 
 %changelog
+* Thu Nov 24 2022 Brett Kelly <bkelly@45drives.com> 5.3.4-99
+- added knfs support
+- build 5.3.4
 * Mon Sep 26 2022 Brett Kelly <bkelly@45drives.com> 5.3.3-1
 - build 5.3.3
 * Mon Sep 26 2022 Brett Kelly <bkelly@45drives.com> 5.3.3-100
