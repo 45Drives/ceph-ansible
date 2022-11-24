@@ -68,7 +68,7 @@
     - ceph_nfs_server == 'ganesha'
 
 - name: Create kernel nfs service resource
-  command: pcs resource create nfs_server systemd:{{ 'nfs-server' if ansible_facts['os_family'] == 'RedHat' else 'nfsserver' if ansible_facts['os_family'] == 'Suse' else 'nfs-kernel-server' if ansible_facts['os_family'] == 'Debian' }}" op monitor interval=10s
+  command: pcs resource create nfs_server systemd:"{{ 'nfs-server' if ansible_facts['os_family'] == 'RedHat' else 'nfsserver' if ansible_facts['os_family'] == 'Suse' else 'nfs-kernel-server' if ansible_facts['os_family'] == 'Debian' }}" op monitor interval=10s
   run_once: true
   when:
     - nfs_resource_check.rc == 1
