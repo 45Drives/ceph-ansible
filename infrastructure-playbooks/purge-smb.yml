@@ -28,7 +28,6 @@
       - attr
       - ctdb
       - libsmbclient
-      - libwbclient
       - oddjob
       - oddjob-mkhomedir
       - samba
@@ -44,7 +43,6 @@
       - samba-libs
       - python3-samba
       - winbind
-      - libwbclient0
       - ctdb
       - samba-vfs-modules
       - samba-dsdb-modules
