@@ -1,3 +1,3 @@
-## Ceph Ansible 5.3.4-2
+## Ceph Ansible 5.3.4-3
 
-* build 5.3.4-2
+* released to stable

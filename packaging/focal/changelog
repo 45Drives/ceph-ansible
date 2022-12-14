@@ -1,3 +1,9 @@
+ceph-ansible-45d (5.3.4-3focal) focal; urgency=medium
+
+  * released to stable
+
+ -- Brett Kelly <bkelly@45drives.com>  Wed, 14 Dec 2022 10:28:04 -0400
+
 ceph-ansible-45d (5.3.4-2focal) focal; urgency=medium
 
   * build 5.3.4-2
