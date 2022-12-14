@@ -1,4 +1,3 @@
-## Ceph Ansible 5.3.4-99
+## Ceph Ansible 5.3.4-2
 
-* added knfs support
-* build 5.3.4
+* build 5.3.4-2
