@@ -26,3 +26,4 @@ ceph-ansible.spec
 !cephfs.yml
 !device-alias.yml
 !generate-osd-vars.yml
+!iscsi.yml
