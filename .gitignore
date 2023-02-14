@@ -27,3 +27,5 @@ ceph-ansible.spec
 !device-alias.yml
 !generate-osd-vars.yml
 !iscsi.yml
+!radosgw.yml
+!radosgw-lb.yml
