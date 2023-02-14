@@ -24,3 +24,4 @@ ceph-ansible.spec
 .vscode
 !core.yml
 !cephfs.yml
+!device-alias.yml
