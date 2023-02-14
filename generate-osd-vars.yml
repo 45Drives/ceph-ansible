@@ -1,0 +1,38 @@
+---
+- hosts: osds
+  tasks:
+    - local_action: file path=/usr/share/ceph-ansible/host_vars/ state=directory
+
+    - name: Check that host inventory file exists
+      local_action: stat path=/usr/share/ceph-ansible/host_vars/{{ inventory_hostname }}.yml
+      register: stat_result
+
+    - name: Create inventory file if it does not exist
+      local_action: file path=/usr/share/ceph-ansible/host_vars/{{ inventory_hostname }}.yml state=touch
+      when: not stat_result.stat.exists
+
+    - name: execute generate-osd-vars script with dedicated devices omitted
+      command: /usr/bin/bash /opt/45drives/tools/generate-osd-vars.sh -d "{% for ded_dev in hostvars[inventory_hostname].dedicated_devices -%}{{ ded_dev }}{% if not loop.last %},{% endif %}{%- endfor %}"
+      register: osd_vars_dedicated_devices
+      when: (dedicated_device_db|default(false)|bool) and hostvars[inventory_hostname].dedicated_devices is defined and (hostvars[inventory_hostname].dedicated_devices|length>0)
+
+    - debug:
+         msg: "{{ osd_vars_dedicated_devices.stdout }}"
+      when: osd_vars_dedicated_devices.stdout is defined
+
+    - name: execute generate-osd-vars script
+      command: /usr/bin/bash /opt/45drives/tools/generate-osd-vars.sh
+      register: osd_vars_default
+      when: not dedicated_device_db|default(false)|bool
+
+    - debug:
+         msg: "{{ osd_vars_default.stdout }}"
+      when: osd_vars_default.stdout is defined
+
+    - name: Put generate-osd-vars default output to host inventory files
+      local_action: blockinfile insertbefore=BOF dest=/usr/share/ceph-ansible/host_vars/{{ inventory_hostname }}.yml block={{ osd_vars_default.stdout }} marker="# {mark} **********  generate-osd-vars.sh output **********"
+      when: osd_vars_default.stdout is defined and not osd_vars_default.failed
+
+    - name: Put generate-osd-vars output with dedicated_devices omitted to host inventory files
+      local_action: blockinfile insertbefore=BOF dest=/usr/share/ceph-ansible/host_vars/{{ inventory_hostname }}.yml block={{ osd_vars_dedicated_devices.stdout }} marker="# {mark} **********  generate-osd-vars.sh output **********"
+      when: osd_vars_dedicated_devices.stdout is defined and not osd_vars_dedicated_devices.failed

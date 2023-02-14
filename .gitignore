@@ -25,3 +25,4 @@ ceph-ansible.spec
 !core.yml
 !cephfs.yml
 !device-alias.yml
+!generate-osd-vars.yml
