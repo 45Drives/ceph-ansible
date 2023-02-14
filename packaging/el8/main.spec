@@ -28,6 +28,10 @@ make DESTDIR=%{buildroot} install
 /usr/share/ceph-ansible/*
 
 %changelog
+* Tue Feb 14 2023 Brett Kelly <bkelly@45drives.com> 5.3.5-1
+- set minimum bluestore allocation unit to 4096
+- when using custom ceph repo still pull down iscsi repo from ceph
+- update offline repos to support 45d built ceph packages
 * Wed Dec 14 2022 Brett Kelly <bkelly@45drives.com> 5.3.4-3
 - released to stable
 * Thu Nov 24 2022 Brett Kelly <bkelly@45drives.com> 5.3.4-2

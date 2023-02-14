@@ -1,3 +1,5 @@
-## Ceph Ansible 5.3.4-3
+## Ceph Ansible 5.3.5-1
 
-* released to stable
+* set minimum bluestore allocation unit to 4096
+* when using custom ceph repo still pull down iscsi repo from ceph
+* update offline repos to support 45d built ceph packages

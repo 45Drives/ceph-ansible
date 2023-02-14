@@ -1,3 +1,11 @@
+ceph-ansible-45d (5.3.5-1focal) focal; urgency=medium
+
+  * set minimum bluestore allocation unit to 4096
+  * when using custom ceph repo still pull down iscsi repo from ceph
+  * update offline repos to support 45d built ceph packages
+
+ -- Brett Kelly <bkelly@45drives.com>  Tue, 14 Feb 2023 09:19:47 -0400
+
 ceph-ansible-45d (5.3.4-3focal) focal; urgency=medium
 
   * released to stable
