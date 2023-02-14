@@ -28,17 +28,10 @@ gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ceph
 name=nfs-ganesha stable noarch repo
 
 [ceph-stable-local]
-baseurl = http://{{ offline_repo_server_ip }}/packages/ceph_stable
+baseurl = http://{{ offline_repo_server_ip }}/packages/ceph_45d_stable
 gpgcheck = 1
-gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ceph
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-45drives
 name = Ceph Stable $basearch repo
-priority = 2
-
-[ceph-stable-noarch-local]
-baseurl = http://{{ offline_repo_server_ip }}/packages/ceph_stable_noarch
-gpgcheck = 1
-gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ceph
-name = Ceph Stable noarch repo
 priority = 2
 
 [epel-local]
