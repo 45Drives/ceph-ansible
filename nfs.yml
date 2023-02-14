@@ -1,0 +1,102 @@
+---
+- hosts:
+  - nfss
+
+  gather_facts: false
+  any_errors_fatal: true
+  become: true
+
+  tags: always
+
+  vars:
+    delegate_facts_host: True
+
+  pre_tasks:
+    - import_tasks: raw_install_python.yml
+
+    - name: gather facts
+      setup:
+      when: not delegate_facts_host | bool
+
+    - name: gather and delegate facts
+      setup:
+      delegate_to: "{{ item }}"
+      delegate_facts: True
+      with_items: "{{ groups['all'] }}"
+      run_once: true
+      when: delegate_facts_host | bool
+
+    - name: install required packages for fedora > 23
+      raw: sudo dnf -y install python2-dnf libselinux-python ntp
+      register: result
+      when:
+        - ansible_distribution == 'Fedora'
+        - ansible_distribution_major_version|int >= 23
+      until: result is succeeded
+
+    - name: check if it is atomic host
+      stat:
+        path: /run/ostree-booted
+      register: stat_ostree
+      tags: always
+
+    - name: set_fact is_atomic
+      set_fact:
+        is_atomic: '{{ stat_ostree.stat.exists }}'
+      tags: always
+
+  tasks:
+    - import_role:
+        name: ceph-prerun
+      when:
+        - not skip_prerun | bool
+    - import_role:
+        name: ceph-defaults
+    - import_role:
+        name: ceph-facts
+    - import_role:
+        name: ceph-validate
+    - import_role:
+        name: ceph-infra
+
+- hosts: nfss
+  gather_facts: false
+  order: sorted
+
+  become: True
+  any_errors_fatal: true
+  pre_tasks:
+    - name: set ceph nfs install 'In Progress'
+      run_once: true
+      set_stats:
+        data:
+          installer_phase_ceph_nfs:
+            status: "In Progress"
+            start: "{{ lookup('pipe', 'date +%Y%m%d%H%M%SZ') }}"
+
+  tasks:
+    - import_role:
+        name: ceph-defaults
+      tags: ['ceph_update_config']
+    - import_role:
+        name: ceph-facts
+      tags: ['ceph_update_config']
+    - import_role:
+        name: ceph-handler
+    - import_role:
+        name: ceph-common
+    - import_role:
+        name: ceph-config
+      tags: ['ceph_update_config']
+    - import_role:
+        name: ceph-nfs
+
+  post_tasks:
+    - name: set ceph nfs install 'Complete'
+      run_once: true
+      set_stats:
+        data:
+          installer_phase_ceph_nfs:
+            status: "Complete"
+            end: "{{ lookup('pipe', 'date +%Y%m%d%H%M%SZ') }}"
+            
