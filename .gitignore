@@ -29,3 +29,4 @@ ceph-ansible.spec
 !iscsi.yml
 !radosgw.yml
 !radosgw-lb.yml
+!clients.yml
