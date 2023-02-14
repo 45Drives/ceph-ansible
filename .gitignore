@@ -30,3 +30,4 @@ ceph-ansible.spec
 !radosgw.yml
 !radosgw-lb.yml
 !clients.yml
+!samba.yml
