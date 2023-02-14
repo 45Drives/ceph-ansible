@@ -87,7 +87,7 @@
         dest: /etc/yum.repos.d/ceph-iscsi.repo
         force: true
       when: 
-        - ceph_repository == 'community'
+        - (ceph_repository == 'community') or (ceph_repository == 'custom')
         - not offline_install
 
     - name: install ceph iscsi package
