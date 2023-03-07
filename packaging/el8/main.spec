@@ -28,6 +28,9 @@ make DESTDIR=%{buildroot} install
 /usr/share/ceph-ansible/*
 
 %changelog
+* Tue Mar 07 2023 Brett Kelly <bkelly@45drives.com> 5.3.6-1
+- fixed nfs kernel failover issue
+- added validate check if wrong interface is given
 * Tue Feb 14 2023 Brett Kelly <bkelly@45drives.com> 5.3.5-1
 - set minimum bluestore allocation unit to 4096
 - when using custom ceph repo still pull down iscsi repo from ceph
