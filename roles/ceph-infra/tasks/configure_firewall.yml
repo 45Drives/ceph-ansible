@@ -194,6 +194,17 @@
         - nfs_group_name is defined
         - nfs_group_name in group_names
 
+    - name: open nfs ports (mountd)
+      firewalld:
+        service: mountd
+        zone: "{{ ceph_nfs_firewall_zone }}"
+        permanent: true
+        immediate: true
+        state: enabled
+      when:
+        - nfs_group_name is defined
+        - nfs_group_name in group_names
+
     - name: open nfs HA ports (corosync, pcsd, pacemaker_remote, dlm and corosync-qnetd)
       firewalld:
         service: high-availability
