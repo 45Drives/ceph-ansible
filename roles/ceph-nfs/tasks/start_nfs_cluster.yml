@@ -78,19 +78,20 @@
   run_once: true
   when: ip_resource_check.rc == 1
 
-- name: Check for resource constraint
-  shell: "pcs constraint | grep 'nfs_server with nfs_ip'"
-  failed_when: false
-  run_once: true
-  register: resource_constraint_check
-  when: ceph_nfs_server == 'ganesha'
-
 - name: Set constraint on cluster resources
-  command: pcs constraint colocation add nfs_server with nfs_ip INFINITY
-  run_once: true
-  when: 
-    - resource_constraint_check.rc == 1
-    - ceph_nfs_server == 'ganesha'
+  when: ceph_nfs_server == 'ganesha'
+  block:
+  - name: Check for resource constraint
+    shell: "pcs constraint | grep 'nfs_server with nfs_ip'"
+    failed_when: false
+    run_once: true
+    register: resource_constraint_check
+
+  - name: Set constraint on cluster resources
+    command: pcs constraint colocation add nfs_server with nfs_ip INFINITY
+    run_once: true
+    when: 
+      - resource_constraint_check.rc == 1
 
 - name: set pcs tuning options
   command: pcs resource update nfs_ip op {{ item }} interval=0s timeout=5s
@@ -99,9 +100,18 @@
     - start
     - stop
 
+- name: write nfs config to use static mountd ports on debian/ubuntu
+  when: ansible_facts['os_family'] == 'Debian'
+  template:
+    src: nfs-kernel-server.j2
+    dest: /etc/default/nfs-kernel-server
+    owner: root
+    group: root
+    mode: '0644'
+
 - name: Enable and start nfs daemon
   service:
     name: "{{ 'nfs-server' if ansible_facts['os_family'] == 'RedHat' else 'nfsserver' if ansible_facts['os_family'] == 'Suse' else 'nfs-kernel-server' if ansible_facts['os_family'] == 'Debian' }}"
     enabled: true
-    state: started
+    state: restarted
   when: ceph_nfs_server == 'kernel'

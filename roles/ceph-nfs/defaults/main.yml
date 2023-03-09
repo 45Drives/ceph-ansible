@@ -76,6 +76,8 @@ ceph_nfs_disable_caching: false
 
 ceph_nfs_limit_nfs4: false
 
+ceph_nfs_mountd_port: 24008
+
 ####################
 #    PCS Config    #
 ####################
