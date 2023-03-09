@@ -1,4 +1,3 @@
-## Ceph Ansible 5.3.6-1
+## Ceph Ansible 5.3.6-2
 
-* fixed nfs kernel failover issue
-* added validate check if wrong interface is given
+* set static port for mountd service when using nfs-kernel in debian based systems
