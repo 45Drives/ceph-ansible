@@ -553,6 +553,8 @@ ceph_iscsi_config_dev: false
 #ceph_conf_overrides:
 #  global:
 #    osd pool default pg autoscale mode: "off"
+#    bluestore min alloc size hdd: "4096"
+#    bluestore min alloc size ssd: "4096"
 
 
 #############
