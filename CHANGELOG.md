@@ -1,3 +1,3 @@
-## Ceph Ansible 5.3.6-2
+## Ceph Ansible 5.3.7-1
 
-* set static port for mountd service when using nfs-kernel in debian based systems
+* allow either custom or community repo source

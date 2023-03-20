@@ -28,6 +28,8 @@ make DESTDIR=%{buildroot} install
 /usr/share/ceph-ansible/*
 
 %changelog
+* Mon Mar 20 2023 Brett Kelly <bkelly@45drives.com> 5.3.7-1
+- allow either custom or community repo source
 * Thu Mar 09 2023 Brett Kelly <bkelly@45drives.com> 5.3.6-2
 - set static port for mountd service when using nfs-kernel in debian based systems
 * Tue Mar 07 2023 Brett Kelly <bkelly@45drives.com> 5.3.6-1

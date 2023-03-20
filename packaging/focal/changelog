@@ -1,3 +1,9 @@
+ceph-ansible-45d (5.3.7-1focal) focal; urgency=medium
+
+  * allow either custom or community repo source
+
+ -- Brett Kelly <bkelly@45drives.com>  Mon, 20 Mar 2023 15:03:15 -0300
+
 ceph-ansible-45d (5.3.6-2focal) focal; urgency=medium
 
   * set static port for mountd service when using nfs-kernel in debian based systems
