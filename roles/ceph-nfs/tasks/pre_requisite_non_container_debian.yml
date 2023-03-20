@@ -5,7 +5,7 @@
     - name: stable repos specific tasks
       when:
         - nfs_ganesha_stable | bool
-        - ceph_repository == 'community'
+        - ceph_repository == 'community' or ceph_repository == 'custom'
       block:
         - name: add nfs-ganesha stable repository
           apt_repository:
