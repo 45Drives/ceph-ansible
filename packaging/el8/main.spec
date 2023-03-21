@@ -28,6 +28,8 @@ make DESTDIR=%{buildroot} install
 /usr/share/ceph-ansible/*
 
 %changelog
+* Tue Mar 21 2023 Brett Kelly <bkelly@45drives.com> 5.3.7-2
+- run ceph-defaults and ceph-facts role with rgws hosts when deploying rgw-loadbalancing
 * Mon Mar 20 2023 Brett Kelly <bkelly@45drives.com> 5.3.7-1
 - allow either custom or community repo source
 * Thu Mar 09 2023 Brett Kelly <bkelly@45drives.com> 5.3.6-2
