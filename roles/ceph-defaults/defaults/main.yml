@@ -723,7 +723,7 @@ grafana_plugins:
 grafana_allow_embedding: True
 grafana_port: 3000
 grafana_conf_overrides: {}
-prometheus_container_image: "docker.io/prom/prometheus:v2.7.2"
+prometheus_container_image: "docker.io/prom/prometheus:v2.43.1"
 prometheus_container_cpu_period: 100000
 prometheus_container_cpu_cores: 2
 # container_memory is in GB
