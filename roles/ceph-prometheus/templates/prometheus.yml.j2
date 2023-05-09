@@ -5,6 +5,9 @@ global:
 rule_files:
   - '/etc/prometheus/alerting/*'
 
+scrape_config_files:
+  - '/etc/prometheus/scrape_configs/*.yml'
+
 scrape_configs:
   - job_name: 'prometheus'
     static_configs:
