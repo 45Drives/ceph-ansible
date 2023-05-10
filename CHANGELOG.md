@@ -1,3 +1,3 @@
-## Ceph Ansible 5.3.8-2
+## Ceph Ansible 5.3.8-3
 
-* updated prometheus to add support for wildcard scrape config files
+* relax ansible requirement to allow newer versions

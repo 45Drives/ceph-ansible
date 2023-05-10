@@ -28,6 +28,8 @@ make DESTDIR=%{buildroot} install
 /usr/share/ceph-ansible/*
 
 %changelog
+* Wed May 10 2023 Brett Kelly <bkelly@45drives.com> 5.3.8-3
+- relax ansible requirement to allow newer versions
 * Wed May 10 2023 Brett Kelly <bkelly@45drives.com> 5.3.8-2
 - updated prometheus to add support for wildcard scrape config files
 * Tue Mar 21 2023 Brett Kelly <bkelly@45drives.com> 5.3.7-2
