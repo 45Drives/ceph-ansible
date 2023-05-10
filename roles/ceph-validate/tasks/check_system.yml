@@ -7,7 +7,7 @@
 - name: fail on unsupported ansible version
   fail:
     msg: "Ansible version must be 2.9!"
-  when: ansible_version.minor|int != 9
+  when: ansible_version.minor|int < 9
 
 - name: fail on unsupported system
   fail:
