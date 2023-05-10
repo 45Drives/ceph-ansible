@@ -1,3 +1,9 @@
+ceph-ansible-45d (5.3.8-2focal) focal; urgency=medium
+
+  * updated prometheus to add support for wildcard scrape config files
+
+ -- Brett Kelly <bkelly@45drives.com>  Wed, 10 May 2023 10:03:01 -0300
+
 ceph-ansible-45d (5.3.7-2focal) focal; urgency=medium
 
   * run ceph-defaults and ceph-facts role with rgws hosts when deploying rgw-loadbalancing

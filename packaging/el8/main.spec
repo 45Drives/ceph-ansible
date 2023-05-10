@@ -28,6 +28,8 @@ make DESTDIR=%{buildroot} install
 /usr/share/ceph-ansible/*
 
 %changelog
+* Wed May 10 2023 Brett Kelly <bkelly@45drives.com> 5.3.8-2
+- updated prometheus to add support for wildcard scrape config files
 * Tue Mar 21 2023 Brett Kelly <bkelly@45drives.com> 5.3.7-2
 - run ceph-defaults and ceph-facts role with rgws hosts when deploying rgw-loadbalancing
 * Mon Mar 20 2023 Brett Kelly <bkelly@45drives.com> 5.3.7-1

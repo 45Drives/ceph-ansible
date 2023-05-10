@@ -1,3 +1,3 @@
-## Ceph Ansible 5.3.7-2
+## Ceph Ansible 5.3.8-2
 
-* run ceph-defaults and ceph-facts role with rgws hosts when deploying rgw-loadbalancing
+* updated prometheus to add support for wildcard scrape config files
