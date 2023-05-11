@@ -1,3 +1,11 @@
+ceph-ansible-45d (5.3.8-4focal) focal; urgency=medium
+
+  * update grafana version to 9.5.1
+  * update prometheus version to 2.43.1
+  * relax anisble verison requirement
+
+ -- Brett Kelly <bkelly@45drives.com>  Thu, 11 May 2023 06:30:16 -0300
+
 ceph-ansible-45d (5.3.8-3focal) focal; urgency=medium
 
   * relax ansible requirement to allow newer versions

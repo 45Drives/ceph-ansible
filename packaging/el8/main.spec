@@ -28,6 +28,10 @@ make DESTDIR=%{buildroot} install
 /usr/share/ceph-ansible/*
 
 %changelog
+* Thu May 11 2023 Brett Kelly <bkelly@45drives.com> 5.3.8-4
+- update grafana version to 9.5.1
+- update prometheus version to 2.43.1
+- relax anisble verison requirement
 * Wed May 10 2023 Brett Kelly <bkelly@45drives.com> 5.3.8-3
 - relax ansible requirement to allow newer versions
 * Wed May 10 2023 Brett Kelly <bkelly@45drives.com> 5.3.8-2
