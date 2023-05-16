@@ -28,6 +28,8 @@ make DESTDIR=%{buildroot} install
 /usr/share/ceph-ansible/*
 
 %changelog
+* Tue May 16 2023 Brett Kelly <bkelly@45drives.com> 5.3.9-1
+- first testing package with ansible-core-2.12 support
 * Thu May 11 2023 Brett Kelly <bkelly@45drives.com> 5.3.8-4
 - update grafana version to 9.5.1
 - update prometheus version to 2.43.1

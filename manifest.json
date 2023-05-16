@@ -2,9 +2,9 @@
     "__version": "45D-R1",
     "name": "ceph-ansible-45d",
     "title": "Ceph Ansible",
-    "prerelease": false,
-    "version": "5.3.8",
-    "buildVersion": "4",
+    "prerelease": true,
+    "version": "5.3.9",
+    "buildVersion": "1",
     "author": "Brett Kelly <bkelly@45drives.com>",
     "url": "https://github.com/45Drives/ceph-ansible",
     "category": "utils",
@@ -24,15 +24,19 @@
     "dependencies": {
         "deb": [
             "ansible",
+            "python3-netaddr",
             "python3",
             "samba-ansible (>= 1.1.3)"
         ],
         "el": [
-            "ansible = 2.9.27",
+            "ansible > 2.9.27",
             "python3",
             "python3-netaddr",
+            "python38-netaddr",
             "python3-pyyaml",
+            "python38-pyyaml",
             "python3-six",
+            "python38-six",
             "samba-ansible >= 1.1.3"
         ]
     },
@@ -50,8 +54,8 @@
     ],
     "changelog": {
         "urgency": "medium",
-        "version": "5.3.8",
-        "buildVersion": "4",
+        "version": "5.3.9",
+        "buildVersion": "1",
         "ignore": [],
         "date": null,
         "packager": "Brett Kelly <bkelly@45drives.com>",
