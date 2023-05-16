@@ -1,3 +1,3 @@
-## Ceph Ansible 5.3.9-1
+## Ceph Ansible 5.3.9-2
 
-* first testing package with ansible-core-2.12 support
+* tighten up rpm deps

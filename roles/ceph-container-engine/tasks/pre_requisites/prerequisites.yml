@@ -11,17 +11,17 @@
     - ansible_facts['os_family'] == 'Debian'
   tags: with_pkg
 
-# ensure extras enabled for docker
-- name: enable extras on centos
-  yum_repository:
-    name: extras
-    state: present
-    enabled: yes
-  when:
-    - ansible_facts['distribution'] == 'CentOS'
-    - ceph_docker_enable_centos_extra_repo | bool
-  tags:
-    with_pkg
+# # ensure extras enabled for docker
+# - name: enable extras on centos
+#   yum_repository:
+#     name: extras
+#     state: present
+#     enabled: yes
+#   when:
+#     - ansible_facts['distribution'] == 'CentOS'
+#     - ceph_docker_enable_centos_extra_repo | bool
+#   tags:
+#     with_pkg
 
 - name: install container packages
   package:
