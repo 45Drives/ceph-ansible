@@ -1,3 +1,12 @@
+ceph-ansible-45d (5.4.0-1focal) focal; urgency=medium
+
+  * ansible-core 2.12 support
+  * use podman with ubuntu 20.04
+  * snapshield support
+  * nfs kernel server use correct mountd port
+
+ -- Brett Kelly <bkelly@45drives.com>  Thu, 18 May 2023 13:58:02 -0300
+
 ceph-ansible-45d (5.3.9-2focal) focal; urgency=medium
 
   * tighten up rpm deps

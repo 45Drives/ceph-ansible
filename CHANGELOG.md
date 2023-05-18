@@ -1,3 +1,6 @@
-## Ceph Ansible 5.3.9-2
+## Ceph Ansible 5.4.0-1
 
-* tighten up rpm deps
+* ansible-core 2.12 support
+* use podman with ubuntu 20.04
+* snapshield support
+* nfs kernel server use correct mountd port
