@@ -5,6 +5,15 @@
     - "{{ ansible_facts['distribution'] }}-{{ ansible_facts['distribution_major_version'] }}.yml"
     - "{{ ansible_facts['os_family'] }}.yml"
 
+- name: stop and disable docker.service and docker.socket if podman is container_binary
+  service:
+    name: "{{ item }}"
+    state: stopped
+    enabled: false
+  with_items:
+    - docker.socket
+    - docker
+
 - name: debian based systems tasks
   include_tasks: debian_prerequisites.yml
   when:
