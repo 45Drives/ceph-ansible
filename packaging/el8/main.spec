@@ -28,6 +28,10 @@ make DESTDIR=%{buildroot} install
 /usr/share/ceph-ansible/*
 
 %changelog
+* Thu May 25 2023 Brett Kelly <bkelly@45drives.com> 5.4.0-3
+- ansible-core 2.12 support
+- ubuntu20 uses podman
+- snapshield support
 * Wed May 24 2023 Brett Kelly <bkelly@45drives.com> 5.4.0-2
 - set ansible 5.6.0 rpm dep
 * Thu May 18 2023 Brett Kelly <bkelly@45drives.com> 5.4.0-1

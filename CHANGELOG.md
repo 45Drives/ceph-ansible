@@ -1,3 +1,5 @@
-## Ceph Ansible 5.4.0-2
+## Ceph Ansible 5.4.0-3
 
-* set ansible 5.6.0 rpm dep
+* ansible-core 2.12 support
+* ubuntu20 uses podman
+* snapshield support
