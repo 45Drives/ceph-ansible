@@ -5,6 +5,22 @@
     state: absent
   when: container_package_name == 'docker-ce'
 
+- name: Gather the package facts
+  ansible.builtin.package_facts:
+    manager: auto
+
+- name: stop and disable docker.service and docker.socket if podman is container_binary
+  service:
+    name: "{{ item }}"
+    state: stopped
+    enabled: false
+  when:
+    - container_binary == 'podman'
+    - "'docker.io' in ansible_facts.packages"
+  with_items:
+    - docker.socket
+    - docker
+    
 - name: configure docker-ce repo when not offline_install
   block:
   - name: allow apt to use a repository over https (debian)
