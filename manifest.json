@@ -24,7 +24,7 @@
     "dependencies": {
         "deb": [
             "ansible (= 5.10.0)",
-            "anisble-core (2.12.10)",
+            "anisble-core (= 2.12.10)",
             "python3-netaddr",
             "python3",
             "samba-ansible (>= 1.1.3)"
