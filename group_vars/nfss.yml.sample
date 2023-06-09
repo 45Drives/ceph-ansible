@@ -84,7 +84,7 @@ dummy:
 
 #ceph_nfs_limit_nfs4: false
 
-#ceph_nfs_mountd_port: 24008
+#ceph_nfs_mountd_port: 20048
 
 ####################
 #    PCS Config    #
