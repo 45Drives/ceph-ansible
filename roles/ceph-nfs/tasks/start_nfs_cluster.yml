@@ -1,4 +1,24 @@
 ---
+- name: remove default corosync.conf if present
+  block:
+    - name: check if corosync.conf exists
+      stat:
+        path: /etc/corosync/corosync.conf
+      register: corosync_file
+
+    - name: Read the first line of corosync.conf
+      command: "head -n 1 /etc/corosync/corosync.conf"
+      register: first_line
+      changed_when: false
+      ignore_errors: true
+      when: corosync_file.stat.exists
+
+    - name: Remove corosync.conf if the first line matches
+      file:
+        path: /etc/corosync/corosync.conf
+        state: absent
+      when: corosync_file.stat.exists and first_line.stdout == "# Please read the corosync.conf.5 manual page"
+
 - name: Enable and start PCS daemon
   service:
     name: pcsd
