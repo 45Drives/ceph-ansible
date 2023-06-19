@@ -221,7 +221,10 @@ ceph_iscsi_config_dev: true # special repo for deploying iSCSI gateways
 # ceph_custom_repo should be the URL to the repo base.
 #
 #ceph_custom_key: https://server.domain.com/ceph-custom-repo/key.asc
-ceph_custom_repo: https://server.domain.com/ceph-custom-repo
+#ceph_custom_repo: https://server.domain.com/ceph-custom-repo
+
+ceph_custom_repo: "{% if ansible_facts['os_family'] == 'Debian' %}https://ceph.repo.45drives.com/quincy/debian{% elif ansible_facts['os_family'] == 'RedHat' %}https://ceph.repo.45drives.com/quincy/rhel/el8/ceph_45d.repo{% endif %}"
+ceph_custom_key: "https://repo.45drives.com/key/gpg.asc"
 
 
 # ORIGIN: LOCAL CEPH INSTALLATION
@@ -684,7 +687,7 @@ grafana_crt: ''
 grafana_key: ''
 # When using https, please fill with a hostname for which grafana_crt is valid.
 grafana_server_fqdn: ''
-grafana_container_image: "docker.io/grafana/grafana:6.7.4"
+grafana_container_image: "docker.io/grafana/grafana:9.5.1"
 grafana_container_cpu_period: 100000
 grafana_container_cpu_cores: 2
 # container_memory is in GB
@@ -714,7 +717,7 @@ grafana_allow_embedding: True
 grafana_port: 3000
 grafana_network: "{{ public_network }}"
 grafana_conf_overrides: {}
-prometheus_container_image: "docker.io/prom/prometheus:v2.7.2"
+prometheus_container_image: "docker.io/prom/prometheus:v2.43.1"
 prometheus_container_cpu_period: 100000
 prometheus_container_cpu_cores: 2
 # container_memory is in GB
