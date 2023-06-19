@@ -23,3 +23,8 @@
   when:
     - secure_cluster | bool
     - inventory_hostname == groups[mon_group_name] | first
+
+- name: disable pg_autoscaling cluster wide
+  include_tasks: disable_pg_autoscale.yml
+  when:
+    - disable_global_pg_autoscaling | bool
