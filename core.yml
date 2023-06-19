@@ -100,6 +100,10 @@
     - import_role:
         name: ceph-mgr
       when: groups.get(mgr_group_name, []) | length == 0
+    - name: set insecure global_id reclaim to {{ allow_insecure_global_reclaim }}
+      command: >
+        {{ container_exec_cmd }} ceph --cluster {{ cluster }} config set mon auth_allow_insecure_global_id_reclaim {{ allow_insecure_global_reclaim }}
+      changed_when: false
 
   post_tasks:
     - name: set ceph monitor install 'Complete'
