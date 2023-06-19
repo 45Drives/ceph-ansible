@@ -28,6 +28,8 @@ make DESTDIR=%{buildroot} install
 /usr/share/ceph-ansible/*
 
 %changelog
+* Mon Jun 19 2023 Brett Kelly <bkelly@45drives.com> 5.4.1-1
+- fix nfs deployment bug in ubuntu clusters
 * Thu May 25 2023 Brett Kelly <bkelly@45drives.com> 5.4.0-3
 - ansible-core 2.12 support
 - ubuntu20 uses podman

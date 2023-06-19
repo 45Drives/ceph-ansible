@@ -1,5 +1,3 @@
-## Ceph Ansible 5.4.0-3
+## Ceph Ansible 5.4.1-1
 
-* ansible-core 2.12 support
-* ubuntu20 uses podman
-* snapshield support
+* fix nfs deployment bug in ubuntu clusters
