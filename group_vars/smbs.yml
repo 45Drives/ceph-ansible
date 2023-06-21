@@ -1,0 +1,48 @@
+---
+# Update samba packages if already installed
+upgrade_samba_packages: true
+
+# Manage Firewall
+manage_firewall: true
+
+# Roles
+domain_member: false
+cluster_member: true
+
+# Join Method
+# join_method: sssd|winbind
+join_method: 'sssd'
+# Join Authorization
+# join_auth: kerberos|password
+join_auth: 'kerberos'
+join_user: ''
+join_password: ''
+# Domain Name
+realm: ''
+workgroup: ''
+# Server Name
+# This varible is ignored when not a cluster member and NetBIOS name is set to the hostname of the server
+netbios_name: 'CTDBCLUSTER'
+
+auto_id_mapping: true
+enumerate_ids: false
+fully_qualified_names: false
+
+# Enable windows side permissions
+enable_windows_acl: true
+share_admins:
+  - "Domain Admins"
+  - "user"
+
+# ctdb 
+ctdb_public_addresses:
+  - vip_address: '192.168.63.66'
+    vip_interface: 'ens18'
+    subnet_mask: '16'
+  - vip_address: '192.168.63.67'
+    vip_interface: 'ens18'
+    subnet_mask: '16'
+
+# backend_filesystem: cephfs|generic
+backend_filesystem: cephfs
+shared_storage_mountpoint: /mnt/cephfs
