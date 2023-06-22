@@ -22,6 +22,8 @@
 
   tasks:
     - import_role:
+        name: ceph-prerun
+    - import_role:
         name: ceph-defaults
       tags: ['ceph_update_config']
     - import_role:

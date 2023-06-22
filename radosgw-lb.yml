@@ -42,6 +42,8 @@
 
   tasks:
     - import_role:
+        name: ceph-prerun
+    - import_role:
         name: ceph-defaults
 
     # dummy container setup is only supported on x86_64
