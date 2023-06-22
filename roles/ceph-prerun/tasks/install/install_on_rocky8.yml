@@ -1,0 +1,15 @@
+---
+- name: Install Extra Dependencies in Rocky 8
+  dnf:
+    name: epel-release
+    state: latest
+  register: result
+  until: result is succeeded
+  when: not offline_install
+
+- name: Install Extra Dependencies in Rocky 8
+  dnf:
+    name: "{{ rocky_install_pkgs }}"
+    state: latest
+  register: result
+  until: result is succeeded

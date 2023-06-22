@@ -1,0 +1,45 @@
+---
+- name: setup 45drives repository
+  block:
+  - name: Configure 45Drives repository | Get repo setup script
+    get_url:
+      url: https://repo.45drives.com/setup
+      dest: /tmp/setup
+
+  - name: Configure 45Drives repository | Run repo setup script
+    shell: bash /tmp/setup
+
+  - name: Configure 45Drives repository | Remove repo setup script
+    file:
+      path: /tmp/setup
+      state: absent
+  when:
+    - not offline_install
+
+- name: setup offline repositories
+  include_tasks: offline/repo_setup.yml
+  when: offline_install
+
+- name: set grafana image fact when offline_install
+  set_fact: grafana_container_image="localhost/grafana-offline:5.4.2"
+  when: offline_install
+
+- name: include_tasks cleanup/cleanup_on_ubuntu.yml
+  include_tasks: cleanup/cleanup_on_ubuntu.yml
+  when: ansible_distribution == 'Ubuntu'
+
+- name: include_tasks cleanup/cleanup_on_rocky8.yml
+  include_tasks: cleanup/cleanup_on_rocky8.yml
+  when:
+    - ansible_distribution == 'Rocky'
+    - ansible_distribution_major_version == '8'
+
+- name: include_tasks install/install_on_ubuntu.yml
+  include_tasks: install/install_on_ubuntu.yml
+  when: ansible_distribution == 'Ubuntu'
+    
+- name: include_tasks install/install_on_rocky8.yml
+  include_tasks: install/install_on_rocky8.yml
+  when:
+    - ansible_distribution == 'Rocky'
+    - ansible_distribution_major_version == '8'

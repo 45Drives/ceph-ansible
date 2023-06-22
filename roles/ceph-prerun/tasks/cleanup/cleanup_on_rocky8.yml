@@ -1,0 +1,9 @@
+---
+- name: Remove unneeded pkgs in rocky
+  block:
+    - name: Remove packages
+      yum:
+        name: "{{ rocky_cleanup_pkgs }}"
+        state: absent
+      register: result
+      until: result is succeeded
