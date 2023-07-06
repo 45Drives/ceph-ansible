@@ -1,0 +1,82 @@
+---
+- name: ubuntu systems - repo handling
+  when:
+    - ceph_nfs_server == 'ganesha'
+    - not offline_install 
+  block:
+    - name: stable repos specific tasks
+      block:
+        - name: add nfs-ganesha stable repository
+          apt_repository:
+            repo: 'ppa:nfs-ganesha/nfs-ganesha-3.0'
+            state: present
+            update_cache: no
+          register: add_ganesha_apt_repo
+
+        - name: update apt cache
+          apt:
+            update_cache: yes
+          register: update_ganesha_apt_cache
+          retries: 5
+          delay: 2
+          until: update_ganesha_apt_cache is success
+          when: add_ganesha_apt_repo is changed
+
+        - name: add libntirpc3 stable repository
+          apt_repository:
+            repo: 'ppa:nfs-ganesha/libntirpc-3.0'
+            state: present
+            update_cache: no
+          register: add_libntirpc_apt_repo
+
+        - name: update apt cache
+          apt:
+            update_cache: yes
+          register: update_libntirpc_apt_cache
+          retries: 5
+          delay: 2
+          until: update_libntirpc_apt_cache is success
+          when: add_libntirpc_apt_repo is changed
+
+
+- name: ubuntu systems - install nfs-ganesha packages
+  when: ceph_nfs_server == 'ganesha'
+  block:
+    - name: install nfs cephfs gateway
+      apt:
+        name: ['nfs-ganesha', 'nfs-ganesha-ceph', 'nfs-ganesha-rados-grace', 'nfs-ganesha-rados-urls']
+        state: "{{ (upgrade_ceph_packages|bool) | ternary('latest','present') }}"
+      register: result
+      until: result is succeeded
+      when: nfs_file_gw
+
+    - name: install ubuntu nfs-ganesha-rgw and ceph-radosgw packages
+      apt:
+        name: ['nfs-ganesha', 'nfs-ganesha-rgw', 'nfs-ganesha-rados-grace', 'nfs-ganesha-rados-urls', 'ceph-radosgw', 'radosgw']
+        state: "{{ (upgrade_ceph_packages|bool) | ternary('latest','present') }}"
+      register: result
+      until: result is succeeded
+      when: nfs_obj_gw | bool
+
+- name: ubuntu systems - install nfs-kernel packages
+  when: ceph_nfs_server == 'kernel'
+  block:
+    - name: install nfs cephfs gateway
+      apt:
+        name: ['nfs-kernel-server', 'nfs-common']
+        state: "{{ (upgrade_ceph_packages|bool) | ternary('latest','present') }}"
+      register: result
+      until: result is succeeded
+      when: nfs_file_gw
+
+- name: ubuntu systems - install pacemaker/corosync/pcs
+  when: ceph_nfs_rados_backend_driver == "rados_ng"
+  block:
+    - name: install pacemaker
+      apt:
+        name: ['pacemaker', 'corosync', 'pcs']
+        state: "{{ (upgrade_ceph_packages|bool) | ternary('latest','present') }}"
+      register: result
+      until: result is succeeded
+      when:
+        - groups['nfss'] | length > 1

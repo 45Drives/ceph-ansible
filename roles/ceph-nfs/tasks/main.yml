@@ -1,4 +1,7 @@
 ---
+- name: include configuration validation tasks
+  include_tasks: validate.yml
+
 # global/common requirement
 - name: stop nfs server service
   systemd:
@@ -6,6 +9,7 @@
     state: stopped
     enabled: no
   failed_when: false
+  when: ceph_nfs_server == 'ganesha'
 
 - name: include pre_requisite_non_container.yml
   include_tasks: pre_requisite_non_container.yml
@@ -77,5 +81,14 @@
         - item.0.item.name == 'client.' + ceph_nfs_ceph_user or item.0.item.name == rgw_client_name
       no_log: "{{ no_log_on_ceph_key_tasks }}"
 
+- name: include configure_cephfs_backend.yml
+  import_tasks: configure_cephfs_backend.yml
+
 - name: include start_nfs.yml
   import_tasks: start_nfs.yml
+  when: ceph_nfs_server == 'ganesha'
+
+- name: include start_nfs_cluster.yml
+  import_tasks: start_nfs_cluster.yml
+  when:
+    - ceph_nfs_rados_backend_driver == "rados_ng"

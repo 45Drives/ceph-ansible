@@ -23,16 +23,30 @@ ceph_nfs_enable_service: true
 # can be set by 'ceph_nfs_service_suffix'
 # ceph_nfs_service_suffix: "{{ ansible_facts['hostname'] }}"
 
+# NFS server choice between 'kernel' or 'ganesha'
+ceph_nfs_server: kernel
+nfs_shared_storage_mountpoint: /mnt/nfsgw
+
 ######################
 # NFS Ganesha Config #
 ######################
 ceph_nfs_log_file: "/var/log/ganesha/ganesha.log"
-ceph_nfs_dynamic_exports: false
+ceph_nfs_dynamic_exports: true
+ceph_nfs_ceph_user: "admin"
+ceph_nfs_fs_root: "nfs"
+
+nfs_keyring:
+  - { name: client.nfs, caps: { mds: "allow r path=/, allow rwps path=/{{ ceph_nfs_fs_root }}", mon: "allow r", osd: "allow *" }, mode: "0600" }
+
 # If set to true then rados is used to store ganesha exports
 # and client sessions information, this is useful if you
 # run multiple nfs-ganesha servers in active/passive mode and
 # want to do failover
-ceph_nfs_rados_backend: false
+ceph_nfs_rados_backend: true
+# backend mode, either rados_ng, or rados_cluster
+# Default (rados_ng) is for single gateway/active-passive use.
+# rados_cluster is for active-active nfs cluster. Requires ganesha-grace-db to be initialized
+ceph_nfs_rados_backend_driver: "rados_ng"
 # Name of the rados object used to store a list of the export rados
 # object URLS
 ceph_nfs_rados_export_index: "ganesha-export-index"
@@ -48,6 +62,20 @@ ceph_nfs_rados_export_index: "ganesha-export-index"
 # Note: Irrespective of this option's setting, ganesha's caching is disabled
 # when setting 'nfs_file_gw' option as true.
 ceph_nfs_disable_caching: false
+
+ceph_nfs_limit_nfs4: false
+
+ceph_nfs_mountd_port: 20048
+
+####################
+#    PCS Config    #
+####################
+pcmk_cluster_name: hacluster
+pcmk_user: hacluster
+
+ceph_nfs_floating_ip_address: '192.168.18.73'
+ceph_nfs_floating_ip_cidr: '16'
+ceph_nfs_floating_ip_interface : 'ens3'
 
 # This is the file ganesha will use to control NFSv4 ID mapping
 ceph_nfs_idmap_conf: "/etc/ganesha/idmap.conf"

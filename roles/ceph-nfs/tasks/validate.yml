@@ -1,0 +1,19 @@
+---
+# knfs does not support active active scenarios
+# fail if ceph_nfs_server is 'kernel' and ceph_nfs_rados_backend_driver is 'rados_cluster"
+- name: validate nfs playbook settings
+  fail: 
+    msg: |
+      Kernel nfs server does not support active active config
+      Change ceph_nfs_rados_backend_driver to 'rados_ng' when ceph_nfs_server is 'kernel'
+  when: 
+    - ceph_nfs_server == 'kernel'
+    - ceph_nfs_rados_backend_driver == 'rados_cluster'
+
+- name: fail if floating IP interface does not exist
+  fail:
+    msg: "floating IP interface [{{ ceph_nfs_floating_ip_interface }}] does not exist on this host"
+  when:
+    - ceph_nfs_floating_ip_interface not in ansible_interfaces
+    - ceph_nfs_server == 'kernel'
+    - ceph_nfs_rados_backend_driver == 'rados_cluster'

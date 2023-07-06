@@ -231,6 +231,9 @@ ceph_iscsi_config_dev: false
 #ceph_custom_key: https://server.domain.com/ceph-custom-repo/key.asc
 #ceph_custom_repo: https://server.domain.com/ceph-custom-repo
 
+#ceph_custom_repo: "{% if ansible_facts['os_family'] == 'Debian' %}https://ceph.repo.45drives.com/quincy/debian{% elif ansible_facts['os_family'] == 'RedHat' %}https://ceph.repo.45drives.com/quincy/rhel/el8/ceph_45d.repo{% endif %}"
+#ceph_custom_key: "https://repo.45drives.com/key/gpg.asc"
+
 
 # ORIGIN: LOCAL CEPH INSTALLATION
 #
@@ -351,6 +354,15 @@ ceph_iscsi_config_dev: false
 #cephfs_pools:
 #  - "{{ cephfs_data_pool }}"
 #  - "{{ cephfs_metadata_pool }}"
+
+##########
+# NFS    #
+##########
+# Name of the rados pool and namespace used to store a list of the export and grace rados
+# object URLS
+#ceph_nfs_ganesha_pool: 'nfs_ganesha'
+#ceph_nfs_export_namespace: "ganesha-export"
+#ceph_nfs_grace_namespace: "ganesha-grace"
 
 ## OSD options
 #
@@ -554,8 +566,10 @@ ceph_iscsi_config_dev: false
 #os_tuning_params:
 #  - { name: fs.file-max, value: 26234859 }
 #  - { name: vm.zone_reclaim_mode, value: 0 }
-#  - { name: vm.swappiness, value: 10 }
+#  - { name: vm.swappiness, value: 0 }
 #  - { name: vm.min_free_kbytes, value: "{{ vm_min_free_kbytes }}" }
+#  - { name: kernel.pid_max, value: 4194304 }
+
 
 # For Debian & Red Hat/CentOS installs set TCMALLOC_MAX_TOTAL_THREAD_CACHE_BYTES
 # Set this to a byte value (e.g. 134217728)

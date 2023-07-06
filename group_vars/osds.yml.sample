@@ -128,25 +128,28 @@ dummy:
 ###############
 # CRUSH RULES #
 ###############
-#crush_rule_config: false
+#crush_rule_config: true
+
+# Both crush rules are set as default intentionally, do not change.
+# This was done to have the role handle the dynamic case of all hdd OSD, all ssd OSD or mix of both as OSDs
+
+#crush_rule_ssd:
+#  name: replicated_ssd
+#  root: default
+#  type: host
+#  class: ssd
+#  default: true
 
 #crush_rule_hdd:
-#  name: HDD
+#  name: replicated_hdd
 #  root: default
 #  type: host
 #  class: hdd
 #  default: false
 
-#crush_rule_ssd:
-#  name: SSD
-#  root: default
-#  type: host
-#  class: ssd
-#  default: false
-
-#crush_rules:
-#  - "{{ crush_rule_hdd }}"
-#  - "{{ crush_rule_ssd }}"
+# crush_rules:
+#   - "{{ crush_rule_hdd }}"
+#   - "{{ crush_rule_ssd }}"
 
 # Caution: this will create crush roots and racks according to hostvars {{ osd_crush_location }}
 # and will move hosts into them which might lead to significant data movement in the cluster!

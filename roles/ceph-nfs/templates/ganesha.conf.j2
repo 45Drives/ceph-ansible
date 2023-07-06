@@ -10,6 +10,13 @@ NFS_Core_Param
 {% if ceph_nfs_bind_addr is defined %}
        Bind_Addr={{ ceph_nfs_bind_addr }};
 {% endif %}
+    	Enable_NLM = false;
+    	Enable_RQUOTA = false;
+{% if ceph_nfs_limit_nfs4 %}
+        Protocols = 4;
+{% else %}
+        Protocols = 3,4;
+{% endif %}
 {{ ganesha_core_param_overrides | default(None) }}
 }
 
@@ -20,7 +27,6 @@ EXPORT_DEFAULTS {
 
 CACHEINODE {
 	Dir_Chunk = 0;
-
 	NParts = 1;
 	Cache_Size = 1;
 }
@@ -30,19 +36,36 @@ CACHEINODE {
 RADOS_URLS {
    ceph_conf = '/etc/ceph/{{ cluster }}.conf';
    userid = "{{ ceph_nfs_ceph_user }}";
+   {% if ceph_nfs_dynamic_exports %}
+   watch_url = "rados://{{ ceph_nfs_ganesha_pool }}/{{ ceph_nfs_export_namespace }}/conf-{{ ansible_hostname }}";
+   {% endif %}
 }
-%url rados://{{ cephfs_data_pool.name }}/{{ ceph_nfs_rados_export_index }}
 
+{% if ceph_nfs_rados_backend_driver is defined %}
 NFSv4 {
-	RecoveryBackend = 'rados_kv';
-	IdmapConf = "{{ ceph_nfs_idmap_conf }}";
+        RecoveryBackend = '{{ ceph_nfs_rados_backend_driver }}';
 }
+{% else %}
+NFSv4 {
+        RecoveryBackend = 'rados_ng';
+}
+{% endif %}
+
+
 RADOS_KV {
 	ceph_conf = '/etc/ceph/{{ cluster }}.conf';
 	userid = "{{ ceph_nfs_ceph_user }}";
-	pool = "{{ cephfs_data_pool.name }}";
+	pool = "{{ ceph_nfs_ganesha_pool }}";
+	namespace = "{{ ceph_nfs_grace_namespace }}";
+	{% if 'rados_cluster' in ceph_nfs_rados_backend_driver %}
+	nodeid = "{{ ansible_hostname }}";
+	{% endif %}
 }
 {% endif %}
+
+{% if ceph_nfs_dynamic_exports %}
+%url rados://{{ ceph_nfs_ganesha_pool }}/{{ ceph_nfs_export_namespace }}/conf-{{ ansible_hostname }}
+{% else %}
 
 {% if nfs_file_gw | bool %}
 EXPORT

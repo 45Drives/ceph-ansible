@@ -347,6 +347,15 @@ cephfs_pools:
   - "{{ cephfs_data_pool }}"
   - "{{ cephfs_metadata_pool }}"
 
+##########
+# NFS    #
+##########
+# Name of the rados pool and namespace used to store a list of the export and grace rados
+# object URLS
+ceph_nfs_ganesha_pool: 'nfs_ganesha'
+ceph_nfs_export_namespace: "ganesha-export"
+ceph_nfs_grace_namespace: "ganesha-grace"
+
 ## OSD options
 #
 lvmetad_disabled: false
