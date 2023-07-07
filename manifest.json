@@ -65,7 +65,6 @@
         "vagrant_variables.yml.sample",
         "generate_group_vars_sample.sh",
         "core.yml",
-        ".tox",
         "test.yml",
         "LICENSE",
         "tox-podman.ini",
@@ -89,9 +88,7 @@
         "clients.yml",
         "cephfs.yml",
         "group_vars",
-        "README-MULTISITE.md",
-        "tox-cephadm.ini",
-        "tox-rbdmirror.ini",
+        "README.rst",
         "rhcs_edits.txt",
         "tox-shrink_osd.ini",
         "library",
@@ -105,10 +102,8 @@
         "urgency": "medium",
         "version": "7.0.0",
         "build_number": "1",
-        "date": "2023-07-07T09:34:34.283998",
+        "date": null,
         "packager": "Brett Kelly <bkelly@45drives.com>",
-        "changes": [
-            "Initial build"
-        ]
+        "changes": []
     }
 }
