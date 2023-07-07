@@ -1,0 +1,35 @@
+name: Build Packages
+on:
+  push:
+    branches:
+      - dev-45d-quincy
+jobs:
+  prebuild:
+    runs-on: buildinator
+    outputs:
+      manifest: ${{ steps.prebuild.outputs.manifest }}
+      matrix: ${{ steps.prebuild.outputs.matrix }}
+      uuid: ${{ steps.prebuild.outputs.uuid }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - id: prebuild
+        name: Prebuild flow
+        uses: 45drives/actions/prebuild-flow@main
+        with:
+          directory: ${{ github.workspace }}
+
+  build:
+    needs: prebuild
+    runs-on: buildinator
+    strategy:
+      matrix:
+        build: ${{ fromJSON(needs.prebuild.outputs.matrix).include }}
+    steps:
+      - name: Build package
+        uses: 45drives/actions/build-package@main
+        with:
+          manifest: ${{ needs.prebuild.outputs.manifest }}
+          build: ${{ toJSON(matrix.build) }}
+          uuid: ${{ needs.prebuild.outputs.uuid }}

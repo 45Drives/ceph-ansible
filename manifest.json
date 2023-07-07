@@ -1,0 +1,114 @@
+{
+    "schema_version": "45D_AP_V2.0",
+    "name": "ceph-ansible-45d",
+    "title": "Ceph Ansible",
+    "description": "Ceph Ansible Deployment Playbooks",
+    "version": "7.0.0",
+    "build_number": "1",
+    "stable": false,
+    "author": "Brett Kelly <bkelly@45drives.com>",
+    "git_url": "https://github.com/45Drives/ceph-ansible-45d",
+    "licence": "GPL-3.0",
+    "defaults": {
+        "change_urgency": "medium"
+    },
+    "architecture": {
+        "rocky": "x86_64",
+        "debian": "amd64",
+        "ubuntu": "amd64"
+    },
+    "dependencies": {
+        "ubuntu_common": [],
+        "rocky_common": []
+    },
+    "builds": [
+        {
+            "group": "ubuntu",
+            "os_name": "ubuntu-focal",
+            "repo": "community",
+            "image": "ci.cr.45d.io/ci/simple/ubuntu-focal:1"
+        },
+        {
+            "group": "ubuntu",
+            "os_name": "ubuntu-jammy",
+            "repo": "community",
+            "image": "ci.cr.45d.io/ci/simple/ubuntu-jammy:1"
+        },
+        {
+            "group": "rocky",
+            "os_name": "rocky-el8",
+            "repo": "community",
+            "image": "ci.cr.45d.io/ci/simple/rocky-el8:1"
+        },
+        {
+            "group": "rocky",
+            "os_name": "rocky-el9",
+            "repo": "community",
+            "image": "ci.cr.45d.io/ci/simple/rocky-el9:1"
+        }
+    ],
+    "sources": [
+        "requirements.txt",
+        "tox-update.ini",
+        "tests",
+        "tox-external_clients.ini",
+        "Makefile",
+        "roles",
+        "iscsi.yml",
+        "ansible.cfg",
+        "profiles",
+        "tox-docker2podman.ini",
+        "vagrant_variables.yml",
+        "requirements.yml",
+        "nfs.yml",
+        "dummy-ansible-hosts",
+        "vagrant_variables.yml.sample",
+        "generate_group_vars_sample.sh",
+        "core.yml",
+        ".tox",
+        "test.yml",
+        "LICENSE",
+        "tox-podman.ini",
+        "dashboard.yml",
+        "tox.ini",
+        "site-container.yml.sample",
+        ".mergify.yml",
+        "plugins",
+        "raw_install_python.yml",
+        "module_utils",
+        "samba.yml",
+        "tox-filestore_to_bluestore.ini",
+        "infrastructure-playbooks",
+        "radosgw.yml",
+        ".readthedocs.yaml",
+        "device-alias.yml",
+        "site.yml.sample",
+        "ceph-ansible.spec.in",
+        "contrib",
+        ".deepsource.toml",
+        "clients.yml",
+        "cephfs.yml",
+        "group_vars",
+        "README-MULTISITE.md",
+        "tox-cephadm.ini",
+        "tox-rbdmirror.ini",
+        "rhcs_edits.txt",
+        "tox-shrink_osd.ini",
+        "library",
+        "Vagrantfile",
+        "tox-subset_update.ini",
+        "generate-osd-vars.yml",
+        "docs",
+        "radosgw-lb.yml"
+    ],
+    "changelog": {
+        "urgency": "medium",
+        "version": "7.0.0",
+        "build_number": "1",
+        "date": "2023-07-07T09:34:34.283998",
+        "packager": "Brett Kelly <bkelly@45drives.com>",
+        "changes": [
+            "Initial build"
+        ]
+    }
+}
