@@ -23,7 +23,9 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 make DESTDIR=%{buildroot} install
 
 %files
-/usr/share/cockpit/module/*
+%doc README.rst
+%license LICENSE
+/usr/share/ceph-ansible/*
 
 %changelog
 * Fri Jul 07 2023 Brett Kelly <bkelly@45drives.com> 7.0.0-1
