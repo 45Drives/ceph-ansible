@@ -48,6 +48,7 @@
         }
     ],
     "sources": [
+        ".git",
         "requirements.txt",
         "tox-update.ini",
         "tests",
