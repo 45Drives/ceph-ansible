@@ -2,7 +2,7 @@ name: Build Packages
 on:
   push:
     branches:
-      - dev-45d-quincy
+      - build-45d-quincy
 jobs:
   prebuild:
     runs-on: buildinator
