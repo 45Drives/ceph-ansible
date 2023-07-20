@@ -35,7 +35,9 @@ jobs:
           uuid: ${{ needs.prebuild.outputs.uuid }}
 
   edge_deploy:
-    needs: prebuild
+    needs:
+      - prebuild
+      - build
     runs-on: buildinator
     steps:
       - name: Run sign playbook
