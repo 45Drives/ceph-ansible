@@ -2,7 +2,7 @@ name: Build Packages
 on:
   push:
     branches:
-      - dev-45d-quincy
+      - dev-45d-quincy-ap
 jobs:
   prebuild:
     runs-on: buildinator
@@ -33,3 +33,20 @@ jobs:
           manifest: ${{ needs.prebuild.outputs.manifest }}
           build: ${{ toJSON(matrix.build) }}
           uuid: ${{ needs.prebuild.outputs.uuid }}
+
+  edge_deploy:
+    needs: prebuild
+    runs-on: buildinator
+    steps:
+      - name: Run sign playbook
+        uses: 45drives/actions/ansible-playbook@main
+        with:
+          playbook: /root/git/auto-packaging/actions/ansible/sign.yml
+          directory: ${{ inputs.directory }}/packaging
+          group_vars_directory: ${{ inputs.directory }}/packaging/group_vars
+          inventory: |
+            [ci]
+            localhost
+          become: true
+          host_key_checking: true
+          extra_vars: sign_key_name=edge
