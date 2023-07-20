@@ -7,12 +7,12 @@
   include_tasks: pre_requisite_non_container_debian.yml
   when: 
     - ansible_facts['os_family'] == 'Debian'
-    - ansible_distribution != 'Ubuntu'
+    - ansible_facts['distribution'] != 'Ubuntu'
 
 - name: include debian based system related tasks
   include_tasks: pre_requisite_non_container_ubuntu.yml
   when: 
-    - ansible_distribution == 'Ubuntu'
+    - ansible_facts['distribution'] == 'Ubuntu'
 
 - name: install nfs rgw/cephfs gateway - SUSE/openSUSE
   zypper:

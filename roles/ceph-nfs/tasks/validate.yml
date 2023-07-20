@@ -14,6 +14,6 @@
   fail:
     msg: "floating IP interface [{{ ceph_nfs_floating_ip_interface }}] does not exist on this host"
   when:
-    - ceph_nfs_floating_ip_interface not in ansible_interfaces
+    - ceph_nfs_floating_ip_interface not in ansible_facts['interfaces']
     - ceph_nfs_server == 'kernel'
     - ceph_nfs_rados_backend_driver == 'rados_cluster'

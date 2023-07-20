@@ -37,7 +37,7 @@ RADOS_URLS {
    ceph_conf = '/etc/ceph/{{ cluster }}.conf';
    userid = "{{ ceph_nfs_ceph_user }}";
    {% if ceph_nfs_dynamic_exports %}
-   watch_url = "rados://{{ ceph_nfs_ganesha_pool }}/{{ ceph_nfs_export_namespace }}/conf-{{ ansible_hostname }}";
+   watch_url = "rados://{{ ceph_nfs_ganesha_pool }}/{{ ceph_nfs_export_namespace }}/conf-{{ ansible_facts['hostname'] }}";
    {% endif %}
 }
 
@@ -58,13 +58,13 @@ RADOS_KV {
 	pool = "{{ ceph_nfs_ganesha_pool }}";
 	namespace = "{{ ceph_nfs_grace_namespace }}";
 	{% if 'rados_cluster' in ceph_nfs_rados_backend_driver %}
-	nodeid = "{{ ansible_hostname }}";
+	nodeid = "{{ ansible_facts['hostname'] }}";
 	{% endif %}
 }
 {% endif %}
 
 {% if ceph_nfs_dynamic_exports %}
-%url rados://{{ ceph_nfs_ganesha_pool }}/{{ ceph_nfs_export_namespace }}/conf-{{ ansible_hostname }}
+%url rados://{{ ceph_nfs_ganesha_pool }}/{{ ceph_nfs_export_namespace }}/conf-{{ ansible_facts['hostname'] }}
 {% else %}
 
 {% if nfs_file_gw | bool %}
