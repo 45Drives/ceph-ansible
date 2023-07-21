@@ -44,8 +44,8 @@ jobs:
         uses: 45drives/actions/ansible-playbook@main
         with:
           playbook: /root/git/auto-packaging/actions/ansible/sign.yml
-          directory: ${{ inputs.directory }}/packaging
-          group_vars_directory: ${{ inputs.directory }}/packaging/group_vars
+          directory: ${{ github.workspace }}/packaging
+          group_vars_directory: ${{ github.workspace }}/packaging/group_vars
           inventory: |
             [ci]
             localhost
