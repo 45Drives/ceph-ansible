@@ -1,10 +1,26 @@
 ---
-#get current pg autoscaling state
 - name: get current pg autoscaling state
-  shell: "ceph config dump --format=json | jq -r '.[] | select(.name=="osd_pool_default_pg_autoscale_mode") | .value'"
-  register: pg_autoscale_status
+  command: "ceph config dump --format=json"
+  register: ceph_config_json
+  run_once: true
 
+- name: parse ceph_config_json for pg_autoscale_status
+  set_fact:
+    result: "{{ json_data | json_query(query) }}"
+  vars:
+    json_data: "{{ ceph_config_json.stdout | from_json }}"
+    query: "[?name=='osd_pool_default_pg_autoscale_mode'].value"
+  run_once: true
+
+- name: set pg_autoscaler_status if list is not empty
+  set_fact:
+    pg_autoscale_status: "{{ result | first }}"
+  run_once: true
+  when: result | length > 0
+
+# if osd_pool_default_pg_autoscale_mode is not off or if not set at all, set to off
 - name: disable pg autoscaling globally
-  shell: "ceph config set global osd_pool_default_pg_autoscale_mode off"
+  command: "ceph config set global osd_pool_default_pg_autoscale_mode off"
   when:
-    - pg_autoscale_status.stdout != "off"
+    - (pg_autoscale_status | default([]) != "off") or (result | length == 0)
+  run_once: true
