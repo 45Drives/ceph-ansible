@@ -32,6 +32,7 @@
             "python38-netaddr",
             "python38-pyyaml",
             "python38-six",
+            "python38-jmespath",
             "samba-ansible >= 1.1.3"
         ]
     },
