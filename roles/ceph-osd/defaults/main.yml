@@ -137,7 +137,7 @@ crush_rule_hdd:
   root: default
   type: host
   class: hdd
-  default: false
+  default: true
 
 # crush_rules:
 #   - "{{ crush_rule_hdd }}"
