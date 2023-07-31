@@ -70,7 +70,7 @@ upgrade_ceph_packages: False
 ceph_stable_release: quincy
 ceph_origin: repository
 ceph_repository: custom
-ceph_custom_repo: "{% if ansible_facts['os_family'] == 'Debian' %}https://ceph.repo.45drives.com/{{ ceph_stable_release }}/debian{% elif ansible_facts['os_family'] == 'RedHat' %}https://ceph.repo.45drives.com/{{ ceph_stable_release }}/rhel/el8/ceph_{{ ceph_stable_release }}_45d.repo{% endif %}"
+ceph_custom_repo: "{% if ansible_facts['os_family'] == 'Debian' %}https://ceph.repo.45drives.com/{{ ceph_stable_release }}/debian{% elif ansible_facts['os_family'] == 'RedHat' %}https://ceph.repo.45drives.com/{{ ceph_stable_release }}/rocky/el8/ceph_{{ ceph_stable_release }}_45d.repo{% endif %}"
 ceph_custom_key: "https://repo.45drives.com/key/gpg.asc"
 
 offline_install: false
