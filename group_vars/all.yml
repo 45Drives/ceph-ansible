@@ -111,8 +111,14 @@ allow_insecure_global_reclaim: false
 cephfs: cephfs # name of the ceph filesystem
 cephfs_data_pool:
   name: "{{ cephfs_data if cephfs_data is defined else 'cephfs_data' }}"
+  pg_autoscale_mode: "off"
+  pg_num: 32
+  pgp_num: 32
 cephfs_metadata_pool:
   name: "{{ cephfs_metadata if cephfs_metadata is defined else 'cephfs_metadata' }}"
+  pg_autoscale_mode: "off"
+  pg_num: 32
+  pgp_num: 32
 cephfs_pools:
   - "{{ cephfs_data_pool }}"
   - "{{ cephfs_metadata_pool }}"
