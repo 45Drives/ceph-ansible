@@ -34,6 +34,7 @@
     - inventory_hostname in groups.get(nfs_group_name, [])
     - ansible_facts['os_family'] == 'RedHat'
     - ansible_facts['distribution_major_version'] == '8'
+    - ceph_nfs_server == 'ganesha'
 
 # NOTE (leseb): workaround for issues with ganesha and librgw
 - name: add ganesha_t to permissive domain
@@ -45,6 +46,7 @@
     - not containerized_deployment | bool
     - ansible_facts['os_family'] == 'RedHat'
     - ansible_facts['selinux']['status'] == 'enabled'
+    - ceph_nfs_server == 'ganesha'
 
 - name: nfs with external ceph cluster task related
   when:
