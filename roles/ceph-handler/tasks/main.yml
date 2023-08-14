@@ -1,6 +1,6 @@
 ---
 - name: include check_running_cluster.yml
-  include: check_running_cluster.yml
+  include_tasks: check_running_cluster.yml
 
 # We do not want to run these checks on initial deployment (`socket.rc == 0`)
 - name: set_fact handler_mon_status
