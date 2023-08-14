@@ -82,6 +82,7 @@ nfs_ganesha_stable_deb_repo: http://ppa.launchpad.net/nfs-ganesha/nfs-ganesha-4/
 nfs_ganesha_apt_keyserver: keyserver.ubuntu.com
 nfs_ganesha_apt_key_id: EA914D611053D07BD332E18010353E8834DC57CA
 libntirpc_stable_deb_repo: http://ppa.launchpad.net/nfs-ganesha/libntirpc-4/ubuntu
+
 ######################
 # CEPH CONFIGURATION #
 ######################
