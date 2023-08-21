@@ -5,8 +5,7 @@
 %include /etc/ganesha/export.d/INDEX.conf
 {% endif %}
 
-NFS_Core_Param
-{
+NFS_Core_Param {
 {% if ceph_nfs_bind_addr is defined %}
        Bind_Addr={{ ceph_nfs_bind_addr }};
 {% endif %}
@@ -132,6 +131,7 @@ RGW {
         name = "{{ rgw_client_name }}";
         {{ ganesha_rgw_section_overrides | default(None) }}
 }
+{% endif %}
 {% endif %}
 
 LOG {
