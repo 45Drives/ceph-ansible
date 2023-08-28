@@ -10,6 +10,9 @@
       set_fact:
         is_atomic: '{{ stat_ostree.stat.exists }}'
       tags: always
+    - name: set_fact container_binary is podman
+      set_fact:
+        container_binary: "podman"
     - import_role:
         name: ceph-container-engine
 
