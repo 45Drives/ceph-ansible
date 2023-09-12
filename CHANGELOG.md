@@ -1,3 +1,3 @@
-## Ceph Ansible 5.4.2-1
+## Ceph Ansible 5.4.2-2
 
-* fixes for offline installs
+* fixes for offline-installs

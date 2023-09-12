@@ -28,6 +28,8 @@ make DESTDIR=%{buildroot} install
 /usr/share/ceph-ansible/*
 
 %changelog
+* Tue Sep 12 2023 Brett Kelly <bkelly@45drives.com> 5.4.2-2
+- fixes for offline-installs
 * Tue Sep 12 2023 Brett Kelly <bkelly@45drives.com> 5.4.2-1
 - fixes for offline installs
 * Mon Jun 19 2023 Brett Kelly <bkelly@45drives.com> 5.4.1-1
