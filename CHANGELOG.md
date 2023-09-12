@@ -1,3 +1,3 @@
-## Ceph Ansible 5.4.1-1
+## Ceph Ansible 5.4.2-1
 
-* fix nfs deployment bug in ubuntu clusters
+* fixes for offline installs
