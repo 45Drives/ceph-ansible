@@ -31,8 +31,11 @@ ExecStart=/usr/bin/{{ container_binary }} run --rm --name=grafana-server \
   --memory-swap={{ grafana_container_memory * 2 }}GB \
 {% if offline_install == false %}
   -e GF_INSTALL_PLUGINS={{ grafana_plugins|join(',') }} \
-{% endif %}
   {{ grafana_container_image }}
+{% else %}
+  {{ grafana_container_offline_image }}
+{% endif %}
+
 {% if container_binary == 'podman' %}
 ExecStop=-/usr/bin/sh -c "/usr/bin/{{ container_binary }} rm -f `cat /%t/%n-cid`"
 {% else %}
