@@ -1,3 +1,9 @@
+ceph-ansible-45d (5.4.2-3focal) focal; urgency=medium
+
+  * ceph-osd: Don't attach dedicated db or wal to standalone SSD/NVMe OSD
+
+ -- Brett Kelly <bkelly@45drives.com>  Sun, 29 Oct 2023 10:49:33 -0300
+
 ceph-ansible-45d (5.4.2-2focal) focal; urgency=medium
 
   * fixes for offline-installs
