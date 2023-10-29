@@ -1,6 +1,77 @@
 ---
+# There may be mixed OSD types (spinning and no spinning) in the "_devices" varible
+# If dedictated_devices | length > 0 , when the below task runs, it will use dedicated_devices supplied and apply to each OSD, even the non-spinners. 
+# We dont want that. We only want dedicated_devices to be applied to spinners. Non-spinner OSDs are fine on their own.
 
-- name: "use ceph-volume lvm batch to create {{ osd_objectstore }} osds"
+# So when 'dedicated devices | length > 0' we need to split _devices into two lists, _devices_hdd and _devices_ssd. 
+# Loop through _devices, if "cat /sys/block/$(readlink {{ item }})/queue/rotational" is 1 then put it in _devices_hdd. if 0 then put it in _devices_ssd
+# This logic will work for both sata/sas & nvme SSDs. When direct connected, nvme will show up as "nvmeXn1" and when UBM connected they will get a device alias/sd name
+
+- name: create SSD and HDD OSDs separtaly when dedicated db or wal devices are present
+  when:
+    - (dedicated_devices | unique | length > 0) or (bluestore_wal_devices | unique | length > 0)
+    - _devices | default([]) | length > 0
+  block:
+    - name: determine drive type
+      shell: "cat /sys/block/{{ item | basename }}/queue/rotational"
+      register: drive_type
+      with_items: "{{ _devices }}"
+      changed_when: false
+
+    - name: update _devices_hdd 
+      set_fact:
+        _devices_hdd: "{{ _devices_hdd | default([]) + [item.item] }}"
+      when: item.stdout == "1"
+      loop: "{{ drive_type.results }}"
+
+    - name: update _devices_ssd
+      set_fact:
+        _devices_ssd: "{{ _devices_ssd | default([]) + [item.item] }}"
+      when: item.stdout == "0"
+      loop: "{{ drive_type.results }}"
+
+    - name: "use ceph-volume lvm batch to create hdd {{ osd_objectstore }} osds "
+      ceph_volume:
+        cluster: "{{ cluster }}"
+        objectstore: "{{ osd_objectstore }}"
+        batch_devices: "{{ _devices_hdd }}"
+        dmcrypt: "{{ dmcrypt|default(omit) }}"
+        crush_device_class: "{{ crush_device_class|default(omit) }}"
+        osds_per_device: "{{ osds_per_device }}"
+        journal_size: "{{ journal_size }}"
+        block_db_size: "{{ block_db_size }}"
+        block_db_devices: "{{ dedicated_devices | unique if dedicated_devices | length > 0 else omit }}"
+        wal_devices: "{{ bluestore_wal_devices | unique if bluestore_wal_devices | length > 0 else omit }}"
+        journal_devices: "{{ dedicated_devices | unique if dedicated_devices | length > 0 else omit }}"
+        action: "batch"
+      environment:
+        CEPH_VOLUME_DEBUG: "{{ ceph_volume_debug }}"
+        CEPH_CONTAINER_IMAGE: "{{ ceph_docker_registry + '/' + ceph_docker_image + ':' + ceph_docker_image_tag if containerized_deployment else None }}"
+        CEPH_CONTAINER_BINARY: "{{ container_binary }}"
+        PYTHONIOENCODING: utf-8
+      when: _devices_hdd | default([]) | length > 0
+      tags: prepare_osd
+
+    - name: "use ceph-volume lvm batch to create ssd {{ osd_objectstore }} osds"
+      ceph_volume:
+        cluster: "{{ cluster }}"
+        objectstore: "{{ osd_objectstore }}"
+        batch_devices: "{{ _devices_ssd }}"
+        dmcrypt: "{{ dmcrypt|default(omit) }}"
+        crush_device_class: "{{ crush_device_class|default(omit) }}"
+        osds_per_device: "{{ osds_per_device }}"
+        journal_size: "{{ journal_size }}"
+        block_db_size: "{{ block_db_size }}"
+        action: "batch"
+      environment:
+        CEPH_VOLUME_DEBUG: "{{ ceph_volume_debug }}"
+        CEPH_CONTAINER_IMAGE: "{{ ceph_docker_registry + '/' + ceph_docker_image + ':' + ceph_docker_image_tag if containerized_deployment else None }}"
+        CEPH_CONTAINER_BINARY: "{{ container_binary }}"
+        PYTHONIOENCODING: utf-8
+      when: _devices_ssd | default([]) | length > 0
+      tags: prepare_osd
+
+- name: "use ceph-volume lvm batch to create {{ osd_objectstore }} osds when dedicated db nor wal is present "
   ceph_volume:
     cluster: "{{ cluster }}"
     objectstore: "{{ osd_objectstore }}"
@@ -16,8 +87,11 @@
     action: "batch"
   environment:
     CEPH_VOLUME_DEBUG: "{{ ceph_volume_debug }}"
-    CEPH_CONTAINER_IMAGE: "{{ ceph_docker_registry + '/' + ceph_docker_image + ':' + ceph_docker_image_tag if containerized_deployment | bool else None }}"
+    CEPH_CONTAINER_IMAGE: "{{ ceph_docker_registry + '/' + ceph_docker_image + ':' + ceph_docker_image_tag if containerized_deployment else None }}"
     CEPH_CONTAINER_BINARY: "{{ container_binary }}"
     PYTHONIOENCODING: utf-8
-  when: _devices | default([]) | length > 0
+  when: 
+    - _devices | default([]) | length > 0
+    - (dedicated_devices is not defined) or (dedicated_devices | length == 0)
+    - (bluestore_wal_devices is not defined) or (bluestore_wal_devices | length == 0)
   tags: prepare_osd
