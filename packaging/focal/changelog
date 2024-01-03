@@ -1,3 +1,10 @@
+ceph-ansible-45d (5.4.3-2focal) focal; urgency=medium
+
+  * ceph-prerun: Added standalone ansible ppa for ubuntu offline installs, fixed
+    incorrect prometheus container name
+
+ -- Brett Kelly <bkelly@45drives.com>  Wed, 03 Jan 2024 09:48:31 -0400
+
 ceph-ansible-45d (5.4.3-1focal) focal; urgency=medium
 
   * ceph-prerun: Added standalone ansible ppa for ubuntu offline installs
