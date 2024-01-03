@@ -28,6 +28,8 @@ make DESTDIR=%{buildroot} install
 /usr/share/ceph-ansible/*
 
 %changelog
+* Wed Jan 03 2024 Brett Kelly <bkelly@45drives.com> 5.4.3-1
+- ceph-prerun: Added standalone ansible ppa for ubuntu offline installs
 * Sun Oct 29 2023 Brett Kelly <bkelly@45drives.com> 5.4.2-3
 - ceph-osd: Don't attach dedicated db or wal to standalone SSD/NVMe OSD
 * Tue Sep 12 2023 Brett Kelly <bkelly@45drives.com> 5.4.2-2

@@ -1,3 +1,3 @@
-## Ceph Ansible 5.4.2-3
+## Ceph Ansible 5.4.3-1
 
-* ceph-osd: Don't attach dedicated db or wal to standalone SSD/NVMe OSD
+* ceph-prerun: Added standalone ansible ppa for ubuntu offline installs

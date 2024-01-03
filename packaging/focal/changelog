@@ -1,3 +1,9 @@
+ceph-ansible-45d (5.4.3-1focal) focal; urgency=medium
+
+  * ceph-prerun: Added standalone ansible ppa for ubuntu offline installs
+
+ -- Brett Kelly <bkelly@45drives.com>  Wed, 03 Jan 2024 09:35:48 -0400
+
 ceph-ansible-45d (5.4.2-3focal) focal; urgency=medium
 
   * ceph-osd: Don't attach dedicated db or wal to standalone SSD/NVMe OSD
