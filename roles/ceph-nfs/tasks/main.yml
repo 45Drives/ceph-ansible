@@ -18,6 +18,25 @@
     - ceph_nfs_server == 'kernel'
     - ceph_nfs_rados_backend_driver == 'rados_cluster'
 
+## FAIL IF NUMBER OF VIPS IS GREATER THAN NUMBER OF GATEWAYS
+
+- name: fail if number of VIPs is greater than number of gateways
+  when: ceph_nfs_server == 'kernel'
+  block:
+  - name: set fact number of nfs hosts
+    set_fact:
+      num_nfs_hosts: "{{ groups[nfs_group_name] | length }}"
+
+  - name: set fact number of NFS VIPs configured
+    set_fact:
+      num_nfs_vips: "{{ ceph_nfs_vips | length }}"
+
+  - name: fail if number of VIPs is greater than number of gateways
+    fail:
+      msg: "Too many NFS VIPs. Number of NFS VIPs must not exceed number of nfs gateway hosts"
+    when:
+      - num_nfs_vips > num_nfs_hosts
+
 # global/common requirement
 - name: stop nfs server service
   systemd:

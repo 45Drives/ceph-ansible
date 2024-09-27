@@ -87,38 +87,14 @@
     - nfs_resource_check.rc == 1
     - ceph_nfs_server == 'ganesha'
 
-- name: Check for nfs_ip resource
-  shell: "pcs resource show nfs_ip"
-  failed_when: false
-  run_once: true
-  register: ip_resource_check
+## Loop through each set of VIPs 
 
-- name: Create Floating IP for NFS service
-  command: pcs resource create nfs_ip ocf:heartbeat:IPaddr2 ip={{ ceph_nfs_floating_ip_address }} cidr_netmask={{ ceph_nfs_floating_ip_cidr }} nic={{ ceph_nfs_floating_ip_interface }} op monitor interval=10s
-  run_once: true
-  when: ip_resource_check.rc == 1
-
-- name: Set constraint on cluster resources
-  when: ceph_nfs_server == 'ganesha'
-  block:
-  - name: Check for resource constraint
-    shell: "pcs constraint | grep 'nfs_server with nfs_ip'"
-    failed_when: false
-    run_once: true
-    register: resource_constraint_check
-
-  - name: Set constraint on cluster resources
-    command: pcs constraint colocation add nfs_server with nfs_ip INFINITY
-    run_once: true
-    when: 
-      - resource_constraint_check.rc == 1
-
-- name: set pcs tuning options
-  command: pcs resource update nfs_ip op {{ item }} interval=0s timeout=5s
-  run_once: true
-  with_items:
-    - start
-    - stop
+- name: configure VIP resources
+  include_tasks: "configure_vip_resorces.yml"
+  loop: "{{ ceph_nfs_vips }}"
+  loop_control:
+    loop_var: vip
+    index_var: idx
 
 - name: write nfs config to use static mountd ports on debian/ubuntu
   when: ansible_facts['os_family'] == 'Debian'

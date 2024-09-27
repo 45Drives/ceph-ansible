@@ -1,0 +1,23 @@
+---
+- name: Check for nfs_ip resource
+  shell: "pcs resource show nfs_ip_{{ idx }}"
+  failed_when: false
+  run_once: true
+  register: ip_resource_check
+
+- name: Create Floating IP resource nfs_ip_
+  command: pcs resource create nfs_ip_{{ idx }} ocf:heartbeat:IPaddr2 ip={{ vip.ip_address }} cidr_netmask={{ vip.cidr }} nic={{ vip.interface }} op monitor interval=10s
+  run_once: true
+  when: ip_resource_check.rc == 1
+
+- name: set pcs tuning options
+  command: pcs resource update nfs_ip_{{ idx }} op {{ item }} interval=0s timeout=5s
+  run_once: true
+  with_items:
+    - start
+    - stop
+
+- name: constrain nfs_ip_{{ idx }} to {{ nfs_host_ips[{{ idx }}] }}
+  command: pcs constraint location nfs_ip_{{ idx }} prefers "{{ nfs_host_ips[idx] }}"
+  run_once: true
+
