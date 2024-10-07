@@ -28,6 +28,8 @@ make DESTDIR=%{buildroot} install
 /usr/share/ceph-ansible/*
 
 %changelog
+* Mon Oct 07 2024 Brett Kelly <bkelly@45drives.com> 5.4.4-1
+- updated alerting rules
 * Wed Jan 03 2024 Brett Kelly <bkelly@45drives.com> 5.4.3-2
 - ceph-prerun: Added standalone ansible ppa for ubuntu offline installs, fixed incorrect
   prometheus container name
