@@ -45,7 +45,7 @@
         set_fact:
           _devices: "{{ devices | difference(_rejected_devices | default([])) }}"
 
-      - name: run 'ceph-volume lvm batch --report' to see how many osds are to be created
+      - name: 
         ceph_volume:
           cluster: "{{ cluster }}"
           objectstore: "{{ osd_objectstore }}"

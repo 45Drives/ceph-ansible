@@ -12,9 +12,10 @@
 
 - name: fail if floating IP interface does not exist
   fail:
-    msg: "floating IP interface [{{ ceph_nfs_floating_ip_interface }}] does not exist on this host"
+    msg: "floating IP interface [{{ item.interface }}] does not exist on this host"
+  loop: "{{ ceph_nfs_vips }}"
   when:
-    - ceph_nfs_floating_ip_interface not in ansible_interfaces
+    - item.interface not in ansible_interfaces
     - ceph_nfs_server == 'kernel'
     - ceph_nfs_rados_backend_driver == 'rados_cluster'
 

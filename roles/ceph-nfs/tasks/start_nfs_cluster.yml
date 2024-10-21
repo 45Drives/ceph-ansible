@@ -90,7 +90,7 @@
 ## Loop through each set of VIPs 
 
 - name: configure VIP resources
-  include_tasks: "configure_vip_resorces.yml"
+  include_tasks: "configure_vip_resources.yml"
   loop: "{{ ceph_nfs_vips }}"
   loop_control:
     loop_var: vip

@@ -17,7 +17,7 @@
     - start
     - stop
 
-- name: constrain nfs_ip_{{ idx }} to {{ nfs_host_ips[{{ idx }}] }}
+- name: constrain nfs_ips
   command: pcs constraint location nfs_ip_{{ idx }} prefers "{{ nfs_host_ips[idx] }}"
   run_once: true
 
