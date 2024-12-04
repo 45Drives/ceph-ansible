@@ -28,6 +28,8 @@ make DESTDIR=%{buildroot} install
 /usr/share/ceph-ansible/*
 
 %changelog
+* Wed Dec 04 2024 Brett Kelly <bkelly@45drives.com> 5.4.6-1
+- remove multiple nfs vips
 * Mon Oct 21 2024 Brett Kelly <bkelly@45drives.com> 5.4.5-1
 - ceph-nfs - update nfs validation task
 * Mon Oct 07 2024 Brett Kelly <bkelly@45drives.com> 5.4.4-1
