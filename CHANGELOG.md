@@ -1,3 +1,3 @@
-## Ceph Ansible 5.4.6-1
+## Ceph Ansible 5.4.7-1
 
-* remove multiple nfs vips
+* ceph-nfs: updated interface validation task
