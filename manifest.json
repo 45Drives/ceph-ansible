@@ -4,7 +4,7 @@
     "title": "Ceph Ansible",
     "stable": false,
     "version": "5.4.7",
-    "build_number": "1",
+    "build_number": "2",
     "author": "Brett Kelly <bkelly@45drives.com>",
     "git_url": "https://github.com/45Drives/ceph-ansible",
     "license": "GPL-3.0+",
