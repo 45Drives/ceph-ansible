@@ -1,5 +1,5 @@
 {
-    "schema_version": "45D-R1",
+    "schema_version": "45D_AP_V2.0",
     "name": "ceph-ansible-45d",
     "title": "Ceph Ansible",
     "stable": false,
